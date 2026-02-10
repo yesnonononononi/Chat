@@ -1,0 +1,88 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: Chat-server
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/chat?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+  rabbitmq:
+    port: 5672
+    virtual-host:
+    password: guest
+    host: localhost
+    username: guest
+    template:
+      mandatory: true
+      retry:
+        enabled: true
+        initial-interval: 1000
+        max-interval: 10000
+        multiplier: 2
+        max-retries: 3
+    publisher-confirm-type: correlated
+    publisher-returns: true
+    connection-timeout: 1s
+    listener:
+      simple:
+        default-requeue-rejected: false
+  data:
+    aliyun:
+      endpoint: dypnsapi.aliyuncs.com
+      sign-name: 速通互联验证码
+      template-code: 100001
+      template-param: '{"code":"##code##","min":"5"}'
+      code-type: 1
+      valid-time: 120
+      code-length: 6
+
+      bucket-name: summit-chat
+      endpointForOss: oss-cn-beijing.aliyuncs.com
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+      timeout: 3000ms
+      lettuce:
+        pool:
+          max-active: 8        # 最大活跃连接数
+          max-idle: 8          # 最大空闲连接数
+          min-idle: 2          # 最小空闲连接数
+          max-wait: 3000ms     # 连接池耗尽时的等待时间（-1表示无限等待）
+
+
+
+socket:
+  io:
+    port: 9090
+
+mybatis:
+  mapper-locations: classpath*:mapper/*.xml
+  type-aliases-package: com.summit.chat
+  configuration:
+      map-underscore-to-camel-case: true
+
+# Swagger配置
+springdoc:
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  group-configs:
+    - group: 'default'
+      paths-to-match: '/**'
+      packages-to-scan: com.summit.chat
+
+logging:
+  level:
+    org.springframework.security: DEBUG  # 打印授权、拦截的详细日志
+    org.springframework.web: INFO
+    org.springdoc: DEBUG  # 启用springdoc日志
+    org.slf4j: DEBUG
