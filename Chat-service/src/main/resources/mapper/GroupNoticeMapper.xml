@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.summit.chat.Mapper.GroupNoticeMapper">
+
+    <insert id="insert" parameterType="com.summit.chat.model.entity.GroupNotice">
+        insert into group_notice (
+            group_id, publisher_id, content, create_time, update_time, is_deleted
+        ) values (
+            #{groupId}, #{publisherId}, #{content}, #{createTime}, #{updateTime}, #{isDeleted}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.summit.chat.model.entity.GroupNotice">
+        update group_notice
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="groupId != null">group_id = #{groupId},</if>
+            <if test="publisherId != null">publisher_id = #{publisherId},</if>
+            <if test="content != null and content != ''">content = #{content},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="isDeleted != null">is_deleted = #{isDeleted},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="batchDelete">
+        update group_notice 
+        set is_deleted = 1 
+        where id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        and group_id = #{groupId}
+    </update>
+
+</mapper>

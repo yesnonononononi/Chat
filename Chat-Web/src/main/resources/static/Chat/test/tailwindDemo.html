@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8" />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-blue-100 p-10">
+  <div
+    class=" relative group bg-white lg:h-auto max-w-lg lg:max-w-md mx-auto rounded-xl text-3xl lg:text-xl hover:ring-indigo-700/50 hover:ring-2 hover:outline-none">
+    <div class="flex items-center justify-between border-b-2 select-none">
+      <i class="group-hover:text-indigo-500 font-bold m-4 ">用户详情</i>
+      <button type="button" class="text-blue-500 mx-4 mt-4">编辑</button>
+    </div>
+    <div class="flex items-center gap-4">
+
+
+      <img class="w-16 h-16 bg-gray-200 rounded-full m-4" src="https://img-s.msn.cn/tenant/amp/entityid/AA11MPlT?w=0&h=0&q=60&m=6&f=jpg&u=t"/>
+        
+     
+
+      <div>
+        <p class="font-bold mb-4">username</p>
+        <p>张三@qq.com</p>
+      </div>
+      <div class="h-24 flex-1 flex flex-col justify-center items-center">
+        <label for="toggle" class="flex relative cursor-pointer">
+          <input type="checkbox" class="sr-only peer" id="toggle">
+          <!--轨道 -->
+          <div class="relative w-16 h-8 border border-indigo-600 bg-white rounded-full peer-checked:bg-blue-500/50 transition-colors duration-300 "></div>
+          <!-- 滑块 -->
+          <div
+            class="absolute left-1 top-1 bottom-1 w-6 h-6 rounded-full bg-gray-500 peer-checked:bg-green-500 peer-checked:translate-x-8 transition-transform duration-300">
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <!--  <div class="absolute inset-0 opacity-0 bg-gray-700/50 group-hover:opacity-100 flex flex-col items-center justify-center
+    transition-opacity duration-200 rounded-xl
+    ">
+      <svg class="w-12 h-12 text-indigo-600 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+      </svg>
+    </div> -->
+  </div>
+
+
+
+
+
+
+  <!-- 
+  group-hover 的基本规则
+
+在父元素上加 group 类（随便加在哪里都行，通常加在最外层 div）
+在子元素上加 group-hover:xxx 前缀
+只要鼠标在父元素任何地方 hover，子元素的 group-hover: 样式就会生效
+ -->
+
+  <!-- 
+ peer 的基本规则
+
+在要被“监听”的元素上加 peer 类（通常是 input、checkbox、button 等可交互元素）
+在后面的兄弟元素上加 peer-hover:xxx、peer-focus:xxx 等前缀
+只要鼠标 hover / focus 在 peer 元素上，后面的兄弟元素的 peer-* 样式就会生效
+ -->
+
+
+  <!-- 
+ 3. select-none / user-select（是否允许选中文字）
+控制用户能不能用鼠标选中/复制文字。
+
+select-none
+→ 完全不能选中文字（最常用）
+→ 场景：
+按钮、图标、导航菜单（不想让用户误选文字）
+代码块标题、卡片标签
+防止在拖拽时选中文字
+
+select-text     → 允许正常选中（默认）
+select-all      → 一点击就全选
+select-auto     → 浏览器默认行为
+ -->
+
+  <!--
+  data-[*]: 的基本规则
+写法：data-属性名="值":样式
+
+data-state="open":rotate-180
+
+→ 当元素的 data-state="open" 时，旋转 180°
+
+data-[size=large]:text-3xl
+
+→ 当 data-size="large" 时，文字变 3xl 大小
+
+data-[theme=dark]:bg-gray-900
+
+→ 当 data-theme="dark" 时，背景变深灰
+
+最常见的是 data-state、data-active、data-disabled、data-checked 等（很多组件库如 Headless UI、Radix UI、Shadcn UI 都用这个约定）。
+ -->
+
+</body>
+
+</html>

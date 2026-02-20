@@ -1,0 +1,104 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 修复 Element Plus 与 TailwindCSS Forms 插件冲突导致的双重边框问题 */
+/* 只移除原生input的边框和阴影，不影响Element Plus的wrapper */
+.el-input__inner,
+.el-textarea__inner {
+  border: none !important;
+  box-shadow: none !important;
+  background-color: transparent; /* 确保背景透明，不遮挡wrapper */
+}
+
+/* 保持Focus状态下的样式清理 */
+.el-input__inner:focus,
+.el-textarea__inner:focus {
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* 针对el-form内部的input进行特殊处理，确保其可见性和可交互性 */
+.el-form .el-input__wrapper {
+  width: 100%;
+}
+
+@layer components {
+  /* 暗黑,白亮主题 */
+  .theme-dark {
+    --theme-color: white; 
+    --theme-bg: rgba(10, 10, 10, 1);
+    @apply bg-[var(--theme-bg)] text-white transition-all duration-500;
+  }
+  .theme-dark .menu-item {
+    @apply glow-white;
+  }
+
+  .theme-light {
+    --theme-color: black; 
+    --theme-bg:white;
+    @apply bg-[var(--theme-bg)] text-black transition-all duration-500;
+  }
+
+  .theme-light .span {
+    @apply text-black;
+  }
+
+  .theme-light .el-icon {
+    @apply text-black;
+  }
+
+  .theme-light .menu-item {
+    color: var(--theme-color) !important; 
+  }
+
+  /* hover时发光字体 */
+  /* 组件层封装,使用glow-white text-red时确保red生效 */
+  .glow-white {
+    @apply text-[var(--theme-color)]  font-bold cursor-pointer transition-all duration-300;
+     
+  }
+
+  .glow-white:hover {
+    text-shadow:
+      0 0 8px rgba(255, 255, 225, 1),
+      0 0 20px rgba(255, 255, 255, 0.9),
+      0 0 40px rgba(255, 255, 255, 0.7),
+      0 0 80px rgba(255, 255, 255, 0.5);
+  }
+
+  /* 下划线中心扩展  scaleX(0) => scaleX(1) transform-origin: center; */
+  .menu-item {
+    @apply relative z-10 text-center;
+  }
+
+  .menu-item::after {
+    position: absolute;
+    content: "";
+    left: 0;
+    bottom: -6px;
+    transform-origin: center;
+    transform: scaleX(0);
+    background: linear-gradient(90deg, transparent, var(--theme-color), transparent);
+    width: 100%;
+    height: 2px;
+    transition: transform 0.35s ease;
+  }
+  .menu-item:hover::after {
+    transform: scaleX(1);
+  }
+
+  /* 发光字体 */
+  .font-glow {
+    text-shadow:
+      0 0 4px rgba(255, 255, 225, 1),
+      0 0 8px rgba(255, 255, 255, 0.8),
+      0 0 10px rgba(255, 255, 255, 0.6),
+      0 0 14px rgba(255, 255, 225, 0.4);
+  }
+
+  :root {
+    --theme-color: white;
+    --theme-bg:white;
+  }
+}

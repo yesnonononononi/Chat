@@ -1,0 +1,17 @@
+{
+  "files": [],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    },
+    {
+      "path": "./tsconfig.app.json"
+    }
+  ],
+
+  "compilerOptions": {
+    "types": ["vite/client", "node"] // 包含 Node.js 和 Vite 客户端类型
+  }
+
+}
+

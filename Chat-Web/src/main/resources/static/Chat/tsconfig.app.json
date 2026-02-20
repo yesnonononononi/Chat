@@ -1,0 +1,21 @@
+{
+  "extends": "@vue/tsconfig/tsconfig.dom.json",
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"],
+  "exclude": ["src/**/__tests__/*"],
+  "compilerOptions": {
+    // 核心：保留基础严格模式（避免隐式 any，TS 核心价值）
+    "strict": true,
+    // 关闭冗余严格规则（减少你的开发负担）
+    "strictNullChecks": true, // 保留空值校验（避免 null/undefined 报错，核心安全）
+    "strictPropertyInitialization": false, // 关闭「类属性必须初始化」（非必要）
+    "noUnusedParameters": false, // 关闭「未使用参数报错」（开发中临时注释不麻烦）
+    "noUnusedLocals": false, // 关闭「未使用变量报错」（同上）
+    "skipLibCheck": true, // 跳过第三方库（如 Element Plus）的类型校验（避免冲突）
+    "allowJs": true, // 允许项目中混合 JS 文件（万一需要复用之前的 JS 代码）
+    "resolveJsonModule": true, // 允许导入 JSON 文件（常用功能）
+    "baseUrl": ".", // 基础路径，方便导入（如 import '@/components/xxx'）
+    "paths": {
+      "@/*": ["src/*"] // 配置别名 @ 指向 src（和 JS 项目一致，无需改）
+    }
+  }
+}

@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8" />
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="m-0 p-0 ">
+    <div class="absolute inset-0 bg-gray-100/20 z-[-1]"></div>
+    <!-- 导航栏 -->
+    <div class="flex justify-between min-h-4 mt-4 p-4">
+        <span class="text-2xl ml-8 text-black font-bold select-none ">logo</span>
+        <div class="flex justify-around items-center gap-16">
+            <label for="price" class="hover:text-indigo-300 cursor-pointer font-bold">定价</label>
+            <label for="product" class="hover:text-indigo-300 cursor-pointer font-bold">产品</label>
+            <div class="relative ">
+                <input type="text" class="
+                flex-1  border rounded-xl focus:ring-2 focus: ring-indigo-500 focus:outline-none" />
+                <span class="absolute right-1 cursor-pointer hover:text-indigo-400 ">
+                    搜索
+                </span>
+            </div>
+            <div class="relative  flex justify-around items-center gap-x-2 mr-4">
+                <div class=" group">
+                    <div class=" mr-0 p-2 cursor-pointer"><img class="w-12 h-12  rounded-full" src="https://img-s.msn.cn/tenant/amp/entityid/AA11MPlT?w=0&h=0&q=60&m=6&f=jpg&u=t"/></div>
+                    <div
+                        class=" absolute pointer-events-none  z-10 top-full mt-2 right-8 opacity-0 group-hover:-translate-y-3 group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-700 ">
+                        <div class="flex flex-col gap-y-6 max-w-[272px] h-56 border ">
+                            <div class="h-8 border mx-4 mt-4 bg-gray-700 cursor-pointer rounded-xl text-center ">
+                                <label for="get_vip">
+                                    <span class="inline-block text-white font-bold cursor-pointer" id="get_vip">
+                                        立即充值会员
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="flex justify-between items-center mx-6">
+                                <div>
+                                    <div class="w-8 h-8 border rounded-full bg-gray-300 cursor-pointer"></div>
+                                    <span class="select-none">登录</span>
+                                </div>
+                                <div>
+                                    <div class="w-8 h-8 border rounded-full bg-gray-300 cursor-pointer"></div>
+                                    <span class="select-none">注册</span>
+                                </div>
+                                <div>
+                                    <div class="w-8 h-8 border rounded-full bg-gray-300 cursor-pointer"></div>
+                                    <span class="select-none">找回</span>
+                                </div>
+                            </div>
+                            <span class="inline-block text-center text-sm text-gray-400">
+                                快速登录
+                            </span>
+                            <div
+                                class="flex flex-col mx-[100px] border rounded-xl mb-2 w-16 h-36 bg-green-500 cursor-pointer">
+                                <span class="text-center text-white text-sm font-bold select-none">微信登录</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <label for="" class="hover:text-red-500 cursor-pointer">充值vip</label>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- pointer-events-none : 脱离鼠标命中区域,可以暂时不被hover判定,当hover到触发区时,再设置为auto,使能够hover这片区域,避免消失 -->
+</body>

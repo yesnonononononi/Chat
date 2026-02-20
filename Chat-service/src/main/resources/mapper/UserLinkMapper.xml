@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.summit.chat.Mapper.UserLinkMapper">
+  <select id="getLinkById" resultType="com.summit.chat.model.vo.UserLinkVO">
+      -- 场景1：当前用户作为 user_id，好友是 link_user_id
+      SELECT
+          u.icon,
+          ul.link_user_id AS linkId,
+          u.nick_name AS nickName,
+          ul.is_frequent,
+          ul.remark,
+          ul.is_delete
+      FROM user_link ul
+               INNER JOIN user u ON ul.link_user_id = u.id
+      WHERE ul.user_id = #{userID}
+        AND ul.is_delete = 0  -- 过滤已删除的好友
+      UNION
+-- 场景2：当前用户作为 link_user_id，好友是 user_id
+      SELECT
+          u.icon,
+          ul.user_id AS linkId,  -- 此时好友ID是 user_id
+          u.nick_name AS nickName,
+          ul.is_frequent,
+          ul.remark,
+          ul.is_delete
+      FROM user_link ul
+               INNER JOIN user u ON ul.user_id = u.id  -- 关联好友的 user 信息
+      WHERE ul.link_user_id = #{userID}
+        AND ul.is_delete = 0;
+  </select>
+
+    <insert id="saveLink">
+        insert user_link(link_user_id, user_id, remark,is_frequent) values (#{linkID},#{userID},#{remark},#{isFrequent})
+        ON DUPLICATE KEY UPDATE
+        is_delete = 0,
+        remark = VALUES(remark),
+        is_frequent = VALUES(is_frequent)
+    </insert>
+
+    <select id="linkExist" resultType="java.lang.Integer">
+        select exists(select 1 from user_link where( (user_id = #{userID} and link_user_id = #{linkID}) or (user_id = #{linkID} and link_user_id = #{userID})) and is_delete = 0 )
+    </select>
+</mapper>
