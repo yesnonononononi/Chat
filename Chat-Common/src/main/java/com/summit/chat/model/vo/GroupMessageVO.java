@@ -5,12 +5,13 @@ import com.summit.chat.Enum.MsgType;
 import lombok.Data;
 
 import java.sql.Timestamp;
+import java.io.Serializable;
 
 /**
  * <p>消息体</p>
  */
 @Data
-public class GroupMessageVO {
+public class GroupMessageVO implements Serializable {
     /**
      * 群id
      */

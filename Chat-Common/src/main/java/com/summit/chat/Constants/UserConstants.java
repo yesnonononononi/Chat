@@ -40,4 +40,5 @@ public class UserConstants {
     public static final String PW_ERROR = "密码错误";
     public static final int DEFAULT_VERIFY_CODE_LENGTH = 6;
     public static final String PHONE_INVALID = "手机号格式错误";
+    public static final String SET_NOT_SUPER_ADMIN = "用户不存在或者已经是管理员了";
 }

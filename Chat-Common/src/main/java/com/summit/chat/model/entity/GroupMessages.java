@@ -2,11 +2,13 @@ package com.summit.chat.model.entity;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
 /**
  * 群聊消息表
  */
-public class GroupMessages {
+public class GroupMessages implements Serializable {
 
 
   /**

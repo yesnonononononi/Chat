@@ -5,10 +5,13 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.core.SessionCallback;
+import org.springframework.data.redis.RedisSystemException;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
@@ -35,31 +38,68 @@ public class RedisProcessor implements Cache{
 
 
     public void set(String key, Object value) {
-        opsStr.set(key, StrUtil.toString(value));
+        try {
+            opsStr.set(key, StrUtil.toString(value));
+        } catch (RedisConnectionFailureException | RedisSystemException e) {
+            log.error("【Redis缓存】设置缓存失败, key: {}, 错误: {}", key, e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error("【Redis缓存】设置缓存时发生未知错误, key: {}", key, e);
+            throw new RuntimeException("缓存操作失败", e);
+        }
     }
 
     public void set(String key, Object value,Long duration,TimeUnit timeUnit) {
-        opsStr.set(key, StrUtil.toString(value),duration,timeUnit);
+        try {
+            opsStr.set(key, StrUtil.toString(value),duration,timeUnit);
+        } catch (RedisConnectionFailureException | RedisSystemException e) {
+            log.error("【Redis缓存】设置带过期时间的缓存失败, key: {}, 错误: {}", key, e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error("【Redis缓存】设置带过期时间的缓存时发生未知错误, key: {}", key, e);
+            throw new RuntimeException("缓存操作失败", e);
+        }
     }
 
 
     public <T> T get(String key, Class<? extends T> type) {
-        String res = opsStr.get(key);
-        if(StrUtil.isBlank(res)){
+        try {
+            String res = opsStr.get(key);
+            if(StrUtil.isBlank(res)){
+                return null;
+            }
+            return JSONUtil.parse(res).toBean(type);
+        } catch (RedisConnectionFailureException | RedisSystemException e) {
+            log.error("【Redis缓存】获取缓存失败, key: {}, 错误: {}", key, e.getMessage());
+            return null; // 缓存获取失败时返回null，不影响业务流程
+        } catch (Exception e) {
+            log.error("【Redis缓存】获取缓存时发生未知错误, key: {}", key, e);
             return null;
         }
-        return JSONUtil.parse(res).toBean(type);
     }
 
 
     public void expire(String key, Long duration, TimeUnit timeUnit) {
-        redis.expire(key, duration, timeUnit);
+        try {
+            redis.expire(key, duration, timeUnit);
+        } catch (RedisConnectionFailureException | RedisSystemException e) {
+            log.error("【Redis缓存】设置过期时间失败, key: {}, 错误: {}", key, e.getMessage());
+        } catch (Exception e) {
+            log.error("【Redis缓存】设置过期时间时发生未知错误, key: {}", key, e);
+        }
     }
 
 
     public boolean exist(String key) {
-
-        return redis.hasKey(key);
+        try {
+            return redis.hasKey(key);
+        } catch (RedisConnectionFailureException | RedisSystemException e) {
+            log.error("【Redis缓存】检查key是否存在失败, key: {}, 错误: {}", key, e.getMessage());
+            return false;
+        } catch (Exception e) {
+            log.error("【Redis缓存】检查key是否存在时发生未知错误, key: {}", key, e);
+            return false;
+        }
     }
 
     /**
@@ -69,43 +109,97 @@ public class RedisProcessor implements Cache{
      */
 
     public void putAll(String hashName, Object entry) {
-        Map<String, Object> map = BeanUtil.beanToMap(entry);
-        map.replaceAll((key,value)->StrUtil.toStringOrEmpty(value));
-        opsHash.putAll(hashName, map);
+        try {
+            Map<String, Object> map = BeanUtil.beanToMap(entry);
+            map.replaceAll((key,value)->StrUtil.toStringOrEmpty(value));
+            opsHash.putAll(hashName, map);
+        } catch (RedisConnectionFailureException | RedisSystemException e) {
+            log.error("【Redis缓存】批量设置hash失败, hashName: {}, 错误: {}", hashName, e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error("【Redis缓存】批量设置hash时发生未知错误, hashName: {}", hashName, e);
+            throw new RuntimeException("缓存操作失败", e);
+        }
     }
 
 
     public void put(String hashName, String key, Object value) {
-        opsHash.put(hashName, key, value);
+        try {
+            opsHash.put(hashName, key, value);
+        } catch (RedisConnectionFailureException | RedisSystemException e) {
+            log.error("【Redis缓存】设置hash字段失败, hashName: {}, key: {}, 错误: {}", hashName, key, e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error("【Redis缓存】设置hash字段时发生未知错误, hashName: {}, key: {}", hashName, key, e);
+            throw new RuntimeException("缓存操作失败", e);
+        }
     }
 
 
     public String get(String hashName, String key) {
-        Object o = opsHash.get(hashName, key);
-        if(o==null){
+        try {
+            Object o = opsHash.get(hashName, key);
+            if(o==null){
+                return null;
+            }
+            return o.toString();
+        } catch (RedisConnectionFailureException | RedisSystemException e) {
+            log.error("【Redis缓存】获取hash字段失败, hashName: {}, key: {}, 错误: {}", hashName, key, e.getMessage());
+            return null;
+        } catch (Exception e) {
+            log.error("【Redis缓存】获取hash字段时发生未知错误, hashName: {}, key: {}", hashName, key, e);
             return null;
         }
-        return o.toString();
     }
 
     public Map getAllForHash(String key){
-        //获取哈希的所有键值对
-        Map<Object, Object> entries = opsHash.entries(key);
-        return entries;
+        try {
+            //获取哈希的所有键值对
+            Map<Object, Object> entries = opsHash.entries(key);
+            return entries;
+        } catch (RedisConnectionFailureException | RedisSystemException e) {
+            log.error("【Redis缓存】获取hash所有字段失败, key: {}, 错误: {}", key, e.getMessage());
+            return null;
+        } catch (Exception e) {
+            log.error("【Redis缓存】获取hash所有字段时发生未知错误, key: {}", key, e);
+            return null;
+        }
     }
 
     
 
     public Boolean deleteHash(String key) {
-        return redis.delete(key);  // 修复：使用redis.delete()删除整个哈希表，而不是opsHash.delete()
+        try {
+            return redis.delete(key);
+        } catch (RedisConnectionFailureException | RedisSystemException e) {
+            log.error("【Redis缓存】删除hash失败, key: {}, 错误: {}", key, e.getMessage());
+            return false;
+        } catch (Exception e) {
+            log.error("【Redis缓存】删除hash时发生未知错误, key: {}", key, e);
+            return false;
+        }
     }
 
     public List<Object> executePipelined(SessionCallback<?> session) {
-        return redis.executePipelined(session);
+        try {
+            return redis.executePipelined(session);
+        } catch (RedisConnectionFailureException | RedisSystemException e) {
+            log.error("【Redis缓存】执行管道操作失败, 错误: {}", e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error("【Redis缓存】执行管道操作时发生未知错误", e);
+            throw new RuntimeException("缓存管道操作失败", e);
+        }
     }
 
     public void remove(String key){
-         redis.delete(key);
+        try {
+            redis.delete(key);
+        } catch (RedisConnectionFailureException | RedisSystemException e) {
+            log.error("【Redis缓存】删除key失败, key: {}, 错误: {}", key, e.getMessage());
+        } catch (Exception e) {
+            log.error("【Redis缓存】删除key时发生未知错误, key: {}", key, e);
+        }
     }
 
 }

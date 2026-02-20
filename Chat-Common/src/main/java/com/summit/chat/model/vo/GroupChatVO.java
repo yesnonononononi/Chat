@@ -2,13 +2,14 @@ package com.summit.chat.model.vo;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 /**
  * 群聊信息表vo
  */
 @Data
-public class GroupChatVO {
+public class GroupChatVO implements Serializable {
     private Long id;
     private String groupName;
     private String groupDescription;

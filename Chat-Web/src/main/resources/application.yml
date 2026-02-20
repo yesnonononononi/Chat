@@ -8,11 +8,11 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/chat?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
     username: root
-    password: YOUR_DB_PASSWORD
+    password: root
   rabbitmq:
     port: 5672
     virtual-host:
-    password: YOUR_RABBITMQ_PASSWORD
+    password: guest
     host: localhost
     username: guest
     template:
@@ -38,21 +38,23 @@ spring:
       code-type: 1
       valid-time: 120
       code-length: 6
-      access-key-id: YOUR_ALIYUN_ACCESS_KEY_ID
-      access-key-secret: YOUR_ALIYUN_ACCESS_KEY_SECRET
+      access-key-id: ${ALIYUN_ACCESS_KEY_ID:your_access_key_id}
+      access-key-secret: ${ALIYUN_ACCESS_KEY_SECRET:your_access_key_secret}
       bucket-name: summit-chat
       endpointForOss: oss-cn-beijing.aliyuncs.com
     redis:
       host: localhost
       port: 6379
       database: 0
-      timeout: 3000ms
+      timeout: 5000ms        # 增加超时时间
+      connect-timeout: 5000ms # 连接超时时间
       lettuce:
         pool:
-          max-active: 8        # 最大活跃连接数
-          max-idle: 8          # 最大空闲连接数
-          min-idle: 2          # 最小空闲连接数
-          max-wait: 3000ms     # 连接池耗尽时的等待时间（-1表示无限等待）
+          max-active: 16       # 增加最大活跃连接数
+          max-idle: 16         # 增加最大空闲连接数
+          min-idle: 4          # 增加最小空闲连接数
+          max-wait: 5000ms     # 增加连接池等待时间
+        shutdown-timeout: 100ms # 优雅关闭超时时间
 
 
 
@@ -62,8 +64,8 @@ socket:
 
 
 livekit:
-  secret: YOUR_LIVEKIT_SECRET
-  apiKey: YOUR_LIVEKIT_API_KEY
+  secret: ${LIVEKIT_SECRET:your_livekit_secret}
+  apiKey: ${LIVEKIT_API_KEY:your_livekit_api_key}
 
 
 mybatis:

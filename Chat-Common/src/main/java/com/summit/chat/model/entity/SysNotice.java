@@ -1,9 +1,16 @@
 package com.summit.chat.model.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
 
 @Data
-public class SysNotice {
+@AllArgsConstructor
+@NoArgsConstructor
+public class SysNotice implements Serializable {
   private long id;
   private String msg;
   private java.sql.Timestamp createTime;

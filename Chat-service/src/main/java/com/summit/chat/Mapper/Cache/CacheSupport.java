@@ -1,5 +1,8 @@
 package com.summit.chat.Mapper.Cache;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.summit.chat.Constants.BaseConstants;
+import com.summit.chat.Constants.UserConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.stereotype.Component;
@@ -12,11 +15,13 @@ import java.util.function.Function;
 @Component
 public class CacheSupport implements Cache{
 
+    private final ObjectMapper objectMapper;
     RedisProcessor processor;
     Validator validator;
-    public CacheSupport(RedisProcessor processor,Validator validator) {
+    public CacheSupport(RedisProcessor processor, Validator validator, ObjectMapper objectMapper) {
         this.processor = processor;
         this.validator = validator;
+        this.objectMapper = objectMapper;
     }
 
     public <T>T get(String  tableId,Class<T>tClass){
@@ -27,35 +32,7 @@ public class CacheSupport implements Cache{
         return cacheName + ":" + key;
     }
 
-    /**
-     * 查询操作+缓存
-     * @param cacheName 缓存业务前缀如:user:profile
-     * @param tableId 缓存键:这里为id: user:profile:<id>
-     * @param function 数据库查询操作函数
-     * @return 返回查询到的结果,如果为null,代表没有查询到结果
-     * @param <T> 方法的参数类型
-     * @param <R> 方法的返回值
-     */
-    public <T,R> R get(String cacheName,T tableId , Function<T,R> function){
-        String id = String.valueOf(tableId);
-        //从缓存中获取
-        Map allForHash = processor.getAllForHash(buildKey(cacheName, id));
 
-        //检查是否获取到
-        if (validator.baseValidate(allForHash)) {
-            //获取到了,就返回
-            return (R) allForHash;
-        }
-        //否则查数据库
-
-        return function.apply(tableId);
-    }
-
-
-    public <T,R> void edit(String cacheName,T tableId,Function<T,R>function){
-        //直接改数据库
-        function.apply(tableId);
-    }
 
 
     public void expire(String cacheName, String key, Long duration, TimeUnit timeUnit){

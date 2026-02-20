@@ -1,11 +1,13 @@
 package com.summit.chat.model.vo;
 
 import lombok.Data;
+import java.io.Serializable;
+
 /**
  * 群聊信息表vo
  */
 @Data
-public class GroupMessagesVO {
+public class GroupMessagesVO implements Serializable {
     private Long id;
     private Long groupId;
     private Long senderNickName;

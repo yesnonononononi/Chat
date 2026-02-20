@@ -97,7 +97,7 @@ export class UserApi {
   }
 
     static async putPw(body:userPwPutDto){
-      return ApiHelper.handle(request.put("/user/pw",body));
+      return ApiHelper.handle(request.post("/user/pw",body));
     }
  
 

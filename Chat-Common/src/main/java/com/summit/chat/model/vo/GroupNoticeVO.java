@@ -1,12 +1,13 @@
 package com.summit.chat.model.vo;
 
 import lombok.Data;
+import java.io.Serializable;
 
 @Data
 /**
  * 群公告VO
  */
-public class GroupNoticeVO {
+public class GroupNoticeVO implements Serializable {
 
   /**
    * 公告ID

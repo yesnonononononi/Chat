@@ -1,13 +1,20 @@
 package com.summit.chat.model.entity;
 
 import com.summit.chat.Enum.GroupStatusEnum;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 /**
  * 群组成员表
  */
-public class GroupMembers {
+public class GroupMembers implements Serializable {
 
 
   /**

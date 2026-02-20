@@ -41,8 +41,7 @@ public class CacheSetNode implements RegisterHandleChain {
 
         String id = userVO.getId();
         try {
-            cacheSupport.putAll(UserConstants.CACHE_USER_PROFILE_HASH + ":" + id, userVO);
-            cacheSupport.expire(UserConstants.CACHE_USER_PROFILE_HASH, id, UserConstants.NAME_TIMEOUT, TimeUnit.HOURS);
+            // 只缓存Token信息，用户信息由Spring Cache接管（懒加载）
             cacheSupport.put(UserConstants.CACHE_USER_TOKEN + ":" + token, "USERID", id);
             cacheSupport.expire(UserConstants.CACHE_USER_TOKEN, token, UserConstants.TOKEN_TIMEOUT, TimeUnit.MINUTES);
         }catch (Exception e){

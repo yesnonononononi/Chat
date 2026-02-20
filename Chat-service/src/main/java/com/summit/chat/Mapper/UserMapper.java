@@ -43,7 +43,7 @@ public interface UserMapper {
     @Select("select count(*) from user where DATE(create_time) <= #{dateTime} and  is_delete = 1")
     Integer getTotalUsers(Date dateTime);
 
-    @Update("update user set pw = #{pw} where mobile = #{mobile}")
+    @Update("update user set pw = #{pw} where id = #{id}")
     Integer putPw(UserPwPutDto dto);
 
 

@@ -10,5 +10,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RequireRole {
-    String value() default "admin"; //user admin
+    UserRoleEnum role() default UserRoleEnum.ADMIN;
 }

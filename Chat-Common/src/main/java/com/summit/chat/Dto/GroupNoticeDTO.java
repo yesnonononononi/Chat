@@ -1,12 +1,18 @@
 package com.summit.chat.Dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 /**
  * 群公告DTO
  */
-public class GroupNoticeDTO {
+public class GroupNoticeDTO implements Serializable {
 
   /**
    * 公告ID（更新时使用）

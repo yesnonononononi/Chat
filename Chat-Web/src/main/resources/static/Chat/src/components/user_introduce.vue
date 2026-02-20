@@ -12,12 +12,19 @@
             <div class="w-auto p-2 h-auto flex  my-8">
                 <img :src="userInfo?.icon" alt="" class="w-24 h-24 rounded-xl">
                 <div class="ml-8 flex flex-col justify-around ">
-                    <div class="text-xl font-bold flex items-center gap-2">
+                    <div class="text-xl font-bold flex items-center gap-2 flex-wrap">
                         {{ userInfo?.nickName }}
                         <span class="w-2 h-2 rounded-full" v-if="userInfo?.gender"
                             :class="userInfo?.gender == 1 ? 'bg-blue-500' : 'bg-pink-500'"></span>
                         <span v-if="userInfo?.role === 'admin'"
                             class="px-2 py-0.5 text-xs rounded-full bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-bold shadow-sm scale-75 origin-left">管理员</span>
+                        <span v-if="userInfo?.role === 'super_admin'"
+                            class="px-2 py-0.5 text-xs rounded-full bg-gradient-to-r from-purple-600 via-fuchsia-500 to-pink-500 text-white font-bold shadow-md flex items-center gap-1 border border-yellow-200/50 scale-75 origin-left md:scale-90">
+                            <el-icon class="text-yellow-300">
+                                <Trophy />
+                            </el-icon>
+                            超级管理员
+                        </span>
                     </div>
                     <div class="text-sm text-gray-400">爱好:{{ userInfo?.hobby || '未展示任何爱好' }}</div>
                     <div class="text-sm text-gray-400">年龄:{{ userInfo?.age || '未知' }}</div>
@@ -57,7 +64,7 @@ import { UserApi } from '../api/user';
 import type { userInfo } from '../types/user';
 import { Log } from '../utils/TipUtil';
 import { BusinessError } from '../exception/BusinessError';
-import { FriendApi } from '@/api/friend';
+import { FriendApi } from '../api/friend';
 import { el } from 'element-plus/es/locale/index.mjs';
 const route = useRoute();
 const user_me = userStore();
@@ -89,6 +96,23 @@ async function queryUserById() {
     }
 
 }
+
+function delLink() {
+    try {
+        if (loading.value) return;
+        loading.value = true;
+    } catch (err) {
+        if (err instanceof BusinessError) {
+            Log.error(err.message);
+        } else {
+            Log.error("服务繁忙");
+            console.error(err);
+        }
+    } finally {
+        loading.value = false;
+    }
+}
+
 function getMore() {
     router.push({
         name: 'user_more',
