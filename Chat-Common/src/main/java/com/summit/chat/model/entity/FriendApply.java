@@ -1,9 +1,16 @@
 package com.summit.chat.model.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
 
 @Data
-public class FriendApply {
+@AllArgsConstructor
+@NoArgsConstructor
+public class FriendApply implements Serializable {
   private String id;
   private String applicantId;
   private String recipientId;

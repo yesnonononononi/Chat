@@ -13,7 +13,7 @@ public interface UserService {
 
     Result putUser(UserDTO dto);
 
-    Result getUserById(Long userID);
+    Result getUserById(String userID);
 
     Result getUserByPhone(String phoneNumber);
 

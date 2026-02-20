@@ -3,8 +3,11 @@ package com.summit.chat.model.vo;
 import com.summit.chat.Enum.MsgEnum;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import java.io.Serializable;
 
 /**
  * 发给客户端发送者的回执
@@ -12,7 +15,9 @@ import lombok.Data;
  */
 @Data
 @Builder
-public class MsgCallbackForPrivateVO {
+@NoArgsConstructor
+
+public class MsgCallbackForPrivateVO implements Serializable {
     /**
      * 消息状态
      *  READ(0),  //已读

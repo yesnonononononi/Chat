@@ -22,7 +22,7 @@
             <button class="login-btn" @click="forgetPw">提交</button>
 
             <div class="login-action-group" style="justify-content: center; margin-top: 20px;">
-                <router-link to="/login" class="link">返回登录</router-link>
+                <router-link to="/login" class="link">返回</router-link>
             </div>
         </div>
     </AuthLayout>

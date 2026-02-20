@@ -14,4 +14,5 @@ public class BaseConstants {
     public static final Integer DEFAULT_PAGESIZE = 10;
 
 
+    public static final Long PASS_EXPIRE = 10L;
 }

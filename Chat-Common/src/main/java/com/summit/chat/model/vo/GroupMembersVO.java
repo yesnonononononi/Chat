@@ -1,15 +1,20 @@
 package com.summit.chat.model.vo;
 
 import com.summit.chat.Enum.GroupStatusEnum;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 /**
  * 群聊成员vo
  */
 @Data
-public class GroupMembersVO {
+@AllArgsConstructor
+@NoArgsConstructor
+public class GroupMembersVO implements Serializable {
     private Long Id;
     private String avatar;
     private String nickName;

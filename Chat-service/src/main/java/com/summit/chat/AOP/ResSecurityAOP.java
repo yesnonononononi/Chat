@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.Ordered;
+import org.springframework.data.redis.RedisSystemException;
 import org.springframework.stereotype.Component;
 
 @Aspect
@@ -34,7 +35,19 @@ public class ResSecurityAOP {
     }
     @Around("pointcut()")
     public Object around(@NotNull ProceedingJoinPoint joinPoint) throws Throwable {
-        Object result = joinPoint.proceed();
+        Object result;
+        try {
+            result = joinPoint.proceed();
+        } catch (RedisSystemException e) {
+            log.error("【响应保护】Redis系统异常: {}", e.getMessage(), e);
+            // Redis异常时返回服务器错误
+            return Result.fail(BaseConstants.REDIS_CONNECTION_ERROR);
+        } catch (Exception e) {
+            log.error("【响应保护】执行目标方法时发生异常", e);
+            // 其他异常继续抛出
+            throw e;
+        }
+        
         try {
             // 如果返回值不是Result类型，直接返回（例如ResponseEntity或void）
             if (!(result instanceof Result)) {
@@ -50,10 +63,13 @@ public class ResSecurityAOP {
             data.setSign(sign);
 
             return data;
-        }catch (Exception e){
-            log.error("【响应保护】发生错误:{}",result,e);
-            // 如果签名失败，不应该让接口报错，而是返回原始数据（或者根据安全策略决定是否报错）
-            // 这里为了业务连续性，暂不阻断，但在日志中记录错误
+        } catch (RedisSystemException e) {
+            log.error("【响应保护】签名过程中的Redis异常: {}", e.getMessage(), e);
+            // Redis异常时不进行签名，返回原始数据
+            return result;
+        } catch (Exception e){
+            log.error("【响应保护】签名发生错误:{}",result,e);
+            // 如果签名失败，不应该让接口报错，而是返回原始数据
             return result;
         }
     }

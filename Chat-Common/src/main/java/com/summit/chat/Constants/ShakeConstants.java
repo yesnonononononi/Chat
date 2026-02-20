@@ -14,7 +14,7 @@ public class ShakeConstants {
     public static final String SHAKE_LUA_RESULT_PATH_1 = "Lua/ShakeProtect_1.lua";
     public static final String SHAKE_LUA_CACHE_PREFIX = "shake:result:id:";
     public static final String ARGV_ERROR = "未读取到幂等id";
-    public static final String CACHE_EXPIRE_SECONDS = "10";
+    public static final String CACHE_EXPIRE_SECONDS = "5";
     /**
      * HOLD 占位符的过期时间（秒）。
      * <p>

@@ -29,5 +29,5 @@ export class FriendApi {
     return ApiHelper.handle(request.post("/user/link-user/save", dto));
   }
 
-  static async getLInkById(){}
+ 
 }

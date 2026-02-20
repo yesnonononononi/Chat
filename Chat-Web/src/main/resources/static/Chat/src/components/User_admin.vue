@@ -24,16 +24,22 @@
         </div>
         <div class="w-full md:w-full">
             <el-table :data="userInfo" class="rounded-xl">
-                <el-table-column prop="id" label="ID"> </el-table-column>
-                <el-table-column prop="nickName" label="昵称"> </el-table-column>
-                <el-table-column prop="gender" label="性别">
+                <el-table-column prop="id" align="center" label="ID"> </el-table-column>
+                <el-table-column prop="nickName" align="center" label="昵称"> </el-table-column>
+                <el-table-column prop="gender" align="center" label="性别">
                     <template #default="scope">
                         <span :class="scope.row.gender == 1 ? 'text-blue-400' : 'text-pink-400'">{{
                             getGenderText(scope.row.gender) }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="role" label="角色"> </el-table-column>
-                <el-table-column prop="status" label="状态">
+                <el-table-column prop="role" align="center" label="角色">
+                    <template #default="scope">
+                        <span v-show = "scope.row.role === UserRoleEnum.USER" class="text-green-400">普通用户</span>
+                        <span v-show = "scope.row.role === UserRoleEnum.ADMIN" class="text-blue-400">管理员</span>
+                        <span v-show = "scope.row.role === UserRoleEnum.SUPER_ADMIN" class="text-yellow-400">超管</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="status" align="center" label="状态">
                     <template #default="scope">
                         <span :class="scope.row.status == 1 ? 'text-green-400' : 'text-red-400'">{{
                             getStatusText(scope.row.status) }}</span>
@@ -42,12 +48,12 @@
                 <el-table-column label="操作" align="center" width="200px">
                     <template #default="scope">
                         <span class="text-red-400 cursor-pointer hover:text-red-700 mr-4"
-                            @click="handleBlack(scope.row)" v-if="scope.row.status === 1">禁用</span>
+                            @click="handleBlack(scope.row)" v-if="scope.row.status === 1 &&( scope.row.role === UserRoleEnum.USER || (scope.row.role === UserRoleEnum.ADMIN && user.userInfo?.role === UserRoleEnum.SUPER_ADMIN) && scope.row.role !== UserRoleEnum.SUPER_ADMIN)">禁用</span><!-- 禁用对象不为超管 && ((对象为管理员 && 自己为超管) || 对象为用户 )-->
                         <span class="text-green-400 cursor-pointer hover:text-green-700 mr-4"
-                            @click="handleUnblack(scope.row)" v-if="scope.row.status === 0">启用</span>
+                            @click="handleUnblack(scope.row)" v-if="scope.row.status === 0 &&( scope.row.role === UserRoleEnum.USER || (scope.row.role === UserRoleEnum.ADMIN && user.userInfo?.role === UserRoleEnum.SUPER_ADMIN) && scope.row.role !== UserRoleEnum.SUPER_ADMIN)">启用</span>
                         <span class="text-blue-400 cursor-pointer hover:text-blue-700"
-                            @click="handleSetAdmin(scope.row)" v-if="scope.row.role !== 'admin'">设为管理员</span>
-                    </template>
+                            @click="handleSetAdmin(scope.row)" v-if=" (user.userInfo?.role === UserRoleEnum.SUPER_ADMIN && scope.row.id !== user.userInfo?.id)&&scope.row.role === UserRoleEnum.USER">设为管理员</span>
+                    </template><!--自己是超管&&设置对象不能为自己&&设置对象为user -->
                 </el-table-column>
             </el-table>
             <el-pagination
@@ -65,14 +71,16 @@
     </div>
 </template>
 <script lang="ts" setup>
+import { userStore } from '@/store/UserStore';
 import { AdminApi } from '../api/admin';
 import { BusinessError } from '../exception/BusinessError';
 import type { userInfo } from '../types/user';
 import { Log } from '../utils/TipUtil';
 import { computed, onMounted, reactive, ref } from 'vue';
+import { UserRoleEnum } from '@/enums/UserRoleEnum';
 const loading = ref(false);
 const userInfo = ref<userInfo[]>([]);
-
+const user = userStore();
 const queryParams = reactive({
     page: 1,
     pageSize: 10,

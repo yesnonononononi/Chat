@@ -1,7 +1,17 @@
 package com.summit.chat.model.entity;
 
 
-public class Media {
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class Media implements Serializable {
 
   private String id;
   private String emitterId;

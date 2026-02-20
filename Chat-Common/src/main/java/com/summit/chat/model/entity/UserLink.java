@@ -1,10 +1,16 @@
 package com.summit.chat.model.entity;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
 
 @Data
-public class UserLink {
+@AllArgsConstructor
+@NoArgsConstructor
+public class UserLink implements Serializable {
     @NotNull
     private long userId;  //用户id
     @NotNull

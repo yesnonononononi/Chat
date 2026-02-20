@@ -1,10 +1,16 @@
 package com.summit.chat.Dto;
 
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
 
 @Data
-public class MediaTokenDto {
+@AllArgsConstructor
+@NoArgsConstructor
+public class MediaTokenDto implements Serializable {
     @NotBlank(message = "房间名不能为空")
     private String roomName;
     @NotBlank(message = "用户id不能为空")

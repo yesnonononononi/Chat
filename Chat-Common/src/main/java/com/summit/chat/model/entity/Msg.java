@@ -6,11 +6,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Msg {
+public class Msg implements Serializable {
     @NotBlank(message = "发送者id不能为空")
     public String emitterId;
     @NotBlank(message = "接收者id不能为空")

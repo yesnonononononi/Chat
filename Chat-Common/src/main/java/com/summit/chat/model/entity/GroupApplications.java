@@ -1,12 +1,19 @@
 package com.summit.chat.model.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
 
 /**
  * 群申请
  */
 @Data
-public class GroupApplications {
+@AllArgsConstructor
+@NoArgsConstructor
+public class GroupApplications implements Serializable {
 
   /**
    * 主键ID

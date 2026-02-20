@@ -36,7 +36,7 @@ const handleAuthAndRedirect = async () => {
         if (isAuth.value) {
             sessionStorage.setItem('isAdminAuth', 'true'); // 设置认证标志
             const interval = setInterval(() => {
-                time.value--;
+                if(time.value > 0)time.value--;
             },1000)
 
             setTimeout(() => {

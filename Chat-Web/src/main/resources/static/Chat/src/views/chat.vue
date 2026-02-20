@@ -8,7 +8,7 @@
           chat
         </span>
         <span @click.prevent="handleCreateGroup" class="text-sm cursor-pointer">创建群聊</span>
-        <router-link to="/admin-auth" class="text-sm cursor-pointer">管理中心</router-link>
+        <router-link v-if="user.userInfo?.role ===UserRoleEnum.ADMIN || user.userInfo?.role === UserRoleEnum.SUPER_ADMIN" to="/admin-auth" class="text-sm cursor-pointer">管理中心</router-link>
         <!-- 用户信息 -->
         <div class=" w-10 h-full relative  flex flex-col items-center  justify-center  group cursor-pointer"
           v-if="user.userInfo">
@@ -60,7 +60,7 @@
           <div class="absolute top-16 w-full h-4"></div>
           <!-- 下拉框 -->
           <div
-            class="absolute top-20 right-0 w-48 md:w-64 h-72 rounded-xl z-[100] pointer-events-none opacity-0 bg-white text-center group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-300 shadow-lg border">
+            class="absolute top-20 left-1/2 -translate-x-1/2 w-48 md:w-64 h-72 rounded-xl z-[100000] pointer-events-none opacity-0 bg-white text-center group-hover:opacity-100 group-hover:pointer-events-auto group-hover:-translate-y-2 transition-all duration-700 shadow-lg border">
             <div class="border-b-2 h-8">
               <span class="text-sm md:text-xl font-bold">消息通知</span>
             </div>
@@ -166,10 +166,11 @@ import { SysNoticeApi } from "../api/sysNotice";
 import type { data } from "../types/user";
 import type { SysNotice } from "../types/sysNotice";
 import { TimeUtil } from "../utils/time";
+import { UserRoleEnum } from "@/enums/UserRoleEnum";
 const search_User = ref<friend_info[]>([]);
 const user = userStore();
 const msg = msgStore();
-const fold = ref();
+const fold = ref(false);
 const selectfriend = ref(true);
 const ws = Ws.getInstance();
 const search_Group = ref<GroupChatDto[]>();
@@ -278,7 +279,7 @@ async function queryNotify() {
 }
 onUnmounted(() => {
   selectfriend.value = true;
-  localStorage.setItem("f", fold.value.toString());
+   localStorage.setItem("f", fold.value.toString());
   sessionStorage.setItem("l", JSON.stringify(search_User.value));
 })
 

@@ -32,6 +32,7 @@ public class UserController {
     @Autowired
     RegisterService registerService;
 
+
     /**
      * 手机号+密码
      */
@@ -101,14 +102,13 @@ public class UserController {
     @ShakeProtect("#dto.id")
     @CacheEvict(cacheNames = UserConstants.CACHE_USER_PROFILE_HASH, key = "#dto.id")
     public Result putUser(@RequestBody UserDTO dto) {
-
         return userService.putUser(dto);
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "根据用户id获取信息")
     @Cacheable(cacheNames = UserConstants.CACHE_USER_PROFILE_HASH, key = "#id", unless = "#result.code!=1")
-    public Result getUserById(@PathVariable Long id) {
+    public Result getUserById(@PathVariable String id) {
         return userService.getUserById(id);
     }
 

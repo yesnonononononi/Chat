@@ -4,8 +4,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class VerifyCodeLoginRequest {
+public class VerifyCodeLoginRequest implements Serializable {
     @NotBlank(message = "手机号为空")
     @Pattern(regexp = "^1[3-9]\\d{9}$", message = "手机号格式错误（需为11位有效手机号）")
     private String mobile;

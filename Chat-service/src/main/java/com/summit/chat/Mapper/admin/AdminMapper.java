@@ -38,5 +38,5 @@ public interface AdminMapper {
     void unblackUser(String userID);
 
     @Update("update user set role = 'admin' where id = #{userID}")
-    void setAdmin(String userID);
+    Integer setAdmin(String userID);
 }

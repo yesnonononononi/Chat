@@ -64,12 +64,12 @@ public class CacheSetNodeForLogin implements LoginHandleChain {
             cacheSupport.executePipelined(new SessionCallback<Object>() {
                 @Override
                 public Object execute(RedisOperations operations) throws DataAccessException {
-                    // 1. 缓存用户基本信息
-                    String profileKey = UserConstants.CACHE_USER_PROFILE_HASH + ":" + userId;
-                    Map<String, Object> map = BeanUtil.beanToMap(userVO);
-                    map.replaceAll((key, value) -> StrUtil.toStringOrEmpty(value));
-                    operations.opsForHash().putAll(profileKey, map);
-                    operations.expire(profileKey, UserConstants.NAME_TIMEOUT, TimeUnit.HOURS);
+                    // 1. 缓存用户基本信息 - 已移除，由Spring Cache接管（String结构）
+                    // String profileKey = UserConstants.CACHE_USER_PROFILE_HASH + ":" + userId;
+                    // Map<String, Object> map = BeanUtil.beanToMap(userVO);
+                    // map.replaceAll((key, value) -> StrUtil.toStringOrEmpty(value));
+                    // operations.opsForHash().putAll(profileKey, map);
+                    // operations.expire(profileKey, UserConstants.NAME_TIMEOUT, TimeUnit.HOURS);
 
                     // 2. 缓存Token信息
                     String tokenKey = UserConstants.CACHE_USER_TOKEN + ":" + tokenVO.getToken();

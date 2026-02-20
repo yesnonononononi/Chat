@@ -1,14 +1,19 @@
 package com.summit.chat.model.vo;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 /**
  * 群聊申请VO
  */
 @Data
-public class GroupApplicationVO {
+@AllArgsConstructor
+@NoArgsConstructor
+public class GroupApplicationVO implements Serializable {
     /**
      * 申请ID
      */

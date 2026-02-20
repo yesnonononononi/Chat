@@ -121,6 +121,12 @@ const routes: RouteRecordRaw[] = [
     component: Login,
   },
   {
+    path:"/reset-pw",
+    name: "reset-pw",
+    component: () => import("../views/reset-pw.vue"),
+    meta: { requireAuth: true },
+  },
+  {
     path: "/register",
     name: "Register",
     component: register,

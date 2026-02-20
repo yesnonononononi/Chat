@@ -33,9 +33,14 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserSupport userSupport;
 
+
+
     @Override
     public Result putUser(UserDTO dto) {
         try {
+            // 权限校验：确保只能修改自己的信息
+            userValidator.checkEditAuth(String.valueOf(dto.getId()));
+            
             Integer age = dto.getAge();
             Integer gender = dto.getGender();
             userValidator.checkGender(gender);
@@ -43,6 +48,7 @@ public class UserServiceImpl implements UserService {
             if (dto.getId() == null) return Result.fail(UserConstants.ILLEGAL_CHAR);
             userValidator.checkPwAndNick(dto.getPw(), dto.getNickName());
             userMapper.putUser(dto);
+
             return Result.ok();
         } catch (BusinessException e) {
             return Result.fail(e.getMessage());
@@ -53,18 +59,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Result getUserById(Long userID) {
-        //从数据库拿用户信息
-        User user = userMapper.getUserById(userID);
+    public Result getUserById(String userID) {
 
+
+        User user = userMapper.getUserById(Long.valueOf(userID));
         if (user == null) {
             return Result.fail(UserConstants.USER_NO_EXIST);
         }
-        UserVO userVO = new UserVO();
+        UserVO u = new UserVO();
 
-        BeanUtil.copyProperties(user, userVO);
+        BeanUtil.copyProperties(user, u);
 
-        return Result.ok(userVO);
+
+        return Result.ok(u);
     }
 
     @Override
@@ -98,6 +105,7 @@ public class UserServiceImpl implements UserService {
             userValidator.checkAuth(userID);
 
             userMapper.deleteUserById(userID);
+
             return Result.ok();
         } catch (BusinessException e) {
             return Result.fail(e.getMessage());
@@ -113,6 +121,7 @@ public class UserServiceImpl implements UserService {
         Object data = fileLoadService.upload(file).getData();
         if (data != null) {
             userMapper.putUserIcon(data.toString(), UserHolder.getUserID());
+
             return Result.ok(data.toString());
         } else {
             return Result.fail(UserConstants.ILLEGAL_CHAR);
@@ -124,12 +133,7 @@ public class UserServiceImpl implements UserService {
         try {
             //验证密码
             userValidator.putPwCheck(dto);
-            dto.setPw(userSupport.encryptPw(dto.getPw()));
-            Integer i = userMapper.putPw(dto);
-            if (i == 1) {
-                return Result.ok();
-            }
-            return Result.fail(UserConstants.USER_NO_EXIST);
+            return userSupport.setPw(dto);
         } catch (BusinessException e) {
             return Result.fail(e.getMessage());
         } catch (Exception e) {
@@ -146,14 +150,7 @@ public class UserServiceImpl implements UserService {
             userValidator.forgetPwCheck(dto);
             //手机号格式校验
             userValidator.phoneCheck(dto.getMobile());
-            //加密密码
-            dto.setPw(userSupport.encryptPw(dto.getPw()));
-
-            Integer i = userMapper.putPw(dto);
-            if (i == 1) {
-                return Result.ok();
-            }
-            return Result.fail(UserConstants.USER_NO_EXIST);
+            return userSupport.setPw(dto);
         } catch (BusinessException e) {
             return Result.fail(e.getMessage());
         }catch(Exception e){

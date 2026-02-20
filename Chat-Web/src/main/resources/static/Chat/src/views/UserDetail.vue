@@ -199,7 +199,9 @@ const saveProfile = async () => {
 };
 
 const handleChangePwd = () => {
-  Log.info("功能开发中");
+  router.push({
+    name:"reset-pw"
+  })
 };
 
 const handleDelete = async () => {

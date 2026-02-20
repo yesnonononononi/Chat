@@ -2,10 +2,12 @@ package com.summit.chat.GlobalHandle.SocketHandler;
 
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.summit.chat.Constants.ChatConstants;
 import com.summit.chat.Enum.ChatEvent;
 import com.summit.chat.model.entity.ClientSession;
 import io.lettuce.core.RedisConnectionException;
+import org.springframework.data.redis.RedisSystemException;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +33,7 @@ public class ClientManager {
     @Resource
     SocketIOServer socketIOServer;
     @Resource
-    private RedisTemplate<String, ClientSession> redisTemplate;  // <client userid:uuid>
+    private RedisTemplate<String, Object> redisTemplate;  // <client userid:uuid>
     private final ConcurrentMap<String, ClientSession> map = new ConcurrentHashMap<>();
 
     /**
@@ -66,7 +68,7 @@ public class ClientManager {
             // 将从Redis获取到的有效Session加入本地缓存
             map.put(receiveID, clientFromCache);
             return client;
-        } catch (RedisConnectionException e) {
+        } catch (RedisConnectionException | RedisSystemException e) {
             log.error("【会话管理】Redis连接异常,用户id:{}", receiveID, e);
             return null;
         } catch (Exception e) {
@@ -91,7 +93,7 @@ public class ClientManager {
             if (userId == null) return;
             redisTemplate.delete(buildKey(userId));
             map.remove(userId);
-        } catch (RedisConnectionException e) {
+        } catch (RedisConnectionException | RedisSystemException e) {
             log.error("【会话管理】Redis连接异常,用户id:{}", userId, e);
         } catch (Exception e) {
             log.error("【会话管理】移除用户会话异常,用户id:{},{}", userId,e.getMessage(), e);
@@ -119,7 +121,7 @@ public class ClientManager {
             }
             // 无论如何都要清理本地缓存，确保本地状态最新
             map.remove(userID);
-        } catch (RedisConnectionException e) {
+        } catch (RedisConnectionException | RedisSystemException e) {
             log.error("【会话管理】Redis连接异常,用户id:{}", userID, e);
         } catch (Exception e) {
             log.error("【会话管理】移除用户会话异常,用户id:{},错误:{}", userID,e.getMessage(), e);
@@ -141,7 +143,7 @@ public class ClientManager {
                 return;
             }
             saveClient(userID, client);
-        } catch (RedisConnectionException e) {
+        } catch (RedisConnectionException | RedisSystemException e) {
             log.error("【会话管理】Redis连接异常,用户id:{}", userID, e);
             client.disconnect();
         } catch (Exception e) {
@@ -157,7 +159,29 @@ public class ClientManager {
      * @return 客户端会话信息，如果不存在则返回null
      */
     private ClientSession getClientFromCache(String receiveId) {
-        return redisTemplate.opsForValue().get(buildKey(receiveId));
+        try {
+            // 获取对象
+            Object obj = redisTemplate.opsForValue().get(buildKey(receiveId));
+            if (obj == null) {
+                return null;
+            }
+            
+            // 兼容性处理：如果反序列化结果是 LinkedHashMap（Jackson默认行为），则进行二次转换
+            if (obj instanceof java.util.LinkedHashMap) {
+                return new ObjectMapper()
+                        .configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                        .convertValue(obj, ClientSession.class);
+            }
+            
+            // 正常情况
+            return (ClientSession) obj;
+        } catch (RedisConnectionException | RedisSystemException e) {
+            log.error("【会话管理】从缓存获取用户会话失败,用户id: {}", receiveId, e);
+            return null;
+        } catch (Exception e) {
+            log.error("【会话管理】从缓存获取用户会话时发生未知错误,用户id: {}", receiveId, e);
+            return null;
+        }
     }
 
     /**
@@ -177,7 +201,7 @@ public class ClientManager {
                     .build();
             redisTemplate.opsForValue().set(buildKey(receiveId), clientSession, ChatConstants.EXPIRE_TIME, TimeUnit.HOURS);
             map.put(receiveId, clientSession);
-        } catch (RedisConnectionException e) {
+        } catch (RedisConnectionException | RedisSystemException e) {
             log.error("【会话管理】Redis连接异常,用户id:{}", receiveId, e);
             client.disconnect();
         } catch (Exception e) {
