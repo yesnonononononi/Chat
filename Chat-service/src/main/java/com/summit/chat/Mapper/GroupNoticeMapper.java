@@ -1,7 +1,6 @@
 package com.summit.chat.Mapper;
 
 import com.summit.chat.Annotation.AutoFill;
-import com.summit.chat.Dto.GroupNoticeDTO;
 import com.summit.chat.Enum.OperationType;
 import com.summit.chat.model.entity.GroupNotice;
 import com.summit.chat.model.vo.GroupNoticeVO;

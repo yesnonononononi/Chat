@@ -2,10 +2,7 @@ package com.summit.chat.service.Impl.Support.group.GroupMemberSupport;
 
 import com.summit.chat.Constants.GroupConstants;
 import com.summit.chat.Constants.GroupMemberConstants;
-import com.summit.chat.Constants.GroupMsgConstants;
 import com.summit.chat.Dto.GroupMemberDTO;
-import com.summit.chat.Enum.GroupRole;
-import com.summit.chat.Enum.GroupStatusEnum;
 import com.summit.chat.model.vo.GroupChatVO;
 import com.summit.chat.model.vo.GroupMembersVO;
 import com.summit.chat.service.Impl.Support.group.AbstractGroupValidator;
@@ -25,17 +22,12 @@ public class GroupMemberValidator extends AbstractGroupValidator<GroupMemberDTO>
         return true;
     }
 
-
-    //判断邀请者是否被拉黑
-    public GroupMemberValidator isBlackListByUserId(GroupMembersVO memberInfo) {
-        if (memberInfo.getStatus().equals(GroupStatusEnum.BLACK))
-            super.throwException(GroupMemberConstants.BLACK_LIST_INVITOR);
-        return this;
-    }
-
     //判断群成员是否是群主
     public GroupMemberValidator isOwner(GroupMembersVO memberInfo) {
-        super.verifyOwner(memberInfo);
+        boolean b = super.verifyOwner(memberInfo);
+        if(b){
+            super.throwException(GroupMemberConstants.OWNER_ERROR);
+        }
         return this;
     }
 
@@ -48,8 +40,8 @@ public class GroupMemberValidator extends AbstractGroupValidator<GroupMemberDTO>
     /**
      * 判断群成员是否存在
      */
-    public GroupMembersVO isMemberExist(Long groupId,Long memberId) {
-        GroupMembersVO groupMembersVO = getMember(groupId,memberId);
+    public GroupMembersVO isMemberExist(Long groupId,Long userID) {
+        GroupMembersVO groupMembersVO = getMember(groupId,userID);
         if (groupMembersVO == null) super.throwException(GroupMemberConstants.MEMBER_NOT_EXIST);
         return groupMembersVO;
     }

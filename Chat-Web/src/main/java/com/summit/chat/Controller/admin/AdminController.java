@@ -1,22 +1,16 @@
 package com.summit.chat.Controller.admin;
 
 import com.summit.chat.Annotation.RequireRole;
-import com.summit.chat.Constants.GroupConstants;
-import com.summit.chat.Constants.UserConstants;
-import com.summit.chat.Controller.user.UserController;
-import com.summit.chat.Dto.UserDTO;
 import com.summit.chat.Dto.admin.UserPageQueryDTO;
 import com.summit.chat.Enum.UserRoleEnum;
 import com.summit.chat.Result.Result;
-import java.util.Map;
-
 import com.summit.chat.service.admin.AdminService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @Tag(name = "管理端接口")
 @RestController
@@ -84,5 +78,15 @@ public class AdminController {
     @Operation(summary = "解封群聊")
     public Result unbanGroup(String groupId) {
         return adminService.unBanGroup(groupId);
+    }
+
+
+    @PostMapping("/delAdmin")
+    @RequireRole
+    @Operation(summary = "删除管理员")
+    public Result delAdmin(@RequestBody Map<String, String> requestBody) {
+        String userID = requestBody.get("userID");
+        adminService.delAdmin(userID);
+        return Result.ok();
     }
 }

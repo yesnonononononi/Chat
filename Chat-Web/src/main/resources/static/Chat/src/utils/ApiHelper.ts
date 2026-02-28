@@ -1,6 +1,4 @@
-import { type data } from "@/types/user";
-import { type AxiosResponse } from "axios";
-import { BusinessError } from "@/exception/BusinessError";
+import {BusinessError} from "@/exception/BusinessError";
 
 export class ApiHelper {
   /**

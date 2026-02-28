@@ -4,7 +4,6 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.summit.chat.Constants.BaseConstants;
 import com.summit.chat.Constants.UserConstants;
-import com.summit.chat.Constants.UserLinkConstants;
 import com.summit.chat.Dto.FriendDto;
 import com.summit.chat.Dto.UserLinkDto;
 import com.summit.chat.Exception.BusinessException;
@@ -20,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.validation.annotation.Validated;
 
 @Service
@@ -97,24 +97,30 @@ public class FriendApplyImpl implements FriendApply {
 
             friendApplyMapper.ackApplication(id);
 
-            //接受好友请求时,要建立关系
-            UserLinkDto userLinkDto = new UserLinkDto();
+            //接受好友请求时,要建立双向关系
+            // 1. 保存 接受者 -> 申请者
+            UserLinkDto linkToApplicant = new UserLinkDto();
+            linkToApplicant.setUserID(applyVO.getRecipientId());
+            linkToApplicant.setLinkID(applyVO.getApplicantId());
+            Result res1 = userLinkService.saveLink(linkToApplicant);
+            if (!(res1.getCode() == 1)) {
+                throw new BusinessException(res1.getMsg());
+            }
 
-            userLinkDto.setUserID(applyVO.getRecipientId());
-
-            userLinkDto.setLinkID(applyVO.getApplicantId());
-
-            Result linkResult = userLinkService.saveLink(userLinkDto);
-
-            // 检查结果，如果失败则回滚（除非是“已存在”错误）
-            if (linkResult.getCode() == 0) {
-               return Result.fail(linkResult.getMsg());
+            // 2. 保存 申请者 -> 接受者
+            UserLinkDto linkToRecipient = new UserLinkDto();
+            linkToRecipient.setUserID(applyVO.getApplicantId());
+            linkToRecipient.setLinkID(applyVO.getRecipientId());
+            Result res2 = userLinkService.saveLink(linkToRecipient);
+            if (!(res2.getCode() == 1)) {
+                throw new BusinessException(res2.getMsg());
             }
 
             return Result.ok();
 
         } catch (BusinessException e) {
             log.error("【好友申请】接受好友申请失败:{}", dto.getId(), e);
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return Result.fail(e.getMessage());
 
         } finally {

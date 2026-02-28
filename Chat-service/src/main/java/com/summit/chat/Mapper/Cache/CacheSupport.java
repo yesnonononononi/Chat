@@ -1,16 +1,12 @@
 package com.summit.chat.Mapper.Cache;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.summit.chat.Constants.BaseConstants;
-import com.summit.chat.Constants.UserConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 @Slf4j
 @Component
 public class CacheSupport implements Cache{

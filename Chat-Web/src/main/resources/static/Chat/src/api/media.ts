@@ -1,8 +1,8 @@
 import request from "@/utils/axios";
-import { ApiHelper } from "@/utils/ApiHelper";
-import { BusinessError } from "@/exception/BusinessError";
-import type { mediaToken } from "@/types/auth";
-import type { MediaApplyDTO } from "@/types/media";
+import {ApiHelper} from "@/utils/ApiHelper";
+import {BusinessError} from "@/exception/BusinessError";
+import type {mediaToken} from "@/types/auth";
+import type {MediaApplyDTO} from "@/types/media";
 
 export class MediaApi {
     /**

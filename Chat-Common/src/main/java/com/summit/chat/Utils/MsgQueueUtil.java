@@ -1,6 +1,5 @@
 package com.summit.chat.Utils;
 
-import com.summit.chat.Constants.MsgConstants;
 import com.summit.chat.Constants.QueueConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.connection.CorrelationData;

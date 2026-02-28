@@ -99,7 +99,7 @@ public class MediaServiceImpl implements MediaService {
             }
             rlock = lockService.tryLock(MediaConstants.MEDIA_VIDEO_PREFIX, UUID.randomUUID().toString(), MediaConstants.LEASE_TIME, MediaConstants.WAIT_TIME, TimeUnit.MILLISECONDS);
             if (rlock != null) {
-                mediaMapper.putMedia(MediaState.ACCEPT, emitterId, userID);
+                mediaMapper.accept(emitterId, userID);
                 userMapper.putUserState(UserCallStateEnum.CALLING.getState(), userID);
             }
             return Result.ok();  //返回房间号
@@ -122,7 +122,7 @@ public class MediaServiceImpl implements MediaService {
             mediaValidator.isExistApply(emitterId, userID);
 
             // 更新状态为拒绝
-            mediaMapper.putMedia(MediaState.REJECT, emitterId, userID);
+            mediaMapper.endMedia(emitterId, userID);
             userMapper.putUserState(UserCallStateEnum.IDLE.getState(), userID);
             userMapper.putUserState(UserCallStateEnum.IDLE.getState(), emitterId);
             // 通知申请者

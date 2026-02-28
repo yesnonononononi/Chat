@@ -1,14 +1,9 @@
 package com.summit.chat.service.message.GroupMessageResendCenter;
 
-import com.corundumstudio.socketio.SocketIOClient;
-import com.summit.chat.Enum.ChatEvent;
-import com.summit.chat.Exception.BusinessException;
 import com.summit.chat.GlobalHandle.SocketHandler.ClientManager;
 import com.summit.chat.model.vo.GroupMessageVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import java.sql.BatchUpdateException;
 
 @Slf4j
 @Component

@@ -29,16 +29,16 @@
 
 <script lang="ts" setup>
 import router from '../router';
-import { userStore } from '../store/UserStore';
-import { onMounted, ref, watch, toRef, onUnmounted, nextTick } from 'vue';
-import { useRoute } from 'vue-router';
-import { BusinessError } from '../exception/BusinessError';
-import { Log } from '../utils/TipUtil';
-import { MediaApi } from '../api/media';
-import { Room, RoomEvent } from "livekit-client";
-import type { MediaApplyDTO } from '../types/media';
-import { MediaWs } from '../utils/Socket/MediaWs';
-import { Ws } from '../utils/Socket/webSocket';
+import {userStore} from '../store/UserStore';
+import {nextTick, onMounted, onUnmounted, ref} from 'vue';
+import {useRoute} from 'vue-router';
+import {BusinessError} from '../exception/BusinessError';
+import {Log} from '../utils/TipUtil';
+import {MediaApi} from '../api/media';
+import {Room, RoomEvent} from "livekit-client";
+import type {MediaApplyDTO} from '../types/media';
+import {MediaWs} from '../utils/Socket/MediaWs';
+import {Ws} from '../utils/Socket/webSocket';
 
 const state = ref({
     openCamera: true,
@@ -57,13 +57,14 @@ const friendId = route.params.id as string;
 let room: Room | null = null;
 const token = ref<string>();
 let media = null;
+const socket = Ws.getInstance();
 const role = route.params.role as string;
 const roomName = route.params.roomName as string;
 onMounted(async () => {
     if (!user.userInfo || !user.isLogin || !user.token) router.push('/login');
     await initRoom(roomName);
     await nextTick();
-    if (role=== "initiator") {
+    if (role === "initiator") {
         media = new MediaWs(Ws.getInstance());
         media.initListenAccept(onAccept);
         media.initListenReject(onReject);
@@ -108,13 +109,7 @@ async function callFriend() {
         await MediaApi.send(dto);
         Log.info("已发送视频请求，等待对方接听...");
 
-        // 监听对方响应
-        const ws = user.getWs();
-        const socket = ws?.getSocket();
-
-        if (socket) {
-
-        }
+    
     } catch (error) {
         if (error instanceof BusinessError) {
             Log.error(error.message);
@@ -177,11 +172,13 @@ async function enableCamara() {
     if (!room || !localVideo.value) { console.log("获取本地视频失败"); return; };
 
     try {
+        // 开启摄像头和麦克风
         await room.localParticipant.enableCameraAndMicrophone();
+        // 绑定本地视频
         room.localParticipant.videoTrackPublications.forEach(pub => {
             const track = pub.track;
             if (!track || !localVideo.value) { console.log("未获取到track"); return; }
-            track.attach(localVideo.value);
+            track.attach(localVideo.value); //获取轨道并绑定
         })
     }
     catch (err) {
@@ -225,7 +222,7 @@ async function leaveRoom() {
     try {
         // 主动挂断，通知对方
         await MediaApi.cancel(friendId);
-
+        // 断开连接
         room.disconnect();
         Log.ok("已离开房间");
 

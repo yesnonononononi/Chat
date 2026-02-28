@@ -8,10 +8,10 @@
         <div class="w-full bg-white rounded-xl m-4 text-center">
             <div class="h-full mt-8 flex flex-col items-center">
                 <div class="mb-8 border border-gray-500  text-center">
-                    <span class="w-[50%] h-full  text-xl cursor-pointer" @click="getFriendApply"
-                        :class="{ 'bg-green-400': friendApply }"> 好友申请 </span>
-                    <span class="w-[50%] h-full  text-xl cursor-pointer" @click="getGroupApply"
-                        :class="{ 'bg-indigo-400': !friendApply }"> 群聊申请 </span>
+                    <button class="w-[50%] h-full  text-xl cursor-pointer" @click="getFriendApply"
+                        :class="{ 'bg-green-400': friendApply }"> 好友申请 </button>
+                    <button class="w-[50%] h-full  text-xl cursor-pointer" @click="getGroupApply"
+                        :class="{ 'bg-indigo-400': !friendApply }"> 群聊申请 </button>
                 </div>
                 <el-scrollbar class="flex w-full h-[500px] flex-col items-center gap-y-4 ">
                     <div v-if="friendApply && applicationList.length >= 1">
@@ -21,12 +21,12 @@
                                 <img :src="item.icon" alt="" class="w-12 h-12 rounded-full bg-white ml-4">
                                 <div class="ml-2 ">
                                     <p class="text-sm ">{{ item.applicantNick }}</p>
-                                    <p>{{ item.applyReason || '' }}</p>
+                                    <p class="text-xs">{{ item.applyReason || '' }}</p>
                                 </div>
                             </span>
-                            <div v-if="item.status == 0" class="relative z-10 flex">
+                            <div v-if="item.status === 0" class="relative z-10 flex">
                                 <el-button type="success" @click="ackApply(item)" class="text-xs md:text-sm" >同意</el-button>
-                                <el-button type="danger" @click="rejectApply(item)" class="text-xs md:text-sm">拒绝</el-button>
+                                <el-button type="danger" @click="rejectApply(item)" class="text-xs md:text-sm mr-2">拒绝</el-button>
                             </div>
                             <div v-if="item.status == 1" class="relative z-10 mr-4">
                                 <el-icon color="green"><Select /></el-icon>
@@ -43,13 +43,13 @@
                                 <img :src="item.groupIcon" alt="" class="w-12 h-12 rounded-full bg-white ml-4" />
                                 <div>
                                     <p class="text-sm ">{{ item.groupName }}</p>
-                                    <p>{{ item.applicationReason || '' }}</p>
+                                    <p class="text-xs">{{ item.applicationReason || '' }}</p>
                                 </div>
                             </span>
                             <span v-if="item.status === 'pending'" class="mr-2">待处理</span>
-                            <span v-if="item.status === 'rejected'" class="mr-2">
-                                已拒绝
-                                <span class="text-xs text-gray-400">查看拒绝原因</span>
+                            <span v-if="item.status === 'rejected'" class="mr-2 flex flex-col items-end">
+                                <span>已拒绝</span>
+                                <span class="text-xs text-blue-400 cursor-pointer hover:underline" @click.stop="viewReason(item.rejectionReason)">查看拒绝原因</span>
                             </span>
                             <span v-if="item.status === 'approved'" class="mr-2">已同意</span>
                         </div>
@@ -59,30 +59,47 @@
             </div>
         </div>
 
+        <el-dialog v-model="viewReasonDialogVisible" title="拒绝原因" width="30%">
+            <span>{{ currentReason }}</span>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button type="primary" @click="viewReasonDialogVisible = false">确定</el-button>
+                </span>
+            </template>
+        </el-dialog>
     </div>
 
 
 
 </template>
 <script lang="ts" setup>
-import { type data, type userInfo } from '../types/user';
-import type { friend_apply } from '../types/friend';
-import { ref, onMounted } from 'vue';
-import { Log } from '../utils/TipUtil';
+import type {page} from '../types/user';
+import {type userInfo} from '../types/user';
+import type {friend_apply} from '../types/friend';
+import {onMounted, ref} from 'vue';
+import {Log} from '../utils/TipUtil';
 import router from '../router';
-import { UserApi } from '../api/user';
-import { FriendApi } from '../api/friend';
-import { userStore } from '../store/UserStore';
-import type { page } from '../types/user';
-import { BusinessError } from '../exception/BusinessError';
-import { GroupApi } from '../api/group';
-import type {  GroupApplicationVO } from '../types/group';
+import {UserApi} from '../api/user';
+import {FriendApi} from '../api/friend';
+import {userStore} from '../store/UserStore';
+import {BusinessError} from '../exception/BusinessError';
+import {GroupApi} from '../api/group';
+import type {GroupApplicationVO} from '../types/group';
+
 const user_me = userStore();
 const userInfo = ref<userInfo>();
 const applicationList = ref<friend_apply[]>([]);
 const groupApplicationList = ref<GroupApplicationVO[]>([]);
 const friendApply = ref<boolean>(true);
 const loading = ref(false);
+const viewReasonDialogVisible = ref(false);
+const currentReason = ref("");
+
+function viewReason(reason: string | undefined) {
+    currentReason.value = reason || "管理员未填写拒绝理由";
+    viewReasonDialogVisible.value = true;
+}
+
 onMounted(() => {
  
     (async () => {

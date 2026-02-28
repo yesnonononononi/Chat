@@ -1,20 +1,24 @@
 package com.summit.chat.model.entity;
 
 import lombok.Data;
+import org.springframework.data.annotation.Id;
 
 import java.io.Serializable;
+import java.lang.annotation.Documented;
 
 @Data
+
 /**
  * 群聊消息表
  */
 public class GroupMessages implements Serializable {
 
 
+  @Id
   /**
    * 消息ID
    */
-  private long id;
+  private String id;
   
   /**
    * 群组ID
@@ -39,7 +43,7 @@ public class GroupMessages implements Serializable {
   /**
    * 消息类型
    */
-  private String messageType;
+  private String type;
   /**
    * 1删除,0正常
    */

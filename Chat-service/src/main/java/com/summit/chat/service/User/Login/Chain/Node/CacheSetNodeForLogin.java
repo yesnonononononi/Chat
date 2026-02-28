@@ -1,6 +1,5 @@
 package com.summit.chat.service.User.Login.Chain.Node;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.summit.chat.Constants.BaseConstants;
 import com.summit.chat.Constants.UserConstants;
@@ -15,13 +14,13 @@ import com.summit.chat.service.User.Login.Chain.LoginHandleChain;
 import jodd.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.type.Alias;
+import org.springframework.context.annotation.Scope;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.RedisOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SessionCallback;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -31,12 +30,13 @@ import java.util.concurrent.TimeUnit;
 public class CacheSetNodeForLogin implements LoginHandleChain {
     CacheSupport cacheSupport;
     LoginHandleChain next;
+    RedisTemplate<String, Object> redisTemplate;
 
 
-    public CacheSetNodeForLogin(CacheSupport cacheSupport) {
+    public CacheSetNodeForLogin(RedisTemplate<String,Object> redisTemplate,CacheSupport cacheSupport) {
+        this.redisTemplate = redisTemplate;
         this.cacheSupport = cacheSupport;
     }
-
     /**
      * 将令牌,用户信息放入缓存
      */
@@ -58,18 +58,17 @@ public class CacheSetNodeForLogin implements LoginHandleChain {
             log.error("【用户登录】用户不存在的id:{}", context.getRequest().getMobile());
             throw new DataException(BaseConstants.SERVER_EXCEPTION);
         }
+        //增加用户活跃度
+        // 增加用户活跃度，将当前用户的会话ID作为成员，分数加1
+        // 如果集合不存在，Redis 会自动创建该有序集合
+        // 有序集合的名称为 UserConstants.CACHE_USER_ACTIVE
+        redisTemplate.opsForZSet().incrementScore(UserConstants.CACHE_USER_ACTIVE, userId, 1);
 
         //缓存重入
         try {
             cacheSupport.executePipelined(new SessionCallback<Object>() {
                 @Override
                 public Object execute(RedisOperations operations) throws DataAccessException {
-                    // 1. 缓存用户基本信息 - 已移除，由Spring Cache接管（String结构）
-                    // String profileKey = UserConstants.CACHE_USER_PROFILE_HASH + ":" + userId;
-                    // Map<String, Object> map = BeanUtil.beanToMap(userVO);
-                    // map.replaceAll((key, value) -> StrUtil.toStringOrEmpty(value));
-                    // operations.opsForHash().putAll(profileKey, map);
-                    // operations.expire(profileKey, UserConstants.NAME_TIMEOUT, TimeUnit.HOURS);
 
                     // 2. 缓存Token信息
                     String tokenKey = UserConstants.CACHE_USER_TOKEN + ":" + tokenVO.getToken();

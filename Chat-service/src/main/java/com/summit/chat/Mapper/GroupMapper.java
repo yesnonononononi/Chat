@@ -4,7 +4,6 @@ import com.summit.chat.Annotation.AutoFill;
 import com.summit.chat.Enum.OperationType;
 import com.summit.chat.model.entity.GroupChat;
 import com.summit.chat.model.vo.GroupChatVO;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -19,10 +18,17 @@ public interface GroupMapper {
      * @param groupId
      * @return
      */
-    @Select("select id, group_name, group_description, creator_id, create_time, update_time, status, number, icon from group_chat where id = #{groupId}")
+    @Select("select g.id, g.group_name, g.group_description, g.creator_id, g.create_time, g.update_time, g.status, g.number, g.icon, " +
+            "IFNULL(u.nick_name, u.mobile) as creator_name " +
+            "from group_chat g " +
+            "left join user u on g.creator_id = u.id " +
+            "where g.id = #{groupId}")
     GroupChatVO queryGroupById(Long groupId);
 
-    @Select("select id, group_name, group_description, creator_id, create_time, update_time, status, number, icon from group_chat")
+    @Select("select g.id, g.group_name, g.group_description, g.creator_id, g.create_time, g.update_time, g.status, g.number, g.icon, " +
+            "IFNULL(u.nick_name, u.mobile) as creator_name " +
+            "from group_chat g " +
+            "left join user u on g.creator_id = u.id")
     List<GroupChatVO> queryAllGroup();
 
     @AutoFill(type = OperationType.INSERT)
@@ -34,15 +40,27 @@ public interface GroupMapper {
     @AutoFill(type = OperationType.UPDATE)
     void putGroup(GroupChat groupChat);
 
-    @Select("select id, group_name, group_description, creator_id, create_time, update_time, status, number, icon from group_chat where creator_id = #{userId}")
+    @Select("select g.id, g.group_name, g.group_description, g.creator_id, g.create_time, g.update_time, g.status, g.number, g.icon, " +
+            "IFNULL(u.nick_name, u.mobile) as creator_name " +
+            "from group_chat g " +
+            "left join user u on g.creator_id = u.id " +
+            "where g.creator_id = #{userId}")
     List<GroupChatVO> queryUserGroupByUserId(String userId);
 
 
-    @Select("select id, group_name, group_description, creator_id, create_time, update_time, status, number, icon from group_chat where group_name like concat(#{groupName},'%')")
+    @Select("select g.id, g.group_name, g.group_description, g.creator_id, g.create_time, g.update_time, g.status, g.number, g.icon, " +
+            "IFNULL(u.nick_name, u.mobile) as creator_name " +
+            "from group_chat g " +
+            "left join user u on g.creator_id = u.id " +
+            "where g.group_name like concat(#{groupName},'%')")
     List<GroupChatVO> queryGroupByName(String groupName);
 
 
-    @Select("select group_id, id, group_name, group_description, creator_id, create_time, update_time, status, number, icon from (select group_id from group_members where user_id = #{userID} and status != 2) u inner join group_chat gc on gc.id = u.group_id")
+    @Select("select gc.id, gc.group_name, gc.group_description, gc.creator_id, gc.create_time, gc.update_time, gc.status, gc.number, gc.icon, " +
+            "IFNULL(u.nick_name, u.mobile) as creator_name " +
+            "from (select group_id from group_members where user_id = #{userID} and status != 2) gm " +
+            "inner join group_chat gc on gc.id = gm.group_id " +
+            "left join user u on gc.creator_id = u.id")
     List<GroupChatVO> queryGroupByUserId(String userID);
 
     @AutoFill(type = OperationType.UPDATE)

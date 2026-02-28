@@ -1,7 +1,7 @@
-import type { chat } from "@/types/chat";
-import type { historyPage } from "@/types/msg";
+import type {chat} from "@/types/chat";
+import type {historyPage} from "@/types/msg";
 import request from "@/utils/axios";
-import { ApiHelper } from "@/utils/ApiHelper";
+import {ApiHelper} from "@/utils/ApiHelper";
 
 export class MsgApi {
   /**
@@ -29,7 +29,7 @@ export class MsgApi {
   /**
    * 撤回消息
    */
-  static async withDrawnMsg(dto: chat): Promise<boolean> {
+  static async withdrawnMsg(dto: chat): Promise<boolean> {
     if (!dto || !dto.msg.trim() || !dto.msgId || !dto.sendTime) {
       throw new Error("非法参数,请检查");
     }

@@ -16,9 +16,10 @@ public enum ChatEvent {
     UN_LOGIN("un_login"),
     CHAT_READ("chat_read"),// 消息已读通知
 
-
+    CHAT_WITHDRAWN("chat_withdrawn"), //消息撤回
     //系统
-    KICK_USER("force_logout");
+    KICK_USER("force_logout"),
+    AI_RES_STREAM ("ai_res_stream");
     final String type;
 
     ChatEvent(String type) {

@@ -28,4 +28,5 @@ public class SysNoticeConstants {
      */
     public static final String NOTICE_CACHE_PREFIX = "sys:notice:";
     public static final String NOTICE_CACHE_LIST = "sys:notice:list";
+    public static final String CACHE_LIKE_PREFIX = "sys:notice:like:";
 }

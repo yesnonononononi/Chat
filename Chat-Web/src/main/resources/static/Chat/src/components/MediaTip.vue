@@ -1,5 +1,6 @@
 <template>
-    <div class="absolute top-0 z-[100000] w-full h-auto flex items-center justify-between bg-white shadow-md border-b" v-if="isSend">
+    <div class="absolute top-0 z-[100000] w-full h-auto min-h-[100px] flex items-center justify-between bg-white shadow-md border-b"
+        v-if="isSend">
         <div class=" flex items-center gap-2 p-2">
             <img :src="user?.icon" alt="" class="w-10 h-10 rounded-full object-cover">
             <div>
@@ -10,8 +11,7 @@
         <div class="flex items-center gap-8 px-4" v-if="!isCancel">
             <span class="text-indigo-500 text-xs md:text-sm font-medium hover:text-indigo-700 cursor-pointer"
                 @click="accept">接受</span>
-            <span class="text-gray-400 text-xs md:text-sm hover:text-gray-600 cursor-pointer"
-                @click="reject">拒绝</span>
+            <span class="text-gray-400 text-xs md:text-sm hover:text-gray-600 cursor-pointer" @click="reject">拒绝</span>
         </div>
         <span class="text-gray-400 text-xs md:text-sm px-4" v-if="isCancel">已取消</span>
     </div>
@@ -26,11 +26,13 @@ import router from '../router';
 import { BusinessError } from '../exception/BusinessError';
 import { Log } from '../utils/TipUtil';
 import { userStore } from '../store/UserStore';
+
 const isSend = ref<boolean>(false);  //是否收到视频聊天
 const isCancel = ref<boolean>(false);
 const user = ref<MediaApplyDTO>()
 const user_me = userStore();
 let media: MediaWs | null = null;
+
 
 function receiveListen(data: MediaApplyDTO) {
     isSend.value = true;
@@ -38,20 +40,26 @@ function receiveListen(data: MediaApplyDTO) {
 }
 
 function acceptListen(data: any) {
-    isSend.value = false;
+        isSend.value = false;     
 }
 
 function rejectListen(data: any) {
-    isCancel.value = true;
-    setTimeout(() => { isSend.value = false }, 2000)
+ 
+        isCancel.value = true;
+        setTimeout(() => { isSend.value = false }, 2000)
+ 
+
 }
 
 function cancelListen(data: any) {
-    //对方取消视频聊天
-    console.log("对方取消了视频聊天");
-    isCancel.value = true;
-    isSend.value = false;
-    setTimeout(() => { isCancel.value = false }, 2000)
+   
+        //对方取消视频聊天
+        console.log("对方取消了视频聊天");
+        isCancel.value = true;
+        isSend.value = false;
+        setTimeout(() => { isCancel.value = false }, 2000);
+       
+
 }
 
 function initMediaListeners() {
@@ -64,7 +72,7 @@ function initMediaListeners() {
 }
 
 onMounted(async () => {
-    initMediaListeners();
+   if(user_me.isLogin) initMediaListeners();
 });
 
 watch(() => user_me.isLogin, (newVal) => {

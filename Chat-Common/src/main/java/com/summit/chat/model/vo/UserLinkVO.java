@@ -1,6 +1,7 @@
 package com.summit.chat.model.vo;
 
 import lombok.Data;
+
 import java.io.Serializable;
 
 @Data
@@ -11,4 +12,6 @@ public class UserLinkVO implements Serializable {
     private String nickName;
     private Integer isDelete;
     private Integer isFrequent;
+    private String lastMsgTime;
+    private String lastMsg;
 }

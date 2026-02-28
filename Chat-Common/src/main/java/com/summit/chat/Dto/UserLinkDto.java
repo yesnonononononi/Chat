@@ -17,5 +17,4 @@ public class UserLinkDto implements Serializable {
     private Integer isFrequent;
     private String userID;
 
-
 }

@@ -9,7 +9,7 @@ import com.summit.chat.Mapper.Cache.RedisProcessor;
 import com.summit.chat.Result.Result;
 import com.summit.chat.Utils.AliyunUtil;
 import com.summit.chat.service.Impl.Support.User.UserSupport;
-import com.summit.chat.service.Impl.Support.UserSupport.UserValidator;
+import com.summit.chat.service.Impl.Support.User.UserValidator;
 import com.summit.chat.service.User.Login.Chain.Factory.NodeFactoryTemplate;
 import com.summit.chat.service.User.Login.LoginService;
 import lombok.extern.slf4j.Slf4j;

@@ -40,6 +40,7 @@ public class NodeFactoryOfRegister implements NodeFactoryTemplate01 {
             case NodeTypeOfRegister.USEREXISTVALIDATE->beanFactory.getBean(UserExistValidateNode.class);
             case NodeTypeOfRegister.CACHESET->beanFactory.getBean(CacheSetNode.class);
             case NodeTypeOfRegister.TOKENGENERATE -> beanFactory.getBean(TokenGenerateNode.class);
+            case NodeTypeOfRegister.CONFIGREGISTRY -> beanFactory.getBean(ConfigRegistryNode.class);
             default -> throw new NoSuchNodeException(BaseConstants.CHAIN_CONFIG_EXCEPTION);
         };
         return result;
@@ -71,6 +72,7 @@ public class NodeFactoryOfRegister implements NodeFactoryTemplate01 {
                 NodeTypeOfRegister.CODEVALIDATE,
                 NodeTypeOfRegister.USEREXISTVALIDATE,
                 NodeTypeOfRegister.PW_SERVICE,
+                NodeTypeOfRegister.CONFIGREGISTRY,
                 NodeTypeOfRegister.DBVALIDATE,
                 NodeTypeOfRegister.RESULTGENERATE
         );
@@ -78,6 +80,7 @@ public class NodeFactoryOfRegister implements NodeFactoryTemplate01 {
     //数据库校验 - 结果封装 - 令牌生成  - 缓存
     public List<NodeTypeOfRegister> templateOfAutoRegisterByLogin(){
         return List.of(
+                NodeTypeOfRegister.CONFIGREGISTRY,
                 NodeTypeOfRegister.DBVALIDATE,
                 NodeTypeOfRegister.RESULTGENERATE,
                 NodeTypeOfRegister.TOKENGENERATE,

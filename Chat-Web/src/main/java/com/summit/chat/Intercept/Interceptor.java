@@ -1,6 +1,5 @@
 package com.summit.chat.Intercept;
 
-import com.summit.chat.Constants.AdminConstants;
 import com.summit.chat.Constants.UserConstants;
 import com.summit.chat.Enum.UserRoleEnum;
 import com.summit.chat.Mapper.Cache.RedisProcessor;
@@ -13,8 +12,6 @@ import jodd.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.util.concurrent.TimeUnit;
@@ -35,7 +32,7 @@ public class Interceptor implements HandlerInterceptor {
         // 检查是否为排除路径
         String requestURI = request.getRequestURI();
         System.out.println(requestURI);
-        if (requestURI.equals("/user/login") || requestURI.equals("/user/register") || requestURI.equals("/home") || requestURI.equals("/")) {
+        if (requestURI.equals("/user/login") || requestURI.equals("/user/register") || requestURI.equals("/home") || requestURI.equals("/") || requestURI.equals("/sign") || requestURI.contains("/chat-io")) {
             return true; // 直接放行
         }
         String token = request.getHeader("Authorization");

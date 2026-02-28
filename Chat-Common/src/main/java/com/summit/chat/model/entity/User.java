@@ -1,7 +1,5 @@
 package com.summit.chat.model.entity;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
@@ -15,6 +13,7 @@ public class User implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String id;
+
     private String nickName;
     @NotBlank(message = "密码不能为空")
     private String pw;

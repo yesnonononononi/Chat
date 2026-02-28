@@ -1,6 +1,7 @@
 package com.summit.chat.model.vo;
 
 import lombok.Data;
+
 import java.io.Serializable;
 
 /**
@@ -8,7 +9,7 @@ import java.io.Serializable;
  */
 @Data
 public class GroupMessagesVO implements Serializable {
-    private Long id;
+    private String id;
     private Long groupId;
     private Long senderNickName;
     private String content;

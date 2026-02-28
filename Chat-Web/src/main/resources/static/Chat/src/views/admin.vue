@@ -7,8 +7,10 @@
                 <span class="text-sm md:text-lg glow-white menu-item " @click="router.push({name:'user-admin'})">用户管理</span>
                 <span class="text-sm md:text-lg  glow-white menu-item" @click="router.push({name:'group-admin'})">群聊管理</span>
                 <span class="text-sm md:text-lg glow-white menu-item" @click="router.push({name:'system-admin'})">系统管理</span>
+                <span class="text-sm md:text-lg glow-white menu-item" @click="router.push({name:'emoji-admin'})">表情管理</span>
+                <span class="text-sm md:text-lg glow-white menu-item" @click="router.push({name:'emoji-category-admin'})">表情分类管理</span>
             </div>
-            <div id="right" class="w-full h-full flex flex-col">
+            <div id="right" class="flex-1 h-full flex flex-col min-w-0">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center">
                         <el-icon color="white" size="16" class="cursor-pointer" @click="isFold = !isFold">
@@ -21,8 +23,11 @@
                         </span>
                     </div>
                     <div class="flex items-center">
-                        <el-icon class="mr-4 cursor-pointer" size="16" color="white" @click="toggleTheme">
-                            <Moon />
+                        <el-icon v-if="white_page" class="mr-4 cursor-pointer" size="24" color="white" @click="toggleTheme">
+                            <Moon /> 
+                        </el-icon>  
+                        <el-icon v-if="!white_page" class="mr-4 cursor-pointer" size="24" color="yellow" @click="toggleTheme">
+                            <Sunny /> 
                         </el-icon>
                         <el-icon color="white" size="16" class="mr-4 cursor-pointer">
                             <Bell />
@@ -40,8 +45,9 @@
 </template>
 <script lang="ts" setup>
 import router from '../router';
-import { userStore } from '../store/UserStore';
-import { ref } from 'vue';
+import {userStore} from '../store/UserStore';
+import {ref} from 'vue';
+
 const user = userStore();
 const curPage = ref<string>();
 const isFold = ref<boolean>(false);

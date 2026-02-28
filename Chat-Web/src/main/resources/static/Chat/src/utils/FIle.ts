@@ -1,4 +1,4 @@
-import { BusinessError } from "@/exception/BusinessError";
+import {BusinessError} from "@/exception/BusinessError";
 
 export class FileUtil{
     static async beforeValidate(file:File):Promise<File>{

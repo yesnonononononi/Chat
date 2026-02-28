@@ -39,9 +39,9 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref, computed, onUnmounted } from "vue";
-import { Log } from "../utils/TipUtil";
-import { userStore } from "../store/UserStore";
+import {computed, onUnmounted, reactive, ref} from "vue";
+import {Log} from "../utils/TipUtil";
+import {userStore} from "../store/UserStore";
 import AuthLayout from "../components/AuthLayout.vue";
 
 const loading = ref(false);

@@ -22,4 +22,14 @@
         where id = #{id}
     </update>
 
+    <select id="queryLikeList" resultType="com.summit.chat.model.vo.NoticeLikeVO">
+        select sn.id as noticeId,sn.`like` from sys_notice sn
+        <where>
+        sn.id in
+            <foreach collection="list" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </where>
+    </select>
+
 </mapper>

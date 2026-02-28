@@ -28,13 +28,29 @@
                 <p class="text-xs md:text-sm text-gray-400">人数: {{ group?.number || '未知' }}</p>
                 <div class="flex items-center gap-2 m-2" v-if="group_members.length >= 1">
                     <div v-for="(member) in group_members" :key="member.id" class="cursor-pointer"
-                        @click.prevent="getUserMoreInfo(member.id)">
-                        <img class="mr-2 w-10 h-10 rounded-full" :src="member.avatar" />
-                        <p class="text-xs text-gray-400 max-w-10 truncate">
-                            {{ member.role !== GroupMember.MEMBER ? '' : member.nickName }}
-                            <span class="text-yellow-300" v-if="member.role === GroupMember.ADMIN">@管理员</span>
-                            <span class="text-yellow-300" v-if="member.role === GroupMember.OWNER">@群主</span>
-                        </p>
+                        @click.prevent="getUserMoreInfo(member.userId)">
+                        <el-popover trigger="contextmenu" placement="top" :width=50
+                            :disabled="member.role === GroupMember.ADMIN || member.role === GroupMember.OWNER">
+                            <template #reference>
+                                <div class="w-full h-full text-center">
+                                    <img class="mr-2 w-10 h-10 rounded-full" :src="member.avatar" />
+                                    <p class="text-xs text-gray-400 max-w-10 truncate">
+                                        {{ member.role !== GroupMember.MEMBER ? '' : member.nickName }}
+                                        <span class="text-yellow-300"
+                                            v-if="member.role === GroupMember.ADMIN">@管理员</span>
+                                        <span class="text-yellow-300"
+                                            v-if="member.role === GroupMember.OWNER">@群主</span>
+                                    </p>
+                                </div>
+
+                            </template>
+                            <div class="w-auto flex flex-col items-center text-center gap-2 " v-show="member.role === GroupMember.MEMBER ||(user.userInfo?.role === GroupMember.ADMIN && member.role !== GroupMember.OWNER )|| user.userInfo?.role === GroupMember.OWNER">
+                                <span
+                                    class="border-b border-gray-400 w-full cursor-pointer hover:text-red-400" @click="kickUser(member)">踢出群聊</span>
+                                <span class="w-full cursor-pointer hover:text-red-400" @click="muteUser(member)">{{ member.status === GroupStatus.FORBIDDEN ? '解禁' :'禁言' }}</span>
+                            </div>
+                        </el-popover>
+
                     </div>
                 </div>
 
@@ -52,7 +68,7 @@
 
                         <div class="" v-if="apply.status === GroupMemberStatusEnum.PENDING">
                             <el-button type="primary" @click="approveGroupApply(apply)">同意</el-button>
-                            <el-button type="danger" @click="rejectApplication(apply)">拒绝</el-button>
+                            <el-button type="danger" @click="handleRejectClick(apply)">拒绝</el-button>
                         </div>
                         <span class="text-xs md:text-sm text-gray-400 mr-2"
                             v-else-if="apply.status === GroupMemberStatusEnum.APPROVE">已批准</span>
@@ -117,25 +133,35 @@
             </el-collapse-item>
         </el-collapse>
 
+        <el-dialog v-model="rejectDialogVisible" title="拒绝申请" width="30%">
+            <el-input v-model="rejectReason" placeholder="请输入拒绝理由" type="textarea" :rows="3" />
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="rejectDialogVisible = false">取消</el-button>
+                    <el-button type="primary" @click="confirmReject">确定</el-button>
+                </span>
+            </template>
+        </el-dialog>
     </div>
 
 </template>
 <script setup lang="ts">
-import { nextTick, onMounted, ref } from "vue";
-import { GroupApi } from "../api/group";
-import type { GroupChatVO, GroupMemberVO, GroupApplicationVO, groupNoticeVO } from "../types/group";
-import { useRoute } from "vue-router";
-import { Log } from "../utils/TipUtil";
-import { BusinessError } from "../exception/BusinessError";
+import {nextTick, onMounted, ref} from "vue";
+import {GroupApi} from "../api/group";
+import type {GroupApplicationVO, GroupChatVO, GroupMemberVO, groupNoticeVO, putGroupDto} from "../types/group";
+import {useRoute} from "vue-router";
+import {Log} from "../utils/TipUtil";
+import {BusinessError} from "../exception/BusinessError";
 import router from "../router";
-import { userStore } from "../store/UserStore";
-import { GroupMemberStatusEnum } from "../enums/GroupMemberStatusEnum";
-import { GroupMember } from "../enums/GroupMember";
-import { TimeUtil } from "../utils/time";
-import { values } from "lodash";
-import { FileUtil } from "../utils/FIle";
-import { uploadFile } from "../api/common";
-import type { data } from "../types/user";
+import {userStore} from "../store/UserStore";
+import {GroupMemberStatusEnum} from "../enums/GroupMemberStatusEnum";
+import {GroupMember} from "../enums/GroupMember";
+import {TimeUtil} from "../utils/time";
+import {FileUtil} from "../utils/FIle";
+import {uploadFile} from "../api/common";
+import type {data} from "../types/user";
+import {GroupStatus} from "../enums/GroupStatus";
+
 const route = useRoute();
 const user = userStore();
 const fileList = ref<any[]>();
@@ -147,6 +173,11 @@ const group_notify = ref<groupNoticeVO[]>();
 const loading = ref(false);
 const editDescription = ref<boolean>(false);
 const newDesciption = ref<any>("");
+// 拒绝相关
+const rejectDialogVisible = ref(false);
+const rejectReason = ref("");
+const currentRejectApp = ref<GroupApplicationVO | null>(null);
+
 onMounted(async () => {
     if (!user.userInfo || !user.userInfo.id || !user.isLogin) {
         router.push("/login");
@@ -231,10 +262,10 @@ function queryGroupApplication() {
 }
 
 function getUserMoreInfo(user_id: string) {
+    console.log(user_id)
     router.push({
         name: "user-introduce",
-        params
-            : { id: user_id }
+        params : { id: user_id }
     })
 }
 
@@ -299,7 +330,20 @@ async function delNotify(notifyID: string) {
 
 
 }
-function rejectApplication(apply: GroupApplicationVO) {
+function handleRejectClick(apply: GroupApplicationVO) {
+    currentRejectApp.value = apply;
+    rejectDialogVisible.value = true;
+    rejectReason.value = "";
+}
+
+function confirmReject() {
+    if (!currentRejectApp.value) return;
+    
+    rejectApplication(currentRejectApp.value, rejectReason.value);
+    rejectDialogVisible.value = false;
+}
+
+function rejectApplication(apply: GroupApplicationVO, reason: string) {
     if (!user.userInfo) {
         Log.error("请先登录");
         return;
@@ -308,7 +352,8 @@ function rejectApplication(apply: GroupApplicationVO) {
         id: apply.id,
         applicantId: apply.applicantId,
         groupId: apply.groupId,
-        processBy: user.userInfo.id
+        processedBy: user.userInfo.id,
+        rejectionReason: reason
     }).then(() => {
         Log.ok("操作成功");
         apply.status = GroupMemberStatusEnum.REJECT;
@@ -357,6 +402,60 @@ async function editDes() {
     await nextTick();
     newDesciption.value?.focus();
 }
+
+
+
+async function muteUser(user: GroupMemberVO) {
+    try {
+        if (!user.id || loading.value) return;
+        loading.value = true;
+        const newStatus = user.status === GroupStatus.FORBIDDEN ? GroupStatus.NORMAL : GroupStatus.FORBIDDEN;
+        const body: putGroupDto = {
+            userId: user.userId,
+            groupId: groupId,
+            status: newStatus,
+            memberId: user.id
+        }
+        await GroupApi.banMember(body);
+        Log.ok("操作成功");
+        user.status = newStatus;
+    } catch (err) {
+        if (err instanceof BusinessError) {
+            Log.error(err.message);
+        } else {
+            Log.error("服务繁忙");
+            console.error("未能成功修改群成员状态", err);
+        }
+    } finally {
+        loading.value = false;
+    }
+}
+
+async function kickUser(user: GroupMemberVO) {
+    try {
+        if (!user.id || loading.value) return;
+        loading.value = true;
+        const body: putGroupDto = {
+            userId: user.userId,
+            groupId: groupId,
+            status: GroupStatus.NORMAL,
+            memberId: user.id
+        }
+        await GroupApi.delMember(body);
+        Log.ok("操作成功");
+        group_members.value = group_members.value.filter(item => item.id !== user.id);
+    } catch (err) {
+        if (err instanceof BusinessError) {
+            Log.error(err.message);
+        } else {
+            Log.error("服务繁忙");
+            console.error("踢出操作未能成功", err);
+        }
+    } finally {
+        loading.value = false;
+    }
+}
+
 
 </script>
 <style scoped>

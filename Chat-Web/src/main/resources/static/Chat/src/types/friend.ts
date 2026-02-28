@@ -18,12 +18,14 @@ export interface friend_apply_dto {
 }
 
 export interface friend_info {
-  isFrequent: string;
+  isFrequent?: string;
   nickName: string;
-  remark: string;
+  remark?: string;
   icon: string;
   linkId: string;
-  isDelete: string;
+  isDelete?: string;
+  lastMsgTime?: string;
+  lastMsg?: string;
 }
 
 export interface UserLinkDto {

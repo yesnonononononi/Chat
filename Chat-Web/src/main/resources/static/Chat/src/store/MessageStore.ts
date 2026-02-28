@@ -1,11 +1,18 @@
-import type { chat, ChatGroup } from "@/types/chat";
-import type { notify } from "@/types/notification";
-import type { SysNotice } from "@/types/sysNotice";
-import { defineStore } from "pinia";
+import type {chat, ChatGroup} from "@/types/chat";
+import type {SysNotice} from "@/types/sysNotice";
+import {defineStore} from "pinia";
 
+export interface groupMsg{
+  groupMsgList:ChatGroup[],
+  lastMsg?:ChatGroup
+}
+export interface privateMsg{
+  privateMsgList:chat[],
+  lastMsg?:chat
+}
 export interface session {
-  msgList: chat[]; //信息列表
-  groupMsgList: ChatGroup[];
+  msgList: privateMsg; //信息列表
+  groupMsgList: groupMsg;
   page: number; //当前页码,
   pageSize: number; //每页大小
   hasMore: boolean; //是否还有更多历史消息
@@ -57,8 +64,14 @@ export const msgStore = defineStore("msg", {
       const sid = this.getSessionKey(id, objId);
       if (this.sessionMap[sid]) return sid; //如果本地持久化了,直接返回
       this.sessionMap[sid] = {
-        msgList: [],
-        groupMsgList: [],
+        msgList: {
+          privateMsgList: [],
+          lastMsg: undefined
+        },
+        groupMsgList: {
+          groupMsgList: [],
+          lastMsg: undefined
+        },
         page: 1,
         pageSize: 15,
         hasMore: true,
@@ -68,7 +81,7 @@ export const msgStore = defineStore("msg", {
     },
 
     //获取会话信息列表
-    getMsgList(id: string): chat[] | null {
+    getMsgList(id: string): privateMsg | null {
       let session: session | undefined = this.sessionMap[id];
       if (!session) {
         // 静默返回null，不打印错误日志，避免初始化时大量报错
@@ -78,7 +91,7 @@ export const msgStore = defineStore("msg", {
     },
 
     // 获取群组信息列表
-    getGroupMsgList(id: string): ChatGroup[] | null {
+    getGroupMsgList(id: string): groupMsg | null {
       let session: session | undefined = this.sessionMap[id];
       if (!session) {
         // 静默返回null，不打印错误日志，避免初始化时大量报错
@@ -89,55 +102,66 @@ export const msgStore = defineStore("msg", {
 
     //添加私聊信息
     addMsg(id: string, msg: chat) {
-      let msgList = this.getMsgList(id);
-      if (!msgList) {
+      let msgData = this.getMsgList(id);
+      if (!msgData) {
         // 静默处理，避免控制台刷屏
         return;
       }
       // 避免重复添加
-      if (msgList.some(existingMsg => existingMsg.msgId === msg.msgId)) {
+      if (msgData.privateMsgList.some(existingMsg => existingMsg.msgId === msg.msgId)) {
         return;
       }
-      msgList.push(msg);
+      msgData.privateMsgList.push(msg);
+      msgData.lastMsg = msg;
     },
     //添加群组信息
     addGroupMsg(id: string, msg: ChatGroup) {
-      let msgList = this.getGroupMsgList(id);
-      if (!msgList) {
+      let msgData = this.getGroupMsgList(id);
+      if (!msgData) {
         console.log("未检测到消息列表");
         return;
       }
       // 避免重复添加
-      if (msgList.some(existingMsg => existingMsg.msgId === msg.msgId)) {
+      if (msgData.groupMsgList.some(existingMsg => existingMsg.msgId === msg.msgId)) {
         return;
       }
-      msgList.push(msg);
+      msgData.groupMsgList.push(msg);
+      msgData.lastMsg = msg;
     },
     //添加私聊信息列表
     addMsgs(id: string, msg: chat[]) {
-      let msgList = this.getMsgList(id);
-      if (!msgList) {
+      let msgData = this.getMsgList(id);
+      if (!msgData) {
         // 静默处理，避免控制台刷屏
         return;
       }
       // 过滤掉已存在的消息
       const newMsgs = msg.filter(newMsg => 
-        !msgList.some(existingMsg => existingMsg.msgId === newMsg.msgId)
+        !msgData.privateMsgList.some(existingMsg => existingMsg.msgId === newMsg.msgId)
       );
-      msgList.unshift(...newMsgs);
+      msgData.privateMsgList.unshift(...newMsgs);
+      // 批量添加通常是加载历史记录，lastMsg应该是列表末尾的最新消息，或者是已有lastMsg
+      // 这里不做修改，因为如果是历史消息，lastMsg应该保持为最新的那个（即原来的lastMsg）
+      // 如果是首次加载，lastMsg应该是列表最后一个
+      if (!msgData.lastMsg && msgData.privateMsgList.length > 0) {
+          msgData.lastMsg = msgData.privateMsgList[msgData.privateMsgList.length - 1];
+      }
     },
     //添加群组信息列表
     addGroupMsgs(id: string, msg: ChatGroup[]) {
-      let msgList = this.getGroupMsgList(id);
-      if (!msgList) {
+      let msgData = this.getGroupMsgList(id);
+      if (!msgData) {
         // 静默处理，避免控制台刷屏
         return;
       }
       // 过滤掉已存在的消息
       const newMsgs = msg.filter(newMsg => 
-        !msgList.some(existingMsg => existingMsg.msgId === newMsg.msgId)
+        !msgData.groupMsgList.some(existingMsg => existingMsg.msgId === newMsg.msgId)
       );
-      msgList.unshift(...newMsgs);
+      msgData.groupMsgList.unshift(...newMsgs);
+      if (!msgData.lastMsg && msgData.groupMsgList.length > 0) {
+          msgData.lastMsg = msgData.groupMsgList[msgData.groupMsgList.length - 1];
+      }
     },
 
     //添加系统消息列表
@@ -160,8 +184,9 @@ export const msgStore = defineStore("msg", {
     },
     // 更新私聊消息状态
     updateMsgStatus(sessionId: string, msgId: string, status: number) {
-      const msgList = this.getMsgList(sessionId);
-      if (!msgList) return;
+      const msgData = this.getMsgList(sessionId);
+      if (!msgData) return;
+      const msgList = msgData.privateMsgList;
 
       let found = false;
       // 从后往前查找（假设新消息在后面，回执通常是针对最近的消息）
@@ -192,11 +217,11 @@ export const msgStore = defineStore("msg", {
     },
     // 批量更新私聊会话中所有消息的状态（例如全部已读）
     updateAllMsgStatus(sessionId: string, status: number) {
-      const msgList = this.getMsgList(sessionId);
-      if (!msgList) return;
+      const msgData = this.getMsgList(sessionId);
+      if (!msgData) return;
 
       // 遍历所有消息，仅更新状态不一致的
-      msgList.forEach((msg) => {
+      msgData.privateMsgList.forEach((msg) => {
         if (msg.status !== status) {
           msg.status = status;
         }
@@ -206,8 +231,14 @@ export const msgStore = defineStore("msg", {
     resetSession(id: string) {
       const session = this.sessionMap[id];
       if (session) {
-        session.msgList = [];
-        session.groupMsgList = [];
+        session.msgList = {
+          privateMsgList: [],
+          lastMsg: undefined
+        };
+        session.groupMsgList = {
+          groupMsgList: [],
+          lastMsg: undefined
+        };
         session.page = 1;
         session.hasMore = true;
       }

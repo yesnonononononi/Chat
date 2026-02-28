@@ -6,10 +6,7 @@ import com.summit.chat.Dto.GroupChatDto;
 import com.summit.chat.Enum.GroupStatusEnum;
 import com.summit.chat.Utils.GlobalIDWorker;
 import com.summit.chat.model.entity.GroupChat;
-import com.summit.chat.service.Impl.FileLoadServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
 @Component
 public class GroupSupport {

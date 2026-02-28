@@ -18,5 +18,5 @@ public class GroupMessageDTO implements Serializable {
     private String emitterId;
     private String messageContent;
     private String sentAt;
-    private String messageType;
+    private String type;
 }

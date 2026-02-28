@@ -48,6 +48,13 @@ public class SysNoticeController {
         return sysNoticeService.list();
     }
 
+    @GetMapping("/queryLikeList/{ids}")
+    @Operation(summary = "批量查询点赞列表根据系统公告id")
+    public Result queryLikeList(@PathVariable String ids){
+        return sysNoticeService.queryLikeList(ids);
+    }
+
+
     @PutMapping("/update")
     @RequireRole
     @Operation(summary = "更新系统公告")
@@ -63,5 +70,12 @@ public class SysNoticeController {
     @CacheEvict(value = {SysNoticeConstants.NOTICE_CACHE_LIST, SysNoticeConstants.NOTICE_CACHE_PREFIX}, allEntries = true)
     public Result delete(@PathVariable Long id) {
         return sysNoticeService.delete(id);
+    }
+
+    @GetMapping("/like/{id}")
+    @Operation(summary = "点赞系统公告")
+    @CacheEvict(value = SysNoticeConstants.NOTICE_CACHE_LIST, allEntries = true)
+    public Result like(@PathVariable String id) {
+        return sysNoticeService.like(id);
     }
 }

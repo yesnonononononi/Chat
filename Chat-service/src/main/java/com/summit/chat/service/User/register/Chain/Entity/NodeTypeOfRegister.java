@@ -8,7 +8,9 @@ public enum NodeTypeOfRegister{
     RESULTGENERATE("结果封装节点"),
     USEREXISTVALIDATE("用户存在校验节点"),
     CACHESET("缓存操作节点"),
+    CONFIGREGISTRY("用户配置节点"),
     TOKENGENERATE("令牌生成");
+
 
     public final String nodeType;
 

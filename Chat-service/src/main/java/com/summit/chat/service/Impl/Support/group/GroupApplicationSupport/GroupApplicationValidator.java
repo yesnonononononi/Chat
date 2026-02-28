@@ -1,9 +1,7 @@
 package com.summit.chat.service.Impl.Support.group.GroupApplicationSupport;
 
 import com.summit.chat.Constants.GroupConstants;
-import com.summit.chat.Constants.GroupMsgConstants;
 import com.summit.chat.Dto.GroupApplicationDTO;
-import com.summit.chat.Enum.GroupRole;
 import com.summit.chat.Mapper.GroupApplicationMapper;
 import com.summit.chat.model.vo.GroupMembersVO;
 import com.summit.chat.service.Impl.Support.group.AbstractGroupValidator;

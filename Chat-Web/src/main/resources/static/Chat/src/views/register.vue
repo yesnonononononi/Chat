@@ -49,11 +49,11 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref, onUnmounted } from "vue";
-import type { register } from "../types/register";
-import { Log } from "../utils/TipUtil";
-import { userStore } from "../store/UserStore";
-import { RsaUtil } from "@/utils/RsaUtil";
+import {onUnmounted, reactive, ref} from "vue";
+import type {register} from "../types/register";
+import {Log} from "../utils/TipUtil";
+import {userStore} from "../store/UserStore";
+import {RsaUtil} from "@/utils/RsaUtil";
 import AuthLayout from "../components/AuthLayout.vue";
 
 const loading = ref(false);

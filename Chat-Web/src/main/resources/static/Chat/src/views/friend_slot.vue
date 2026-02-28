@@ -19,9 +19,9 @@
                     </el-button>
                 </div>
             </el-header>
-            <el-container >
+            <el-container  >
                 <el-main>
-                    <div>
+                    <div class="w-full h-[70vh]">
                         <div class="w-full">
                             <el-input v-model="input" placeholder="请输入群聊/用户名" class="rounded-2xl"
                                 @keyup.enter="queryPerson ? search(input) : searchGroup(input)">
@@ -33,8 +33,8 @@
                                 </template>
                             </el-input>
                         </div>
-                        <div class="w-full mt-4">
-                            <el-scrollbar class="flex w-full h-[500px] flex-col  gap-y-4 ">
+                        <div class="w-full h-full mt-4">
+                            <el-scrollbar class="flex w-full h-[70%] flex-col  gap-y-4 ">
 
                                 <div class=" w-full  h-20 mb-4  rounded-xl" v-if="queryPerson">
                                     <div v-for="item in searchList" :key="item.id"
@@ -92,21 +92,43 @@
                 </el-main>
             </el-container>
         </el-container>
+        
+        <!-- 添加好友弹窗 -->
+        <el-dialog v-model="friendDialogVisible" title="添加好友" width="80%" :before-close="handleFriendClose">
+            <el-input v-model="friendApplyReason" placeholder="请输入申请理由" type="textarea" :rows="3" />
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="friendDialogVisible = false">取消</el-button>
+                    <el-button type="primary" @click="confirmSendFriendApplication">发送申请</el-button>
+                </span>
+            </template>
+        </el-dialog>
+
+        <!-- 申请入群弹窗 -->
+        <el-dialog v-model="groupDialogVisible" title="申请入群" width="80%" :before-close="handleGroupClose">
+            <el-input v-model="groupApplyReason" placeholder="请输入申请理由" type="textarea" :rows="3" />
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="groupDialogVisible = false">取消</el-button>
+                    <el-button type="primary" @click="confirmSendGroupApplication">发送申请</el-button>
+                </span>
+            </template>
+        </el-dialog>
     </div>
 </template>
 <script setup lang="ts">;
-import { FriendApi } from '../api/friend';
-import { UserApi } from '../api/user';
-import { GroupApi } from '../api/group';
-import { type search_user, type userInfo, type data, type page } from '../types/user';
-import type { friend_apply, friend_apply_dto } from '../types/friend';
-import { onMounted, ref } from 'vue';
-import { Log } from '../utils/TipUtil';
-import { userStore } from '../store/UserStore';
+import {FriendApi} from '../api/friend';
+import {UserApi} from '../api/user';
+import {GroupApi} from '../api/group';
+import {type search_user, type userInfo} from '../types/user';
+import type {friend_apply_dto} from '../types/friend';
+import {ref} from 'vue';
+import {Log} from '../utils/TipUtil';
+import {userStore} from '../store/UserStore';
 import router from '../router';
-import { Search } from '@element-plus/icons-vue';
-import type { GroupApplicationDTO, GroupChatDto } from '../types/group';
-import { BusinessError } from '../exception/BusinessError';
+import {Search} from '@element-plus/icons-vue';
+import type {GroupApplicationDTO, GroupChatDto} from '../types/group';
+import {BusinessError} from '../exception/BusinessError';
 
 const input = ref<string>('');
 const queryPerson = ref<boolean>(true);
@@ -116,6 +138,23 @@ const userInfo = ref<userInfo>();
 const loading = ref<boolean>(false);
 const user_me = userStore();
  
+// 好友申请相关
+const friendDialogVisible = ref(false);
+const friendApplyReason = ref('');
+const currentFriendId = ref('');
+
+// 群组申请相关
+const groupDialogVisible = ref(false);
+const groupApplyReason = ref('');
+const currentGroupId = ref('');
+
+const handleFriendClose = (done: () => void) => {
+    done();
+}
+
+const handleGroupClose = (done: () => void) => {
+    done();
+}
 
 async function search(nickName: string) {
     if (loading.value) return;
@@ -155,19 +194,27 @@ async function searchGroup(groupName: string) {
         loading.value = false;
     }
 }
-async function sendApplication(user_id: string) {
+
+function sendApplication(user_id: string) {
+    currentFriendId.value = user_id;
+    friendApplyReason.value = "";
+    friendDialogVisible.value = true;
+}
+
+async function confirmSendFriendApplication() {
     if (loading.value) return;
     try {
         loading.value = true;
-        if (!user_id || !user_me.userInfo) { Log.error('未获取到用户信息'); return; }
+        if (!currentFriendId.value || !user_me.userInfo) { Log.error('未获取到用户信息'); return; }
         const body: friend_apply_dto = {
             id: "",
-            applyReason: "",
-            recipientId: user_id,
+            applyReason: friendApplyReason.value,
+            recipientId: currentFriendId.value,
             applicantId: user_me.userInfo.id
         }
         await FriendApi.sendApplication(body);
         loading.value = false;
+        friendDialogVisible.value = false;
         Log.ok("操作成功");
 
     } catch (error: any) {
@@ -181,24 +228,32 @@ async function sendApplication(user_id: string) {
         loading.value = false;
     }
 }
-async function sendApplicationGroup(groupId: string) {
+
+function sendApplicationGroup(groupId: string) {
+    currentGroupId.value = groupId;
+    groupApplyReason.value = "";
+    groupDialogVisible.value = true;
+}
+
+async function confirmSendGroupApplication() {
     if (loading.value) return;
     try {
         loading.value = true;
         const body: GroupApplicationDTO = {
-            groupId: groupId,
-            applicationReason: "",
+            groupId: currentGroupId.value,
+            applicationReason: groupApplyReason.value,
             applicantId: user_me.userInfo?.id,
         }
         await GroupApi.applyGroup(body);
         loading.value = false;
+        groupDialogVisible.value = false;
         Log.ok("操作成功");
     } catch (error: any) {
         if (error instanceof BusinessError) {
             Log.error(error.message);
         } else {
             Log.error("服务繁忙");
-            console.error("发送群组请求遇到问题", error);
+            console.error("发送入群请求遇到问题", error);
         }
     } finally {
         loading.value = false;

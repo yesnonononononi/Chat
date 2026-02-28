@@ -1,6 +1,5 @@
 <template>
-    <div class="common-layout" v-loading="loading"
-        element-loading-background="rgba(220, 220, 220, 0.5)">
+    <div class="common-layout" v-loading="loading" element-loading-background="rgba(220, 220, 220, 0.5)">
         <el-container>
             <el-header height="6vh">
                 <div class="flex justify-between items-center w-full h-[6vh] p-1 border-b-2">
@@ -19,31 +18,51 @@
                         <p v-if="isLoading">正在加载中...</p>
                         <div v-for="item in msgList" :key="item.msgId" class="mb-6 ">
                             <!-- 群成员 -->
-                            <div v-if="user.userInfo && item.emitterId != user.userInfo.id" @click.prevent="toIntroduce(item.emitterId)" class="flex items-center cursor-pointer">
+                            <div v-if="user.userInfo && item.emitterId != user.userInfo.id"
+                                class="flex items-start cursor-pointer">
 
-                                <img :src="item.icon" class="w-10 h-10 md:w-12 md:h-12 rounded-xl" alt="">
+                                <img :src="item.icon" class="w-10 h-10 md:w-12 md:h-12 rounded-xl"
+                                    @click.prevent="toIntroduce(item.emitterId)" alt="">
 
                                 <div class="mx-4">
                                     <p class="mb-2 text-sm text-gray-400">{{ item.nickName || '' }}</p>
-                                    <div
-                                        class="border h-auto border-gray-500/50 rounded-sm inline-block max-w-64 break-words">
-                                        <p class="text-xs md:text-sm mx-2">{{ item.msg }}</p>
+                                    <div class="border h-auto border-gray-500/50 rounded-sm inline-block max-w-64 break-words"
+                                        :class="item.type !== MsgType.TEXT ? 'border-none' : 'border'">
+                                        <p v-if="item.type === MsgType.TEXT" class="text-xs md:text-sm mx-2">{{
+                                            item.msg }}</p>
+                                        <img v-else-if="item.type === MsgType.IMAGE || item.type === MsgType.EMOJI"
+                                            :src="item.emoji?.url" :width="item.emoji?.width"
+                                            :height="item.emoji?.height" :alt="item.emoji?.content"
+                                            class="max-h-32 max-w-32 pointer-events-none user-drag-none select-none object-cover ">
                                     </div>
 
                                 </div>
                             </div>
                             <!-- 自己 -->
                             <div v-else class="">
-                                <div class="flex justify-end items-center">
-                                    <div
-                                        class="border h-auto border-gray-500/50 max-w-[50%] inline-block mr-2 break-words">
-                                        <p class="text-xs md:text-sm mx-2">{{ item.msg }}</p>
-
-                                    </div>
+                                <div class="flex justify-end items-start">
+                                    <el-popover placement="top" :width="60" trigger="contextmenu">
+                                        <div style="text-align: center; margin: 0"
+                                            v-if="item.createTime && Date.now() - item.createTime < MAX_WHIHWRAWN_TIME">
+                                            <el-button size="small" type="danger" link
+                                                @click="recall(item)">撤回</el-button>
+                                        </div>
+                                        <template #reference>
+                                            <div class="border mt-1  border-gray-500/50  inline-block mr-2 break-words cursor-pointer"
+                                                :class="item.type !== MsgType.TEXT ? 'border-none' : 'border'">
+                                                <p v-if="item.type === MsgType.TEXT" class="text-xs  md:text-sm mx-2">{{
+                                                    item.msg }}
+                                                </p>
+                                                <img v-else-if="item.type === MsgType.IMAGE || item.type === MsgType.EMOJI"
+                                                    :src="item.emoji?.url" :width="item.emoji?.width"
+                                                    :height="item.emoji?.height" :alt="item.emoji?.content"
+                                                    class=" max-h-32 max-w-32 pointer-events-none user-drag-none select-none object-cover ">
+                                            </div>
+                                        </template>
+                                    </el-popover>
 
                                     <img :src="user.userInfo.icon" class="w-10 h-10 md:w-12 md:h-12 rounded-xl"
                                         v-if="user.userInfo" alt="">
-
                                 </div>
 
                             </div>
@@ -54,56 +73,51 @@
 
             </el-main>
             <el-footer>
-                <div class="relative border-t-2 h-[20vh] md:h-[27vh] ">
-                    <div id="tool" class="w-full flex items-center gap-x-4 jutify-between">
-                       <el-icon size="24" class="hover:text-indigo-400 cursor-pointer"><Star /></el-icon>
-                        <el-icon size="24" class="hover:text-indigo-400 cursor-pointer"><VideoCamera /></el-icon> 
-                    </div>
-                    <el-input v-model="user_msg_input" type="textarea" class=" w-full h-full  p-2" resize="none"
-                        :disabled="false" :input-style="{ backgroundColor: '#ECEEF1', height: '100%' }" :maxlength="200"
-                        show-word-limit :rows=8 @keydown.enter.exact.prevent="send($event)"
-                        @keydown.ctrl.enter="handleCtrlEnter" />
-                    <div class="absolute bottom-4 right-4 cursor-pointer" @click="send">
-                        <el-icon class="" size="24">
-                            <Right />
-                        </el-icon>
-                    </div>
-                </div>
+                <ChatInput 
+                    v-model="user_msg_input" 
+                    :show-video-call="false"
+                    @send="send"
+                />
             </el-footer>
         </el-container>
     </div>
 </template>
 <script setup lang="ts">
 import { GroupApi } from '../api/group';
-import { Ws, type MsgAck } from '../utils/Socket/webSocket';
+import { type MsgAck } from '../utils/Socket/webSocket';
 import { msgStore } from '../store/MessageStore';
 import { userStore } from '../store/UserStore';
-import { computed, nextTick, onMounted, onUnmounted, watch } from 'vue';
+import { socketStore } from '../store/SocketStore';
+import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
-import type { Group } from '../types/group';
+import type { Group, GroupMessageVO } from '../types/group';
 import { Log } from '../utils/TipUtil';
-import { ref, type Ref } from 'vue';
 import router from '../router';
 import { ChatService } from '../services/ChatService';
 import type { ChatGroup } from '../types/chat';
 import type { ElScrollbar } from 'element-plus';
-import { GroupMsgType } from '../enums/GroupMsgType';
+import { MsgType } from '../enums/GroupMsgType';
 import { BusinessError } from '../exception/BusinessError';
-
+import type { EmojiVO } from '../types/emoji';
+import ChatInput from './ChatInput.vue';
 const wrapEl = ref<InstanceType<typeof ElScrollbar>>();
 const user_msg_input = ref("");
 const msg = msgStore();
 const user = userStore();
-const ws = user.getWs();
+const socket = socketStore();
+const ws = socket.getWs();
 const route = useRoute();
 const groupId = route.params.id as string;
 const group = ref<Group>();
-const currentSessionId = computed(() => { { return msg.getSessionKey(user?.userInfo?.id || "", groupId) } return ""; });
-const msgList = computed(() => { if (currentSessionId.value) return msg.getGroupMsgList(currentSessionId.value) });
+const currentSessionId = computed(() => { { return msg.getSessionKey(user?.userInfo?.id || "", groupId) } });
+const msgData = computed(() => { if (currentSessionId.value) return msg.getGroupMsgList(currentSessionId.value) });
+const msgList = computed(() => msgData.value ? msgData.value.groupMsgList : []);
 const isLoading = ref(false);
 const currentSession = computed(() => { if (currentSessionId.value) return msg.getSession(currentSessionId.value) });
 const groupName = route.params.groupName as string;
 const loading = ref(false);
+const MAX_WHIHWRAWN_TIME = 1000 * 60 * 5;
+
 onMounted(async () => {
     if (!groupId) {
         Log.error("未获取到群聊基本信息");
@@ -162,36 +176,28 @@ watch(msgList, () => {
     });
 }, { deep: true });
 
-function send(e: Event) {
+function send(type: MsgType = MsgType.TEXT, emoji?: EmojiVO) {
     if (!user.userInfo || !user.userInfo.id) return;
     try {
-        const message: ChatGroup = {
-            groupId: groupId,
-            msg: user_msg_input.value,
-            msgId: ChatService.generateUUID(), //消息id由前端生成
-            emitterId: user.userInfo.id,
-            messageType: GroupMsgType.TEXT,
-            createTime: Date.now(),
-            icon: user.userInfo.icon,
-            nickName: user.userInfo.nickName
-        }
+        validateInput(user_msg_input.value, type, emoji);
+        const message = createMessage(emoji, type);
+        if (!message) return;
+        if (type === MsgType.EMOJI && typeof emoji !== 'string') message.emoji = emoji;
         const isSend = ws?.sendOfGroup(message, (msgAck: MsgAck) => {
             if (msgAck.success) {
-                // message.msgId = msgAck.msgId; //前端生成ID后，不需要再从ack获取
-                console.log("消息发送成功");
+                if (msgAck.msgId) {
+                    message.msgId = msgAck.msgId;
+                }
+                if (msgAck.sendTime) {
+                    message.createTime = msgAck.sendTime;
+                }
             } else {
                 Log.error(msgAck.errorMsg || "发送失败");
                 console.warn(msgAck.errorMsg);
             }
         })
-        if (isSend && currentSessionId.value) {
-            msg.addGroupMsg(currentSessionId.value, message);
-            ChatService.scrollToBottom(wrapEl.value);
-            Log.ok("发送群聊消息成功");
-            user_msg_input.value = "";
-            return;
-        }
-        console.log("未能进入消息列表" + isSend, +currentSessionId.value)
+        const is = handleIsSend(isSend, message);
+        if (!is) console.log("未能进入消息列表" + isSend, +currentSessionId.value)
     } catch (err) {
         if (err instanceof BusinessError) {
             Log.error(err.message);
@@ -201,9 +207,58 @@ function send(e: Event) {
         }
     }
 }
-function handleCtrlEnter(event: Event) {
-    ChatService.handleCtrlEnter(event, user_msg_input);
+
+/**
+ * 创建群聊消息对象
+ * @param content - 待发送的消息内容
+ * @param type - 消息类型
+ * @returns ChatGroup - 创建的消息对象
+ */
+function createMessage(emoji?: EmojiVO | string, type: MsgType = MsgType.TEXT) {
+    if (!user.userInfo) return;
+    const message: ChatGroup = {
+        groupId: groupId,
+        msg: (emoji && (typeof emoji === 'string' ? emoji : emoji.id)) || user_msg_input.value,
+        msgId: ChatService.generateUUID(), //消息id由前端生成
+        emitterId: user.userInfo.id,
+        type: type || MsgType.TEXT,
+        createTime: Date.now(),
+        icon: user.userInfo.icon,
+        nickName: user.userInfo.nickName,
+    }
+    return message;
 }
+/**
+ * 校验输入内容的合法性
+ * @param content - 待校验的消息内容
+ * @returns boolean - 校验通过返回 true，否则 false
+ */
+function validateInput(content: string, type: MsgType = MsgType.TEXT, emoji?: EmojiVO) {
+
+    switch (type) {
+        case MsgType.TEXT:
+            if ((!content && content.trim() === "" && !emoji && !user_msg_input.value && user_msg_input.value.trim() === "") || (user_msg_input.value.length > 200 || content.length > 200 )) {
+                throw new BusinessError("信息输入长度不能大于200个字符");
+            }
+            break;
+        case MsgType.EMOJI:
+            if (!emoji) {
+                throw new BusinessError("请选择表情");
+            }
+            break;
+    }
+}
+
+function handleIsSend(isSend: boolean | undefined, message: ChatGroup) {
+    if (isSend && currentSessionId.value) {
+        msg.addGroupMsg(currentSessionId.value, message);
+        ChatService.scrollToBottom(wrapEl.value);
+        user_msg_input.value = "";
+        return true;
+    }
+    return false;
+}
+
 const handleScroll = (params: { scrollLeft: number; scrollTop: number }) => {
     ChatService.handleScroll(params, isLoading, wrapEl, handleToTherShold);
 }
@@ -219,7 +274,13 @@ async function loadHistoryMsgs() {
     try {
         const data = await GroupApi.queryGroupMsgById(groupId, currentSession.value.page, currentSession.value.pageSize);
         if (data && data.records && data.records.length > 0) {
-            msg.addGroupMsgs(currentSessionId.value, ChatService.sortGroupMsgs(data.records));
+            let list = data.records;
+            console.log("历史消息", list);
+            list = ChatService.sortGroupMsgs(list);
+            console.log("处理后的历史消息", list);
+            await ChatService.handleEmoji(undefined, list);
+            console.log("处理后的历史消息1", list);
+            msg.addGroupMsgs(currentSessionId.value, list);
             currentSession.value.page++;
             if (data.records.length < currentSession.value.pageSize) {
                 currentSession.value.hasMore = false;
@@ -247,7 +308,7 @@ function getMoreInfo() {
     })
 }
 
-function toIntroduce(id:string){
+function toIntroduce(id: string) {
     router.push({
         name: "user-introduce",
         params: {
@@ -266,5 +327,32 @@ onUnmounted(() => {
     }
 });
 
-
+const recall = async (item: ChatGroup) => {
+    try {
+        const vo: GroupMessageVO = {
+            msgId: item.msgId,
+            groupId: item.groupId,
+            emitterId: item.emitterId,
+            msg: item.msg
+        };
+        await GroupApi.withdrawnGroupMsg(vo);
+        Log.ok("撤回成功");
+    } catch (e: any) {
+        if (e instanceof BusinessError) Log.error(e.message);
+        else {
+            Log.error("撤回失败");
+            console.error(e);
+        }
+    }
+}
 </script>
+
+<style scoped>
+:deep(.el-scrollbar) {
+    height: 100% !important;
+}
+
+:deep(.el-footer) {
+    height: 100%;
+}
+</style>

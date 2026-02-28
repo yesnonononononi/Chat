@@ -12,13 +12,14 @@ import java.io.Serializable;
 public class MsgAckDTO implements Serializable {
     private boolean isSuccess;
     private String msgId;
+    private Long sendTime;
     private String errorMsg;
 
-    public static MsgAckDTO success(String msgId) {
-        return new MsgAckDTO(true, msgId, null);
+    public static MsgAckDTO success(String msgId, Long sendTime) {
+        return new MsgAckDTO(true, msgId, sendTime, null);
     }
 
     public static MsgAckDTO error(String errorMsg) {
-        return new MsgAckDTO(false, null, errorMsg);
+        return new MsgAckDTO(false, null, null, errorMsg);
     }
 }

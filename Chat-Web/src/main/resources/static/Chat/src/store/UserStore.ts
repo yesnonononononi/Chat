@@ -1,31 +1,20 @@
-import { defineStore, type Store } from "pinia";
-import type { userInfo, data, userVO } from "@/types/user";
-import type { body } from "@/types/auth";
-import { UserApi } from "@/api/user";
-import { Log } from "@/utils/TipUtil";
+import {defineStore} from "pinia";
+import type {userInfo} from "@/types/user";
+import {UserApi} from "@/api/user";
+import {Log} from "@/utils/TipUtil";
 import router from "@/router";
-import type { register } from "@/types/register";
-import { removeUserToken } from "@/utils/UserInfo";
-import { Ws } from "@/utils/Socket/webSocket";
-import type { chat, ChatGroup } from "@/types/chat";
-import type { systemMsg } from "@/types/msg";
-import type { notify } from "@/types/notification";
-import { msgStore, type session } from "./MessageStore";
-import { serverMsgCode } from "@/enums/server-callback";
-import type { MsgACKOfServer } from "@/types/msg-ack";
-import { BusinessError } from "@/exception/BusinessError";
-import { MediaWs } from "@/utils/Socket/MediaWs";
-import type { SysNotice } from "@/types/sysNotice";
-import { TimeUtil } from "@/utils/time";
+import type {register} from "@/types/register";
+import {removeUserToken} from "@/utils/UserInfo";
+import type {chat, ChatGroup} from "@/types/chat";
+import {socketStore} from "./SocketStore";
+import {BusinessError} from "@/exception/BusinessError";
 
 interface User {
   userInfo: userInfo | null;
   isLogin: boolean;
   token: string | null;
-  ws: Ws | null;
   curMsg: chat | null;
   curMsgOfGroup: ChatGroup | null;
-
 }
 
 export const userStore = defineStore("user", {
@@ -34,10 +23,8 @@ export const userStore = defineStore("user", {
     userInfo: null,
     token: localStorage.getItem("userToken") || "",
     isLogin: false,
-    ws: null,
     curMsg: null,
     curMsgOfGroup: null,
-
   }),
   getters: {
     NickName: (state) => state.userInfo?.nickName || "游客",
@@ -48,106 +35,8 @@ export const userStore = defineStore("user", {
   },
   actions: {
     initApp() {
-      if (!this.token || !this.userInfo) return;
-      this.startListener();
-    },
-
-    startListener() {
-      if (!this.userInfo) {
-        console.error("未获取到用户信息");
-        return;
-      }
-      //初始化连接
-      this.ws = Ws.getInstance();
-      if (!this.ws) return;
-      const msg = msgStore();
-
-      //移除旧监听
-      this.ws.removePrivateReceive();
-      this.ws.removeSysReceive();
-
-      //开启全局事件监听
-      this.ws.onOneByoneMsg(
-        (data: chat, ack?: (ackData: MsgACKOfServer) => void) => {
-          if (this.userInfo) {
-            const sid = msg.getSessionKey(this.userInfo.id, data.emitterId);
-            if (!msg.getSession(sid)) {
-              msg.registry(this.userInfo.id, data.emitterId);
-            }
-
-            const session = msg.getSession(sid);
-            // 无论窗口是否打开，都将消息添加到消息列表
-            msg.addMsg(sid, data);
-
-            // 如果窗口已打开，发送已读回执
-            if (session && session.isOpen) {
-              if (ack) {
-                ack({
-                  msgCode: serverMsgCode.READ,
-                  description: "",
-                  symbol: "",
-                  msgId: data.msgId,
-                });
-              }
-            } else {
-              // 如果窗口未打开，触发全局通知
-              this.curMsg = data;
-              setTimeout(() => {
-                this.curMsg = null;
-              }, 3000);
-            }
-          }
-        },
-      );
-
-      //系统事件监听
-      this.ws.systemListen((data: SysNotice) => {
-        console.log("收到系统消息",data);
-        if(data.createTime)data.createTime = TimeUtil.timestampToTime(data.createTime);
-        msg.addSysMsg(data);
-      });
-
-      //管理员事件监听
-      this.ws.onKick((data: string) => {
-        Log.warn(data);
-   
-        this.ws?.disconnect();
-        removeUserToken();
-        router.push("/login");
-      });
-
-      //群聊事件监听
-      this.ws.onGroupMsg(
-        (data: ChatGroup, ack?: (ackData: MsgACKOfServer) => void) => {
-          if (this.userInfo) {
-            const sid = msg.getSessionKey(this.userInfo.id, data.groupId);
-            if (!msg.getSession(sid)) {
-              msg.registry(this.userInfo.id, data.groupId);
-            }
-
-            const session = msg.getSession(sid);
-            msg.addGroupMsg(sid, data);
-
-            // 如果不在当前群聊中，触发全局通知
-            if (!session || !session.isOpen) {
-              this.curMsgOfGroup = data;
-              setTimeout(() => {
-                this.curMsgOfGroup = null;
-              }, 3000);
-            }
-          }
-        },
-      );
-    },
-    removeListener() {
-      if (this.ws) {
-        this.ws.removeSysReceive();
-        this.ws.removePrivateReceive();
-        MediaWs.stopListen();
-      }
-    },
-    getWs() {
-      return this.ws;
+       const socket = socketStore();
+       socket.initApp();
     },
 
     //保存用户信息
@@ -165,10 +54,9 @@ export const userStore = defineStore("user", {
         Log.ok("登录成功");
         router.push("/");
 
-        // 断开旧连接（如匿名连接），确保使用新Token连接
-        Ws.getInstance().disconnect();
-
+  
         // 延迟启动监听，确保状态同步
+        // 这里必须使用 setTimeout 确保 token 已写入 localStorage，因为 Socket 配置会读取它
         setTimeout(() => {
           this.initApp();
         }, 100);
@@ -191,9 +79,7 @@ export const userStore = defineStore("user", {
         const res = await UserApi.loginByCode(loginForm);
         Log.ok("登录成功");
         this.setUserInfo(res.userVO, res.token);
-
-        // 断开旧连接（如匿名连接），确保使用新Token连接
-        Ws.getInstance().disconnect();
+ 
 
         setTimeout(() => {
           this.initApp();
@@ -248,11 +134,9 @@ export const userStore = defineStore("user", {
 
     end: function () {
       removeUserToken();
-      this.removeListener();
-      this.ws?.disconnect();
+      const socket = socketStore();
+      socket.disconnect();
       this.$reset();
-      this.ws = null;
-      Ws.getInstance().disconnect();
       localStorage.removeItem("user_store");
       router.push("/login");
     },
@@ -273,6 +157,5 @@ export const userStore = defineStore("user", {
       }
       this.end();
     },
-    
   },
 });

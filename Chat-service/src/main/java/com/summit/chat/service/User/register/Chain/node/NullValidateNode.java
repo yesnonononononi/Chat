@@ -4,14 +4,12 @@ import cn.hutool.core.util.ObjectUtil;
 import com.summit.chat.Constants.UserConstants;
 import com.summit.chat.Dto.NormalRegisterLoginRequest;
 import com.summit.chat.Result.Result;
-import com.summit.chat.Utils.RSAUtil;
-import com.summit.chat.service.Impl.Support.UserSupport.UserValidator;
+import com.summit.chat.service.Impl.Support.User.UserValidator;
 import com.summit.chat.service.User.register.Chain.Entity.RegisterChainContext;
 import com.summit.chat.service.User.register.Chain.Entity.RegisterHandleChain;
 import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 @Slf4j
 @Component

@@ -1,4 +1,5 @@
-import type { chat } from "@/types/chat";
+import type {chat} from "@/types/chat";
+
 export interface GlobalValidate<T>{
   validate:(t:T)=>boolean,
   throwError:(msg:string)=>void

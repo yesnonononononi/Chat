@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import MediaTip from './components/MediaTip.vue';
 import MessageTip from './components/MessageTip.vue';
- 
 </script>
 
 <template>

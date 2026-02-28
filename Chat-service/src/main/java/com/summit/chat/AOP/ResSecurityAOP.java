@@ -11,11 +11,10 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.annotation.Order;
 import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.RedisSystemException;
 import org.springframework.stereotype.Component;
 
@@ -76,7 +75,6 @@ public class ResSecurityAOP {
 
     private String getSign(String content ) {
         String sign = RSAUtil.sign(content, privateKey);
-        log.info("签名结果:{}",sign);
         return sign;
     }
 

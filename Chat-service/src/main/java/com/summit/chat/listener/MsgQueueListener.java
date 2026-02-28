@@ -4,10 +4,8 @@ import com.summit.chat.Constants.QueueConstants;
 import com.summit.chat.Mapper.MsgMapper;
 import com.summit.chat.model.vo.PrivateMessageVO;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.amqp.core.ExchangeTypes;
 import org.springframework.amqp.rabbit.annotation.*;
-import org.springframework.amqp.rabbit.annotation.Argument;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
 

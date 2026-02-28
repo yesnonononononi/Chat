@@ -1,6 +1,6 @@
-import { fileURLToPath, URL } from 'node:url'
+import {fileURLToPath, URL} from 'node:url'
 
-import { defineConfig } from 'vite'
+import {defineConfig} from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 
@@ -17,6 +17,11 @@ export default defineConfig({
   server: {
     port:5173,
     proxy:{
+      '/chat-io': {
+        target: 'http://localhost:9090',
+        ws: true,
+        changeOrigin: true
+      },
       '/api':{
         target: 'http://localhost:8080',
         changeOrigin:true,

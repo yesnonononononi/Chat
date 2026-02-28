@@ -10,13 +10,9 @@ public enum GroupStatusEnum {
      */
     NORMAL(1),
     /**
-     * 拉黑
-     */
-    BLACK(2),
-    /**
      * 禁言
      */
-    FORBIDDEN(3);
+    FORBIDDEN(2);
 
     private final Integer status;
 

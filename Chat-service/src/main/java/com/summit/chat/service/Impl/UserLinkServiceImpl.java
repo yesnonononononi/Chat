@@ -12,7 +12,6 @@ import com.summit.chat.service.UserLink.UserLinkService;
 import com.summit.chat.service.validate.UserLinkNullValidateService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -51,24 +50,21 @@ public class UserLinkServiceImpl implements UserLinkService {
      */
     @Override
     public Result saveLink(UserLinkDto dto) {
-        String id = UserHolder.getUserID();
+        String id = dto.getUserID();
+        if (id == null) {
+            id = UserHolder.getUserID();
+            dto.setUserID(id);
+        }
         if (validateService.baseValidate(id)) {
             throw new BusinessException(BaseConstants.UNCACHE_USERID);
         }
 
         try {
-            dto.setUserID(id);
-            if(validateService.baseValidate(dto.getIsFrequent())){
+            if (validateService.baseValidate(dto.getIsFrequent())) {
                 dto.setIsFrequent(0);
             }
             userLinkMapper.saveLink(dto);
-
-
-        }catch (DuplicateKeyException duplicateKeyException){
-            log.info("【好友关系】重复插入联系人数据",duplicateKeyException);
-            return Result.fail(UserLinkConstants.USER_LINK_EXIST);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             log.error("【好友关系】保存用户联系人时出现问题:{}, 错误:{}", dto.getUserID(), e.getMessage(), e);
             throw new BusinessException(BaseConstants.UNKNOWN_ERROR);
         }
@@ -77,6 +73,14 @@ public class UserLinkServiceImpl implements UserLinkService {
 
     @Override
     public Result delLink(UserLinkDto dto) {
+        String id = dto.getUserID();
+        if (id == null) {
+            id = UserHolder.getUserID();
+            dto.setUserID(id);
+        }
+        if (validateService.baseValidate(id)) {
+            throw new BusinessException(BaseConstants.UNCACHE_USERID);
+        }
         try {
             validateService.validateOfDelete(dto);
             userLinkMapper.delLink(dto);

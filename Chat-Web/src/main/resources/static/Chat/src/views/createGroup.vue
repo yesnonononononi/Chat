@@ -32,14 +32,15 @@
 
 </template>
 <script setup lang="ts">
-import { Log } from "../utils/TipUtil";
-import { type GroupChatDto } from "../types/group";
-import { onMounted, ref } from "vue";
-import { userStore } from "../store/UserStore";
+import {Log} from "../utils/TipUtil";
+import {type GroupChatDto} from "../types/group";
+import {onMounted, ref} from "vue";
+import {userStore} from "../store/UserStore";
 import router from "../router";
-import { GroupApi } from "../api/group";
-import { uploadFile } from "../api/common";
-import { BusinessError } from "../exception/BusinessError";
+import {GroupApi} from "../api/group";
+import {uploadFile} from "../api/common";
+import {BusinessError} from "../exception/BusinessError";
+
 const avatar = ref();
 const user = userStore();
 const loading = ref(false);
@@ -64,11 +65,9 @@ function handleAvatarSuccess(res: any, file: any) {
     form.value.icon = res.url;
 }
 function beforeAvatarUpload(file: any) {
-    const isJPG = file.type === "image/jpeg";
+     
     const isLt2M = file.size / 1024 / 1024 < 2;
-    if (!isJPG) {
-        Log.error("上传头像图片只能是 JPG 格式!");
-    }
+    
     if (!isLt2M) {
         Log.error("上传头像图片大小不能超过 2MB!");
     }

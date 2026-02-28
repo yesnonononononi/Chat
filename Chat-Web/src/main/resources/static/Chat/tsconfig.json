@@ -10,7 +10,11 @@
   ],
 
   "compilerOptions": {
-    "types": ["vite/client", "node"] // 包含 Node.js 和 Vite 客户端类型
+    "types": ["vite/client", "node"], // 包含 Node.js 和 Vite 客户端类型
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   }
 
 }

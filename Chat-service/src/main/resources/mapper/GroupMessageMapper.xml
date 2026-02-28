@@ -3,7 +3,7 @@
 <mapper namespace="com.summit.chat.Mapper.GroupMessageMapper">
     <insert id="addGroupMsg">
         insert
-        into group_messages(id, group_id, sender_id, msg, create_time, message_type)
-        values (#{id}, #{groupId}, #{emitterId}, #{msg}, #{createTime}, #{messageType})
+        into group_messages(id, group_id, sender_id, msg, create_time, type)
+        values (#{id}, #{groupId}, #{emitterId}, #{msg}, #{createTime}, #{type})
     </insert>
 </mapper>

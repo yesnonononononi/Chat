@@ -1,6 +1,6 @@
-import { WebSocketClient } from "../src/utils/WebSocket/websocket.ts";
+import {WebSocketClient} from "../src/utils/WebSocket/websocket.ts";
 import readline from "node:readline";
-import { stdin as input, stdout as output } from "node:process";
+import {stdin as input, stdout as output} from "node:process";
 
 const client = new WebSocketClient("ws://localhost:8080/ws/message", 5);
 

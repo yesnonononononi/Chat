@@ -4,7 +4,6 @@ import com.corundumstudio.socketio.SocketIOClient;
 import com.summit.chat.Dto.MediaApplyDTO;
 import com.summit.chat.GlobalHandle.SocketHandler.ClientManager;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Component;
 
 @Component

@@ -1,6 +1,6 @@
-import { Socket } from "socket.io-client";
-import { Event } from "@/enums/events";
-import type { systemMsg } from "@/types/msg";
+import {Socket} from "socket.io-client";
+import {Event} from "@/enums/events";
+import type {systemMsg} from "@/types/msg";
 
 export class SystemHandler {
     private socket: Socket;

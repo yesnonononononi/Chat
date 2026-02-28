@@ -4,13 +4,11 @@ import com.summit.chat.Constants.GroupConstants;
 import com.summit.chat.Constants.GroupMsgConstants;
 import com.summit.chat.Enum.GroupRole;
 import com.summit.chat.Enum.GroupStateEnum;
-import com.summit.chat.Enum.GroupStatusEnum;
 import com.summit.chat.Mapper.GroupMapper;
 import com.summit.chat.Mapper.GroupMemberMapper;
 import com.summit.chat.model.vo.GroupChatVO;
 import com.summit.chat.model.vo.GroupMembersVO;
 import com.summit.chat.service.Impl.GlobalValidatorImpl;
-
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Objects;
@@ -70,10 +68,10 @@ public abstract class AbstractGroupValidator<T> extends GlobalValidatorImpl<T> {
     /**
      * 校验是否是群主
      */
-    public void verifyOwner(GroupMembersVO member) {
-        if (member == null || !GroupRole.OWNER.getRole().equals(member.getRole())) {
-            super.throwException(GroupMsgConstants.NOT_OWNER);
-        }
+    public boolean verifyOwner(GroupMembersVO member) {
+        return (member != null && GroupRole.OWNER.getRole().equals(member.getRole()));
+
+
     }
 
     /**

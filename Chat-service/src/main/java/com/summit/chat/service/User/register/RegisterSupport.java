@@ -1,7 +1,6 @@
 package com.summit.chat.service.User.register;
 
 import com.summit.chat.Constants.BaseConstants;
-import com.summit.chat.Constants.LockConstants;
 import com.summit.chat.Dto.NormalRegisterLoginRequest;
 import com.summit.chat.Result.Result;
 import com.summit.chat.service.User.register.Chain.Entity.NodeTypeOfRegister;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 
 @Slf4j

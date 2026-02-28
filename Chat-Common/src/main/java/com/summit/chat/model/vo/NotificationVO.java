@@ -1,7 +1,8 @@
 package com.summit.chat.model.vo;
 
-import java.io.Serializable;
 import lombok.Data;
+
+import java.io.Serializable;
 
 @Data
 public class NotificationVO implements Serializable {

@@ -5,16 +5,15 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.RedisConnectionFailureException;
+import org.springframework.data.redis.RedisSystemException;
 import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.data.redis.core.SessionCallback;
-import org.springframework.data.redis.RedisSystemException;
-import java.util.List;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 @Slf4j
@@ -62,6 +61,12 @@ public class RedisProcessor implements Cache{
     }
 
 
+    /**
+     * 获取缓存 str
+     * @param key 缓存key
+     * @param type 缓存对象类型
+     * @return 缓存对象
+     */
     public <T> T get(String key, Class<? extends T> type) {
         try {
             String res = opsStr.get(key);

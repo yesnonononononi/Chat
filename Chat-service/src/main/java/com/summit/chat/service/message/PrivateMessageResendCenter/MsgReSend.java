@@ -22,7 +22,7 @@ public class MsgReSend {
         SocketIOClient emitterClient = context.getEmitterClient();
         String msgId = msg.getMsgId();
         //发送消息确认,返回生成的消息id给发送者
-        ackToEmitterWithMsgId(context.getAckRequest(), msgId, msg.getEmitterId());
+        ackToEmitterWithMsgId(context.getAckRequest(), msgId, msg.getEmitterId(), msg.getSendTime().getTime());
         // 确保状态绝对不为null，如果为null则设为未读(2)
         if (!context.isOnline()) {
             resendToEmitter(MsgEnum.NOT_ONLINE.getStatus(), msgId, emitterClient, null, null);
@@ -31,8 +31,9 @@ public class MsgReSend {
 
         //用户在线，进行转发
         SocketIOClient receiveClient = context.getReceiveClient();
-
         resendToReceiver(receiveClient, emitterClient, msg);
+        //更新消息状态为已读
+        msg.setStatus(MsgEnum.READ.getStatus());
     }
 
 
@@ -90,10 +91,10 @@ public class MsgReSend {
 
     }
 
-    private void ackToEmitterWithMsgId(AckRequest ackRequest, String msgId,String emitterId) {
+    private void ackToEmitterWithMsgId(AckRequest ackRequest, String msgId,String emitterId, Long sendTime) {
         if (ackRequest != null) {
             log.info("【消息回执】将生成的消息id{}返回给发送者{}",msgId,emitterId);
-            ackRequest.sendAckData(MsgAckDTO.success(msgId));
+            ackRequest.sendAckData(MsgAckDTO.success(msgId, sendTime));
         }
     }
 

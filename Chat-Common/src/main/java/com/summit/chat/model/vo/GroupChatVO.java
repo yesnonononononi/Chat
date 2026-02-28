@@ -14,6 +14,7 @@ public class GroupChatVO implements Serializable {
     private String groupName;
     private String groupDescription;
     private Long creatorId;
+    private String creatorName;
     private Timestamp createTime;
     private Integer status;
     private Integer number;

@@ -18,6 +18,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // 放行WebSocket连接端点，必须在anyRequest之前
                         .requestMatchers("/socket.io/**").permitAll()
+                        .requestMatchers("/chat-io/**").permitAll()
+                        .requestMatchers("/sign").permitAll()
                         // 放行其他所有请求
                         .anyRequest().permitAll()
                 )

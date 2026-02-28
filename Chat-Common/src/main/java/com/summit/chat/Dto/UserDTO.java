@@ -1,7 +1,5 @@
 package com.summit.chat.Dto;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import lombok.Data;
 
 import java.io.Serializable;

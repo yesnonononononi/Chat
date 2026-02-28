@@ -11,16 +11,16 @@ import java.util.List;
 public interface UserLinkMapper {
 
 
-    List<UserLinkVO> getLinkById(String userID);
+    List<UserLinkVO> getLinkById(@org.apache.ibatis.annotations.Param("userID") String userID);
 
 
     void saveLink(UserLinkDto dto);
 
 //存在关系1 不存在0
 
-    Integer linkExist(String userID, String linkID);
+    Integer linkExist(@org.apache.ibatis.annotations.Param("userID") String userID, @org.apache.ibatis.annotations.Param("linkID") String linkID);
 
-    @Delete("delete from user_link where (user_id = #{userID} and link_user_id = #{linkID} ) or (user_id = #{linkID} and link_user_id = #{userID})")
+    @Delete("delete from user_link where (user_id = #{userID} and link_user_id = #{linkID}) or (user_id = #{linkID} and link_user_id = #{userID})")
     void delLink(UserLinkDto dto);
 }
 

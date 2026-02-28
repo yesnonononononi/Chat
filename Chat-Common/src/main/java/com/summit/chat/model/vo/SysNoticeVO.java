@@ -1,6 +1,7 @@
 package com.summit.chat.model.vo;
 
 import lombok.Data;
+
 import java.io.Serializable;
 import java.sql.Timestamp;
 
@@ -15,4 +16,6 @@ public class SysNoticeVO implements Serializable {
     private Timestamp endTime;
     private Long publisherId;
     private String publisherName;
+    private Integer like;
+    private Boolean isLike;
 }

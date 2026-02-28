@@ -1,8 +1,8 @@
-import type { data,userInfo,userVO } from "@/types/user";
-import { reactive, ref } from "vue";
-import { Log } from "./TipUtil";
-import { BusinessError } from "@/exception/BusinessError";
-import { UserApi } from "@/api/user";
+import type {userInfo} from "@/types/user";
+import {reactive} from "vue";
+import {Log} from "./TipUtil";
+import {BusinessError} from "@/exception/BusinessError";
+import {UserApi} from "@/api/user";
 
 const info: userInfo = reactive({
   id: "",

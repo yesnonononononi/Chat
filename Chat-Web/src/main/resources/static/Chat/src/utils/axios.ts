@@ -1,15 +1,15 @@
 import axios from "axios";
 import router from "@/router";
-import { Log } from "./TipUtil";
-import {  getUserToken } from "./UserInfo";
-import { msgStore } from "@/store/MessageStore";
-import { userStore } from "@/store/UserStore";
-import { RsaUtil } from "./RsaUtil";
+import {Log} from "./TipUtil";
+import {getUserToken} from "./UserInfo";
+import {msgStore} from "@/store/MessageStore";
+import {userStore} from "@/store/UserStore";
+import {RsaUtil} from "./RsaUtil";
 
 //配置基础路径(axios实例)
 const request = axios.create({
   baseURL: "/api",
-  timeout: 5000,
+  timeout: 7000,
   headers: {
     "Content-Type": "application/json",
   },

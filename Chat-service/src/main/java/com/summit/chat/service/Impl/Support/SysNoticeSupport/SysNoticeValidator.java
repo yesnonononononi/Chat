@@ -5,6 +5,7 @@ import com.summit.chat.Dto.SysNoticeDTO;
 import com.summit.chat.Mapper.SysNoticeMapper;
 import com.summit.chat.model.vo.SysNoticeVO;
 import com.summit.chat.service.Impl.GlobalValidatorImpl;
+import jodd.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -62,6 +63,12 @@ public class SysNoticeValidator extends GlobalValidatorImpl<SysNoticeDTO> {
         }
         SysNoticeVO notice = sysNoticeMapper.selectById(id);
         if (notice == null) {
+            super.throwException(SysNoticeConstants.NOTICE_NOT_EXIST);
+        }
+    }
+
+    public void validateList(String ids) {
+        if(StringUtil.isBlank(ids)){
             super.throwException(SysNoticeConstants.NOTICE_NOT_EXIST);
         }
     }

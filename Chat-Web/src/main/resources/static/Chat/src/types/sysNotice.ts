@@ -8,6 +8,8 @@ export interface SysNotice {
     endTime?: string;
     publisherId?: string;
     publisherName?: string;
+    like?: number;
+    isLike?: boolean;
 }
 
 export interface SysNoticeDto {

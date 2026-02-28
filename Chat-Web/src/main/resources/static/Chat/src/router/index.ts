@@ -1,11 +1,5 @@
-import { AdminApi } from "@/api/admin";
 import TestEscroller from "@/components/testEscroller.vue";
-import { userStore } from "@/store/UserStore";
-import {
-  createRouter,
-  createWebHistory,
-  type RouteRecordRaw,
-} from "vue-router";
+import {createRouter, createWebHistory, type RouteRecordRaw,} from "vue-router";
 
 const Home = () => import("../views/chat.vue");
 const Login = () => import("../views/Login.vue");
@@ -100,6 +94,16 @@ const routes: RouteRecordRaw[] = [
         path: "system-admin",
         name: "system-admin",
         component: () => import("../components/System_admin.vue"),
+      },
+      {
+        path:"emoji-admin",
+        name: "emoji-admin",
+        component: () => import("../components/Emoji_admin.vue"),
+      },
+      {
+        path:"emoji-category-admin",
+        name: "emoji-category-admin",
+        component: () => import("../components/EmojiCategory_admin.vue"),
       },
     ],
   },

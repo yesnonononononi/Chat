@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.sql.Timestamp;
+
 @Slf4j
 @Component
 public class MsgWorker {
@@ -35,10 +37,10 @@ public class MsgWorker {
              msg.setMsgId(snowflakeNextIdStr);
         }
         
-        long l = System.currentTimeMillis();
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
         context.setReceiveClient(client);
-        msg.setSendTime(l);
+        msg.setSendTime(timestamp);
     }
 }
 

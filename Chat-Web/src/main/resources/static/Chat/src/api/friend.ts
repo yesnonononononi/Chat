@@ -1,6 +1,6 @@
 import request from "@/utils/axios";
-import { ApiHelper } from "@/utils/ApiHelper";
-import type { FriendDto, UserLinkDto } from "@/types/friend";
+import {ApiHelper} from "@/utils/ApiHelper";
+import type {FriendDto, UserLinkDto} from "@/types/friend";
 
 export class FriendApi {
   // FriendApplyController
@@ -29,5 +29,7 @@ export class FriendApi {
     return ApiHelper.handle(request.post("/user/link-user/save", dto));
   }
 
- 
+  static async delLink(dto: UserLinkDto): Promise<any> {
+    return ApiHelper.handle(request.post("/user/link-user/delete", dto));
+  }
 }

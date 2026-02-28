@@ -1,4 +1,4 @@
-import type { chat } from "./chat"
+import type {chat} from "./chat"
 
 export interface systemMsg{
     msgId:string,

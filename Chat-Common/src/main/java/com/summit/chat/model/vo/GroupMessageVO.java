@@ -1,11 +1,9 @@
 package com.summit.chat.model.vo;
 
-import com.summit.chat.Enum.MsgEnum;
-import com.summit.chat.Enum.MsgType;
 import lombok.Data;
 
-import java.sql.Timestamp;
 import java.io.Serializable;
+import java.sql.Timestamp;
 
 /**
  * <p>消息体</p>
@@ -23,7 +21,7 @@ public class GroupMessageVO implements Serializable {
     /**
      * 消息id
      */
-    private Long msgId;
+    private String msgId;
     /**
      * 发送者id
      */
@@ -32,7 +30,7 @@ public class GroupMessageVO implements Serializable {
      * 消息是否删除 0:否 1:是
      */
     private Integer isDeleted;
-    private String messageType;
+    private String type;
     private Timestamp createTime;
     /**
      * 发送者昵称

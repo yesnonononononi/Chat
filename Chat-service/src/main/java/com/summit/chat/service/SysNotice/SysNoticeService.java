@@ -29,4 +29,8 @@ public interface SysNoticeService {
      * 删除系统公告
      */
     Result delete(Long id);
+
+    Result like(String id);
+
+    Result queryLikeList(String ids);
 }

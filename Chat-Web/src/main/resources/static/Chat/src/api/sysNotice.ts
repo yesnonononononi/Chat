@@ -1,6 +1,7 @@
 import request from "@/utils/axios";
-import { ApiHelper } from "@/utils/ApiHelper";
-import type { SysNotice, SysNoticeDto } from "@/types/sysNotice";
+import {ApiHelper} from "@/utils/ApiHelper";
+import type {SysNoticeDto} from "@/types/sysNotice";
+import { BusinessError } from "@/exception/BusinessError";
 
 /**
  * 系统公告 API
@@ -27,6 +28,11 @@ export class SysNoticeApi {
         return ApiHelper.handle(request.get("/sys-notice/list"));
     }
 
+    static async likeList(ids:string): Promise<any> {
+        if (!ids) return;
+        return ApiHelper.handle(request.get(`/sys-notice/queryLikeList/${ids}`));
+    }
+
     /**
      * 更新系统公告
      */
@@ -39,5 +45,9 @@ export class SysNoticeApi {
      */
     static async delete(id: number): Promise<any> {
         return ApiHelper.handle(request.delete(`/sys-notice/${id}`));
+    }
+
+    static async like(id:number):Promise<any>{
+        return ApiHelper.handle(request.get(`/sys-notice/like/${id}`))
     }
 }

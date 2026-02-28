@@ -1,14 +1,14 @@
 import request from "@/utils/axios";
-import { ApiHelper } from "@/utils/ApiHelper";
-import type { data, userInfo,userPwPutDto,userVO } from "@/types/user";
-import { BusinessError } from "@/exception/BusinessError";
+import {ApiHelper} from "@/utils/ApiHelper";
+import type {userInfo, userPwPutDto, userVO} from "@/types/user";
+import {BusinessError} from "@/exception/BusinessError";
 
 export class UserApi {
   /**
    * 根据好友id获取好友基本信息
    */
   static async getUserInfoById(id: string): Promise<userInfo> {
-    if (!id || id.length < 8) {
+    if (!id) {
       throw new BusinessError("非法参数");
     }
     return ApiHelper.handle(request.get(`/user/${id}`));
@@ -51,7 +51,7 @@ export class UserApi {
   }
 
   static async deleteUser(id: string): Promise<boolean> {
-    if (!id || id.length < 8) {
+    if (!id) {
       throw new BusinessError("非法参数,请检查");
     }
     await ApiHelper.handle(request.put(`/user/del/${id}`));

@@ -4,31 +4,29 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch } from 'vue';
+import {onMounted, onUnmounted, ref, watch} from 'vue';
+import type {ComposeOption} from 'echarts/core';
 // 按需引入 ECharts 核心及所需模块
 import * as echarts from 'echarts/core';
-import { BarChart, LineChart, PieChart } from 'echarts/charts';
-import {
-    TitleComponent,
-    TooltipComponent,
-    GridComponent,
-    DatasetComponent,
-    TransformComponent,
-} from 'echarts/components';
-import { LabelLayout, UniversalTransition } from 'echarts/features';
-import { CanvasRenderer } from 'echarts/renderers';
+import type {BarSeriesOption, LineSeriesOption, PieSeriesOption} from 'echarts/charts';
+import {BarChart, LineChart, PieChart} from 'echarts/charts';
 import type {
-    BarSeriesOption,
-    LineSeriesOption,
-    PieSeriesOption
-} from 'echarts/charts';
-import type {
-    TitleComponentOption,
-    TooltipComponentOption,
+    DatasetComponentOption,
     GridComponentOption,
-    DatasetComponentOption
+    LegendComponentOption,
+    TitleComponentOption,
+    TooltipComponentOption
 } from 'echarts/components';
-import type { ComposeOption } from 'echarts/core';
+import {
+  DatasetComponent,
+  GridComponent,
+  LegendComponent,
+  TitleComponent,
+  TooltipComponent,
+  TransformComponent,
+} from 'echarts/components';
+import {LabelLayout, UniversalTransition} from 'echarts/features';
+import {CanvasRenderer} from 'echarts/renderers';
 
 
 // 注册 ECharts 组件（只注册需要的，减小体积）
@@ -38,6 +36,7 @@ echarts.use([
     GridComponent,
     DatasetComponent,
     TransformComponent,
+    LegendComponent,
     BarChart,
     LineChart,
     LabelLayout,
@@ -53,8 +52,9 @@ type ECOption = ComposeOption<
     | TitleComponentOption
     | TooltipComponentOption
     | GridComponentOption
-    |PieSeriesOption
+    | PieSeriesOption
     | DatasetComponentOption
+    | LegendComponentOption
 >;
 
 // 接收父组件传参
@@ -83,8 +83,10 @@ let chartInstance: echarts.ECharts | null = null;
 // 初始化图表
 const initChart = () => {
     if (!chartRef.value) return;
-    // 创建图表实例
-    chartInstance = echarts.init(chartRef.value);
+    // 创建图表实例，设置 devicePixelRatio 解决移动端模糊
+    chartInstance = echarts.init(chartRef.value, null, {
+        devicePixelRatio: window.devicePixelRatio || 1
+    });
     // 设置配置项
     chartInstance.setOption(props.option);
     // 适配窗口大小变化

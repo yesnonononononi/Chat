@@ -1,8 +1,9 @@
 {
   "extends": "@vue/tsconfig/tsconfig.dom.json",
-  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue", "scripts/emojiList.js"],
   "exclude": ["src/**/__tests__/*"],
   "compilerOptions": {
+ 
     // 核心：保留基础严格模式（避免隐式 any，TS 核心价值）
     "strict": true,
     // 关闭冗余严格规则（减少你的开发负担）

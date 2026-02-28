@@ -1,32 +1,26 @@
 package com.summit.chat.service.Impl;
 
-import com.corundumstudio.socketio.SocketIOClient;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.summit.chat.Constants.BaseConstants;
 import com.summit.chat.Constants.MsgConstants;
-import com.summit.chat.Constants.QueueConstants;
 import com.summit.chat.Dto.ChatForPrivatePage;
-import com.summit.chat.Dto.MsgACKOfClientDTO;
-import com.summit.chat.Enum.ChatEvent;
 import com.summit.chat.Enum.MsgEnum;
 import com.summit.chat.Exception.BusinessException;
-import com.summit.chat.GlobalHandle.SocketHandler.ClientManager;
 import com.summit.chat.Mapper.MsgMapper;
 import com.summit.chat.Result.PageResult;
 import com.summit.chat.Result.Result;
 import com.summit.chat.Utils.GlobalIDWorker;
 import com.summit.chat.Utils.UserHolder;
-import com.summit.chat.model.vo.MsgCallbackForPrivateVO;
 import com.summit.chat.model.vo.PrivateMessageVO;
-
+import com.summit.chat.service.Impl.Support.MsgSupport.PrivateMsgSupport;
 import com.summit.chat.service.msg.MsgService;
 import com.summit.chat.service.validate.MsgValidator;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Service
@@ -37,14 +31,14 @@ public class MsgImpl implements MsgService {
     @Autowired
     MsgMapper msgMapper;
     @Autowired
-    ClientManager clientManager;
+    private PrivateMsgSupport privateMsgSupport;
 
     @Override
     public Result save(PrivateMessageVO dto) {
         try {
             String userID = UserHolder.getUserID();
             //保存消息,首先校验消息发送对象是否存在
-            msgValidator.baseValidate(dto,userID);
+            msgValidator.validateSend(dto, userID);
             //生成全局唯一id - 由前端生成，后端不再生成
             // String msgID = GlobalIDWorker.generateId();
             String msgID = dto.getMsgId();
@@ -53,9 +47,9 @@ public class MsgImpl implements MsgService {
                 msgID = GlobalIDWorker.generateId();
                 dto.setMsgId(msgID);
             }
-            
+
             //消息时间戳生成 system.currentMills
-            long time = System.currentTimeMillis();
+            Timestamp time = new Timestamp(System.currentTimeMillis());
             //保存
             // dto.setMsgId(msgID);
             dto.setSendTime(time);
@@ -68,7 +62,7 @@ public class MsgImpl implements MsgService {
         } catch (Exception e) {
             log.error("用户{}保存消息:{}时发生错误", dto.getEmitterId(), dto.getMsg(), e);
             return Result.fail(BaseConstants.SERVER_EXCEPTION);
-        }finally {
+        } finally {
             UserHolder.remove();
         }
 
@@ -80,15 +74,19 @@ public class MsgImpl implements MsgService {
         try {
             //消息撤回,先校验dto的id是否存在,以及消息的发送时间是否存在,撤回时间是否超过最大限制
             msgValidator.validate(dto);
+            //时间检测
+            msgValidator.checkMsgTime(dto);
             //撤回
             msgMapper.withdrawn(dto);
+            //通知接收用户
+            privateMsgSupport.withdrawn(dto);
             return Result.ok();
         } catch (BusinessException e) {
             return Result.fail(e.getMessage());
         } catch (Exception e) {
             log.error("用户{}撤回消息:{}时发生错误", dto.getEmitterId(), dto.getMsg(), e);
             return Result.fail(BaseConstants.SERVER_EXCEPTION);
-        }finally {
+        } finally {
             UserHolder.remove();
         }
     }
@@ -97,7 +95,7 @@ public class MsgImpl implements MsgService {
     public Result queryById(String id) {
         //查询消息通过消息id,直接查即可
         try {
-            List<PrivateMessageVO> privateMessageVOs = msgMapper.queryById(id);
+            PrivateMessageVO privateMessageVOs = msgMapper.queryById(id);
             return Result.ok(privateMessageVOs);
         } catch (Exception e) {
             log.error("用户: {}查询消息: {}时发生错误", UserHolder.getUserID(), id, e);
@@ -113,14 +111,14 @@ public class MsgImpl implements MsgService {
         /*PageHelper.startPage()*/
         try {
             String userID = UserHolder.getUserID();
-            msgValidator.baseValidate(dto,userID);
+            msgValidator.baseValidate(dto, userID);
             return Result.ok(msgMapper.queryByContent(dto));
         } catch (BusinessException e) {
             return Result.fail(e.getMessage());
         } catch (Exception e) {
             log.error("用户: {}查询消息: {}时发生错误", dto.getEmitterId(), dto.getMsg(), e);
             return Result.fail(BaseConstants.SERVER_EXCEPTION);
-        }finally {
+        } finally {
             UserHolder.remove();
         }
     }
@@ -151,7 +149,7 @@ public class MsgImpl implements MsgService {
         } catch (Exception e) {
             log.error("用户: {}查询历史消息: {}时发生错误", dto1.getEmitterId(), dto1.getMsg(), e);
             return Result.fail(BaseConstants.SERVER_EXCEPTION);
-        }finally {
+        } finally {
             UserHolder.remove();
         }
     }
@@ -163,17 +161,12 @@ public class MsgImpl implements MsgService {
             String userId = UserHolder.getUserID();
             if (userId == null) {
                 return Result.fail(BaseConstants.UNCACHE_USERID);
-            }if(emitterId ==null){
+            }
+            if (emitterId == null) {
                 return Result.fail(BaseConstants.ARGV_ERROR);
             }
-
             msgMapper.readMsgFromUser(emitterId, userId);
-
-
-            SocketIOClient client = clientManager.getClient(emitterId);
-            if (client != null) {
-                client.sendEvent(ChatEvent.CHAT_DELIVERED.getType(), MsgCallbackForPrivateVO.builder().msgId(MsgConstants.DEFAULT_READ_ALL).msgCode(MsgEnum.READ.getStatus()).description("").symbol("").build());
-            }
+            privateMsgSupport.read(emitterId);
 
             return Result.ok();
         } catch (Exception e) {
@@ -183,7 +176,6 @@ public class MsgImpl implements MsgService {
             UserHolder.remove();
         }
     }
-
 
 
 }

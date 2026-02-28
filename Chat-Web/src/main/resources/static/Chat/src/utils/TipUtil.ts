@@ -1,4 +1,4 @@
-import { ElMessage } from "element-plus";
+import {ElMessage} from "element-plus";
 
 
 export let log = (options:any)=>{

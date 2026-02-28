@@ -1,13 +1,13 @@
 import request from "@/utils/axios";
-import { ApiHelper } from "@/utils/ApiHelper";
+import {ApiHelper} from "@/utils/ApiHelper";
 import type {
-  GroupChatDto,
-  GroupMemberDTO,
-  GroupMessageDTO,
-  GroupApplicationDTO,
-  GroupMessageVO,
+    GroupApplicationDTO,
+    GroupChatDto,
+    GroupMemberDTO,
+    GroupMessageDTO,
+    GroupMessageVO,
+    putGroupDto,
 } from "@/types/group";
-import { pa } from "element-plus/es/locale/index.mjs";
 
 export class GroupApi {
   // GroupController
@@ -82,7 +82,16 @@ export class GroupApi {
       }),
     );
   }
+ 
 
+  /* 
+  * 封禁
+   */
+   static async banMember(body:putGroupDto){
+    return ApiHelper.handle(request.put("/group/member/set", body))
+  }
+
+ 
   // GroupMessageController
   static async queryGroupMsgById(
     groupId: number | string,

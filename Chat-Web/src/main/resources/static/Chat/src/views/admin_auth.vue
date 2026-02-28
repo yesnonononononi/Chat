@@ -1,7 +1,7 @@
 <template>
     <div class="w-full h-[100vh] flex flex-col justify-center items-center">
         <div
-            class="min-w-64 md:min-w-96 min-h-64 border border-gray-300 rounded-md p-4 shadow-md flex items-center gap-4 animate-breathe">
+            class="min-w-64 md:min-w-96 min-h-48 md:min-h-64 border border-gray-300 rounded-md p-4 shadow-md flex items-center gap-4 animate-breathe">
             <div v-if="!isAuth || !isFail"
                 class="w-16 h-16 rounded-full border border-gray-500 border-b-transparent animate-spin">
             </div>
@@ -13,9 +13,10 @@
 </template>
 <script lang="ts" setup>
 import router from '../router';
-import { AdminApi } from '../api/admin';
-import { onMounted, ref } from 'vue';
-import { Log } from '../utils/TipUtil';
+import {AdminApi} from '../api/admin';
+import {onMounted, ref} from 'vue';
+import {Log} from '../utils/TipUtil';
+
 const isAuth = ref(false);
 const isFail = ref(false);
 const time = ref(5);

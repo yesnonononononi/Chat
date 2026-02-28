@@ -25,9 +25,11 @@ export interface GroupMemberDTO {
 
 export interface GroupMemberVO {
   id: string;
+  userId: string;
   nickName: string;
   avatar: string;
   role: string;
+  status?:number;
 }
 
 export interface GroupMessageDTO {
@@ -42,6 +44,7 @@ export interface GroupApplicationDTO {
   applicationReason?: string;
   applicantId?: string;
   processedBy?: string;
+  rejectionReason?: string;
   [key: string]: any;
 }
 
@@ -84,4 +87,12 @@ export interface groupNoticeVO {
    * 更新时间
    */
   updateTime: string;
+}
+
+export interface putGroupDto{
+  userId: string;
+  groupId: string;
+  status: number;
+  banDuration?: string;
+  memberId?: string;
 }

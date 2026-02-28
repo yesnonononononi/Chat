@@ -38,6 +38,6 @@ public class GroupMessageController {
     @ShakeProtect("#vo.msgId")
     @PostMapping("/withdrawn")
     public Result withdrawn(@RequestBody GroupMessageVO vo) {
-        return groupMessageService.withDrawn(vo);
+        return groupMessageService.withdrawn(vo);
     }
 }

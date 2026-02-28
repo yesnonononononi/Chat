@@ -4,7 +4,6 @@ import com.corundumstudio.socketio.AckRequest;
 import com.corundumstudio.socketio.SocketIOClient;
 import com.summit.chat.Constants.BaseConstants;
 import com.summit.chat.Dto.MsgAckDTO;
-import com.summit.chat.Enum.ChatEvent;
 import com.summit.chat.Exception.BusinessException;
 import com.summit.chat.model.vo.GroupMessageVO;
 import com.summit.chat.service.message.GroupMessageResendCenter.GroupMsgProcessor;
@@ -25,7 +24,7 @@ public class GroupDataListener implements com.corundumstudio.socketio.listener.D
             String msgId = msgForGroupChainProcessor.start(data);
             log.info("【群聊消息转发】来自{}的成员{}发送的消息{}转发成功", data.getGroupId(), data.getEmitterId(), data.getMsgId());
             if (ackSender != null) {
-                ackSender.sendAckData(MsgAckDTO.success(msgId));
+                ackSender.sendAckData(MsgAckDTO.success(msgId, data.getCreateTime().getTime()));
             }
         } catch (BusinessException e) {
             ackSender.sendAckData(MsgAckDTO.error(e.getMessage()));

@@ -25,7 +25,7 @@ public class GroupNoticeController {
     private GroupNoticeService groupNoticeService;
 
     @PostMapping("/publish")
-    @ShakeProtect(value = "#dto.groupId" + ":" + "#dto.publisherId")
+    @ShakeProtect("#dto.groupId + ':' + #dto.publisherId")
     @Operation(summary = "发布群公告")
     @CacheEvict(cacheNames = GroupNoticeConstants.NOTICE_CACHE_PREFIX_LIST, key = "#dto.groupId")
     public Result publish(@RequestBody GroupNoticeDTO dto) {

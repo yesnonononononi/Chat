@@ -31,7 +31,7 @@
                 </div>
             </div>
         </div>
-        <div v-if="islink">
+        <div v-if="isLink">
             <div class="w-full h-auto text-center p-4 border-b-2 border-gray-300 cursor-pointer"
                 @click.prevent="toChat">
                 <span class="text-xs md:text-sm text-indigo-400">发消息</span>
@@ -40,42 +40,90 @@
                 <span class="text-xs md:text-sm text-indigo-400">视频通话</span>
             </div>
             <div>
-                <div class="w-full h-auto text-center p-4 border-b-2 border-gray-300 cursor-pointer" @click="getMore">
+                <div class="w-full h-auto text-center p-4 border-b-2 border-gray-300 cursor-pointer" @click="delLink">
                     <span class="text-xs md:text-sm text-red-400">删除好友</span>
                 </div>
             </div>
         </div>
-        <div v-else>
-            <div class="w-full h-auto text-center p-4 border-b-2 border-gray-300 cursor-pointer" @click="getMore">
+        <div v-else-if="userInfo?.id !== user_me.userInfo?.id">
+            <div class="w-full h-auto text-center p-4 border-b-2 border-gray-300 cursor-pointer" @click="dialogVisible = true">
                 <span class="text-xs md:text-sm text-indigo-400">添加好友</span>
             </div>
         </div>
+
+        <!-- 添加好友弹窗 -->
+        <el-dialog v-model="dialogVisible" title="添加好友" width="80%" :before-close="handleClose">
+            <el-input v-model="applyReason" placeholder="请输入申请理由" type="textarea" :rows="3" />
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="dialogVisible = false">取消</el-button>
+                    <el-button type="primary" @click="sendApplication">发送申请</el-button>
+                </span>
+            </template>
+        </el-dialog>
 
     </div>
 
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue';
+import {onMounted, ref} from 'vue';
 import router from '../router';
-import { useRoute } from 'vue-router';
-import { userStore } from '../store/UserStore';
-import { UserApi } from '../api/user';
-import type { userInfo } from '../types/user';
-import { Log } from '../utils/TipUtil';
-import { BusinessError } from '../exception/BusinessError';
-import { FriendApi } from '../api/friend';
-import { el } from 'element-plus/es/locale/index.mjs';
+import {useRoute} from 'vue-router';
+import {userStore} from '../store/UserStore';
+import {UserApi} from '../api/user';
+import type {userInfo} from '../types/user';
+import {Log} from '../utils/TipUtil';
+import {BusinessError} from '../exception/BusinessError';
+import {FriendApi} from '../api/friend';
+import type {friend_apply_dto} from '../types/friend';
+
 const route = useRoute();
 const user_me = userStore();
 const userId = route.params.id as string;
 const userInfo = ref<userInfo>();
 const loading = ref(false);
-const islink = ref(false);
+const isLink = ref(false);
+const dialogVisible = ref(false);
+const applyReason = ref('');
+
+const handleClose = (done: () => void) => {
+    done();
+}
+
+async function sendApplication() {
+    if (loading.value) return;
+    try {
+        loading.value = true;
+        if (!userInfo.value?.id || !user_me.userInfo) {
+            Log.error('未获取到用户信息');
+            return;
+        }
+        const body: friend_apply_dto = {
+            id: "",
+            applyReason: applyReason.value,
+            recipientId: userInfo.value.id,
+            applicantId: user_me.userInfo.id
+        }
+        await FriendApi.sendApplication(body);
+        Log.ok("申请已发送");
+        dialogVisible.value = false;
+        applyReason.value = "";
+    } catch (error: any) {
+        if (error instanceof BusinessError) {
+            Log.error(error.message);
+        } else {
+            Log.error("服务繁忙");
+            console.error("发送好友请求遇到问题", error);
+        }
+    } finally {
+        loading.value = false;
+    }
+}
 onMounted(async () => {
     if (!user_me.isLogin || !user_me.token) router.push('/login');
     await queryUserById();
-    await isLink();
+    await hasLink();
 })
 async function queryUserById() {
     try {
@@ -97,10 +145,24 @@ async function queryUserById() {
 
 }
 
-function delLink() {
+async function delLink() {
     try {
         if (loading.value) return;
         loading.value = true;
+        if (!userInfo.value?.id) return;
+        await FriendApi.delLink({
+            userID: user_me.userInfo?.id,
+            linkID: userInfo.value.id
+        });
+        Log.ok("删除成功");
+        isLink.value = false;
+        // 更新本地存储
+        const link = sessionStorage.getItem('l');
+        if (link) {
+            const users = JSON.parse(link) as { linkId: string, nickName: string }[];
+            const newUsers = users.filter(u => u.linkId !== userInfo.value?.id);
+            sessionStorage.setItem('l', JSON.stringify(newUsers));
+        }
     } catch (err) {
         if (err instanceof BusinessError) {
             Log.error(err.message);
@@ -112,6 +174,8 @@ function delLink() {
         loading.value = false;
     }
 }
+
+ 
 
 function getMore() {
     router.push({
@@ -151,7 +215,7 @@ function toVideo() {
 
 }
 
-async function isLink() {
+async function hasLink() {
     try {
         loading.value = true;
         const link = sessionStorage.getItem('l') as string;
@@ -160,7 +224,7 @@ async function isLink() {
         user.forEach(element => {
 
             if (element.linkId === userId && element.nickName === userInfo.value?.nickName) {
-                islink.value = true;
+                isLink.value = true;
             }
         });
     } catch (e) {

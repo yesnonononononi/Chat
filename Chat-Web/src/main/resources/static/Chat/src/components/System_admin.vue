@@ -19,12 +19,13 @@
 </template>
 <script lang="ts" setup>
 
-import { SysNoticeApi } from '../api/sysNotice';
-import { BusinessError } from '../exception/BusinessError';
-import { userStore } from '../store/UserStore';
-import type { SysNotice, SysNoticeDto } from '../types/sysNotice';
-import { Log } from '../utils/TipUtil';
-import { ref } from 'vue';
+import {SysNoticeApi} from '../api/sysNotice';
+import {BusinessError} from '../exception/BusinessError';
+import {userStore} from '../store/UserStore';
+import type {SysNoticeDto} from '../types/sysNotice';
+import {Log} from '../utils/TipUtil';
+import {ref} from 'vue';
+
 const user = userStore();
 const loading = ref(false);
 const notify = ref<string>('');

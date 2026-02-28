@@ -1,12 +1,9 @@
 package com.summit.chat.service.message.GroupMessageResendCenter;
 
 import com.corundumstudio.socketio.SocketIOClient;
-import com.summit.chat.Constants.GroupMsgConstants;
 import com.summit.chat.Constants.QueueConstants;
 import com.summit.chat.Enum.ChatEvent;
-import com.summit.chat.GlobalHandle.SocketHandler.ClientManager;
 import com.summit.chat.model.vo.GroupMessageVO;
-import com.summit.chat.service.group.GroupMemberService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;

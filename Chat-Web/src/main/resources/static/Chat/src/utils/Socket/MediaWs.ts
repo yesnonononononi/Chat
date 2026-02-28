@@ -1,6 +1,7 @@
-import type { Socket } from "socket.io-client";
-import type { Ws } from "./webSocket";
-import { Event } from "@/enums/events";
+import type {Socket} from "socket.io-client";
+import type {Ws} from "./webSocket";
+import {Event} from "@/enums/events";
+
 export class MediaWs {
   private static instance: Ws;
   private static socket: Socket;
@@ -8,7 +9,9 @@ export class MediaWs {
   constructor(ws: Ws) {
     if (!MediaWs.instance || !MediaWs.socket) {
       MediaWs.instance = ws;
-      MediaWs.socket = MediaWs.instance.getSocket();
+      const  res =  MediaWs.instance.getSocket();
+
+      if(res)MediaWs.socket = res;
     }
   }
 

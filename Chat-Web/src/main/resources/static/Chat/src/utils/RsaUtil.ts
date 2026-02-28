@@ -1,13 +1,15 @@
 import JSEncrypt from 'jsencrypt';
 import CryptoJS from 'crypto-js';
-import type { data } from "@/types/user";
+import type {data} from "@/types/user";
 
 export class RsaUtil {
     private static publicKey: string | null = null;
     private static readonly KEY_STORAGE_KEY = "SIGN";
     private static WHITELIST = ["/sign", "/upload"];  //接口白名单,存在即不验签
+    private static pendingPromise: Promise<string> | null = null;
+
     /**
-     * 获取公钥（带缓存和重试机制）
+     * 获取公钥（带缓存和重试机制，防止并发重复请求）
      * 独立使用 fetch 避免 axios 循环依赖
      */
     public static async getPublicKey(): Promise<string> {
@@ -19,26 +21,39 @@ export class RsaUtil {
              return sign;
         }
 
-        let n = 2; // 重试次数
-        while (n > 0) {
-            try {
-                const response = await fetch("/api/sign");
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                
-                const res: data<string> = await response.json();
-                if (res.code === 1 && res.data) {
-                    sign = res.data;
-                    this.publicKey = sign;
-                    localStorage.setItem(this.KEY_STORAGE_KEY, sign);
-                    return sign;
-                }
-            } catch (err) {
-                console.error("获取公钥失败, 剩余重试次数:", n - 1, err);
-            }
-            n--;
+        // 如果已有正在进行的请求，直接返回该Promise
+        if (this.pendingPromise) {
+            return this.pendingPromise;
         }
-        
-        throw new Error("无法获取公钥");
+
+        this.pendingPromise = (async () => {
+            let n = 2; // 重试次数
+            while (n > 0) {
+                try {
+                    // 使用相对路径，自动适配 http/https
+                    const response = await fetch("/api/sign");
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    
+                    const res: data<string> = await response.json();
+                    if (res.code === 1 && res.data) {
+                        sign = res.data;
+                        this.publicKey = sign;
+                        localStorage.setItem(this.KEY_STORAGE_KEY, sign);
+                        return sign;
+                    }
+                } catch (err) {
+                    console.error("获取公钥失败, 剩余重试次数:", n - 1, err);
+                }
+                n--;
+            }
+            throw new Error("无法获取公钥");
+        })();
+
+        try {
+            return await this.pendingPromise;
+        } finally {
+            this.pendingPromise = null; // 请求完成后清理
+        }
     }
 
     /**

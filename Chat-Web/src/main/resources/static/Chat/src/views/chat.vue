@@ -8,21 +8,30 @@
           chat
         </span>
         <span @click.prevent="handleCreateGroup" class="text-sm cursor-pointer">创建群聊</span>
-        <router-link v-if="user.userInfo?.role ===UserRoleEnum.ADMIN || user.userInfo?.role === UserRoleEnum.SUPER_ADMIN" to="/admin-auth" class="text-sm cursor-pointer">管理中心</router-link>
+        <router-link
+          v-if="user.userInfo?.role === UserRoleEnum.ADMIN || user.userInfo?.role === UserRoleEnum.SUPER_ADMIN"
+          to="/admin-auth" class="text-sm cursor-pointer">管理中心</router-link>
         <!-- 用户信息 -->
         <div class=" w-10 h-full relative  flex flex-col items-center  justify-center  group cursor-pointer"
           v-if="user.userInfo">
           <img :src="user.userInfo.icon" alt="" class="w-10 h-10 rounded-full object-cover " />
           <div
-            class="absolute z-[99999] top-[60px] w-[200px] h-[200px] md:w-[272px] md:h-[300px] opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto group-hover:-translate-y-2 transition-all duration-700 bg-white  ">
+            class="absolute z-[5] top-[60px] w-[200px] h-[200px] md:w-[272px] md:h-[300px] opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto group-hover:-translate-y-2 transition-all duration-700 bg-white  ">
             <div class="h-16 w-full  border-b-2">
               <div class="w-full h-16 flex  justify-between items-center">
                 <div class="">
-                  <p class="text-sm ml-2">{{ user.userInfo.nickName }}</p>
+                  <span class="text-sm mx-2"
+                    :class="user.userInfo.role === UserRoleEnum.SUPER_ADMIN ? 'text-green-400' : ''">{{
+                      user.userInfo.nickName }}</span>
+                  <span
+                    class="bg-gradient-to-r p-1 rounded-xl from-purple-500 via-pink-500 to-yellow-400 text-white font-bold text-md"
+                    v-show="user.userInfo.role === UserRoleEnum.SUPER_ADMIN">超级管理员</span>
+                  <span class=" rounded-xl text-gray-500 border-2 border-gray-400 p-1  text-xs"
+                    v-show="user.userInfo.role === UserRoleEnum.ADMIN">管理员</span>
                 </div>
               </div>
             </div>
-            <div class="flex justify-between items-center p-2">
+            <div class="  flex justify-between items-center p-2 ">
               <label for="user-detail" class="text-center cursor-pointer" @click="router.push('/user-info')">
                 <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gray-300" id="user-detail">
                   <img class="w-10 h-10 md:w-12 md:h-12  rounded-full"
@@ -59,20 +68,22 @@
           <!-- 透明桥接层，连接图标和下拉框 -->
           <div class="absolute top-16 w-full h-4"></div>
           <!-- 下拉框 -->
-          <div
-            class="absolute top-20 left-1/2 -translate-x-1/2 w-48 md:w-64 h-72 rounded-xl z-[100000] pointer-events-none opacity-0 bg-white text-center group-hover:opacity-100 group-hover:pointer-events-auto group-hover:-translate-y-2 transition-all duration-700 shadow-lg border">
+          <div id="notify"
+            class="absolute top-16 left-1/2 -translate-x-[150px] md:-translate-x-1/2 w-48 md:w-64 h-72 rounded-xl z-[5] pointer-events-none opacity-0 bg-white text-center group-hover:opacity-100 group-hover:pointer-events-auto group-hover:-translate-y-2 transition-all duration-700 shadow-lg border">
             <div class="border-b-2 h-8">
               <span class="text-sm md:text-xl font-bold">消息通知</span>
             </div>
             <el-scrollbar class="w-full flex flex-col overflow-hidden  justify-around cursor-pointer">
               <div v-for="notify in notifications" :key="notify.id"
-                class="w-full h-auto max-h-24 p-4 flex justify-between items-center">
-                <p class="text-xs md:text-sm font-bold">{{ notify.msg }}</p>
-                <div>
-                  <p class="text-xs text-gray-400">发布时间:</p>
-                  <p class="text-xs   text-gray-400">{{ notify.createTime }}</p>
+                class="w-full h-auto max-h-24 p-4 flex flex-col gap-2 justify-between">
+                <div class="text-sm">{{ notify.msg }}</div>
+                <div class="w-full flex items-center justify-evenly">
+                  <span class="text-xs md:text-sm text-gray-400">{{ notify.createTime }}</span>
+                  <span class="fas fa-heart cursor-pointer text-gray-400" :class="notify.isLike ? 'text-red-500' : ''"
+                    @click="handleLike(notify)">
+                    <span class="text-xs md:text-sm ml-2 text-gray-400">{{ notify.like || 0 }}</span>
+                  </span>
                 </div>
-
               </div>
             </el-scrollbar>
           </div>
@@ -87,7 +98,7 @@
           <div class=" overflow-hidden h-[100vh] transition-all  duration-300 ease-in-out"
             :class="fold ? 'w-0 opacity-0 -translate-x-full' : 'w-[200px] md:w-[300px] opacity-100 translate-x-0'">
             <div class="flex justify-around items-center  w-full h-10 text-center">
-              <el-icon class="cursor-pointer">
+              <el-icon >
                 <Search />
               </el-icon>
               <div class="border flex">
@@ -100,19 +111,30 @@
                 <Fold />
               </el-icon>
             </div>
+            <div>
+              <el-input placeholder="昵称/群聊名称" class="text-xs rounded-xl" v-model="user_search">
+                <template #suffix>
+                    <span class="text-md text-gray-400 hover:text-green-500 cursor-pointer" @click="handleSearch">搜索</span>
+                </template>
+              </el-input>
+            </div>
             <el-scrollbar class="h-full w-full">
               <div class="h-full w-full" v-if="selectfriend">
                 <div v-for="item in search_User" :key="item.linkId" @click="handleChat(item)"
                   class="flex justify-between items-center h-16 md:h-[100px] my-4 text-center group cursor-pointer rounded-[4px] border-gray-300 border-b">
                   <div class="flex items-center">
                     <div class="w-auto h-auto rounded-full">
-                      <img :src="item.icon" alt="" class="w-10 h-10 md:w-16 md:h-16   rounded-full" />
+                      <img :src="item.icon" alt="" class="w-10 h-10 md:w-16 md:h-16  shrink-0 rounded-full" />
                     </div>
                     <div class="ml-4">
-                      <p class="mb-2 text-xl font-bold group-hover:text-blue-500">
+                      <p class="mb-1 text-xl truncate md:max-w-[150px] max-w-[60px] group-hover:text-blue-500">
                         {{ item.nickName || `用户${item.linkId}` }}
                       </p>
+                      <p class="text-xs text-gray-400 max-w-[70px] md:max-w-[100px] truncate ">{{ item.lastMsg }}</p>
                     </div>
+                  </div>
+                  <div class="h-1/2 mr-2">
+                    <span class="text-xs mt-2 text-gray-400">{{ item.lastMsgTime }}</span>
                   </div>
                 </div>
               </div>
@@ -163,10 +185,11 @@ import { Log } from "../utils/TipUtil";
 import { BusinessError } from "../exception/BusinessError";
 import EmptyState from "../components/EmptyState.vue";
 import { SysNoticeApi } from "../api/sysNotice";
-import type { data } from "../types/user";
 import type { SysNotice } from "../types/sysNotice";
 import { TimeUtil } from "../utils/time";
-import { UserRoleEnum } from "@/enums/UserRoleEnum";
+import { UserRoleEnum } from "../enums/UserRoleEnum";
+ 
+ 
 const search_User = ref<friend_info[]>([]);
 const user = userStore();
 const msg = msgStore();
@@ -176,19 +199,21 @@ const ws = Ws.getInstance();
 const search_Group = ref<GroupChatDto[]>();
 const loading = ref(false);
 const notifications = computed(() => msg.getNotifyList() || []);
+
+const user_search = ref("");
 onMounted(async () => {
   if (user.userInfo) {
     const userId = user.userInfo.id;
-    const res:friend_info[]|undefined  = await queryLinkUser();
+    const res: friend_info[] | undefined = await queryLinkUser();
     if (res) {  //注册会话信息
-      res.forEach(eachFriend  => {
+      res.forEach(eachFriend => {
         msg.registry(userId, eachFriend.linkId);
       })
- 
-    await queryNotify();
-    fold.value = localStorage.getItem("f") === "true" ? true : false;
+
+      await queryNotify();
+      fold.value = localStorage.getItem("f") === "true" ? true : false;
+    }
   }
-}
 });
 
 
@@ -243,7 +268,11 @@ async function queryLinkUser(): Promise<friend_info[] | undefined> {
   if (loading.value) return;
   try {
     selectfriend.value = true
-    const res = await FriendApi.getLinkList();
+    const res:friend_info[] = await FriendApi.getLinkList();
+    const date = Date.now();
+    res.forEach(eachFriend=>{
+      if(eachFriend.lastMsgTime)eachFriend.lastMsgTime = TimeUtil.formatLastMsgTime(eachFriend.lastMsgTime);
+    })
     search_User.value = res;
     return res;
   } catch (error) {
@@ -260,11 +289,24 @@ async function queryLinkUser(): Promise<friend_info[] | undefined> {
 
 async function queryNotify() {
   try {
+    let s: string = '';
+
     const res: SysNotice[] = await SysNoticeApi.list();
     res.forEach(eachNotify => {
       if (!eachNotify.createTime) return;
       eachNotify.createTime = TimeUtil.timestampToTime(eachNotify.createTime);
+      s += (eachNotify.id + ',');
     })
+    const listRes: SysNotice[] = await SysNoticeApi.likeList(s);
+
+    res.forEach((item, i) => {
+      if (item) {
+        if (listRes[i]) {
+          item.isLike = listRes[i].isLike;
+          item.like = listRes[i].like;
+        }
+      }
+    });
     msg.addNotifyMsgs(res);
   } catch (error) {
     if (error instanceof BusinessError) {
@@ -279,16 +321,53 @@ async function queryNotify() {
 }
 onUnmounted(() => {
   selectfriend.value = true;
-   localStorage.setItem("f", fold.value.toString());
+  localStorage.setItem("f", fold.value.toString());
   sessionStorage.setItem("l", JSON.stringify(search_User.value));
 })
 
+async function handleLike(body: SysNotice) {
+  try {
+    if (!body || !body.id) {
+      console.error("参数错误");
+      return;
+    }
+    await SysNoticeApi.like(body.id);
+    body.like = body.isLike ? (body.like || 0) - 1 : (body.like || 0) + 1;
+    body.isLike = !body.isLike;
+  } catch (err) {
+    if (err instanceof BusinessError) {
+      Log.error(err.message);
+      return;
+    }
+    Log.error("点赞失败");
+    console.error(err);
+  }
+}
 
+
+async function handleSearch(){
+  if(selectfriend.value){
+    const user = search_User.value.find(user=>user.nickName === user_search.value);
+    if(user)search_User.value = [user];
+    else  Log.info("未找到该用户");
+  }else if(search_Group.value){
+    const group = search_Group.value.find(group=>group.groupName === user_search.value);
+    if(group)search_Group.value = [group];
+    else  Log.info("未找到该群组");
+  }
+}
+
+
+ 
 </script>
 
 
 <style scoped>
 :deep(.el-scrollbar) {
-  height: 89%;
+  height: 100%;
+}
+
+#notify :deep(.el-scrollbar) {
+  height: 80%;
 }
 </style>

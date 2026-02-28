@@ -60,8 +60,8 @@ public class GroupMemberServiceImpl implements GroupMemberService {
             GroupMembersVO inviteeInfo = groupMemberValidator.isMemberExist(groupId, inviteeID);
             //判断邀请者是否存在于群聊
             GroupMembersVO userInfo = groupMemberValidator.isMemberExist(groupId, userId);
-            //判断邀请者是否被拉黑,群聊是否已满
-            groupMemberValidator.isBlackListByUserId(userInfo).isFull(groupById);
+            //判断群聊是否已满
+            groupMemberValidator.isFull(groupById);
             //填充属性
             GroupMembers groupMembers = groupMemberSupport.fillProps(dto);
             //插入群成员
@@ -90,7 +90,7 @@ public class GroupMemberServiceImpl implements GroupMemberService {
     @Override
     public Result delMember(GroupMemberDTO dto) {
         Long userId = null;
-        Long groupId = null;
+        Long groupId;
         Long memberId = null;
         try {
             groupMemberValidator.validate(dto);
@@ -100,11 +100,11 @@ public class GroupMemberServiceImpl implements GroupMemberService {
             //判断群聊是否存在
             GroupChatVO groupById = groupMemberValidator.isGroupExist(groupId);
             //判断群成员是否存在
-            GroupMembersVO memberInfo = groupMemberValidator.isMemberExist(groupId, memberId);
+            GroupMembersVO memberInfo = groupMemberValidator.isMemberExist(groupId, userId);
             //判断群成员是否是群主
              groupMemberValidator.isOwner(memberInfo);
            //删除群成员
-            groupMemberMapper.delMemberByGroupIdAndUserId(groupId, memberId);
+            groupMemberMapper.delMemberByGroupIdAndUserId(groupId, userId);
 
             // 更新群人数
             groupMapper.updateGroupNumber(groupId);

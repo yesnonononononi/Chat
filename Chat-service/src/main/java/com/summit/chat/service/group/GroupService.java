@@ -2,7 +2,6 @@ package com.summit.chat.service.group;
 
 import com.summit.chat.Dto.GroupChatDto;
 import com.summit.chat.Result.Result;
-import com.summit.chat.model.vo.GroupChatVO;
 
 public interface GroupService {
     Result addGroup(GroupChatDto dto);

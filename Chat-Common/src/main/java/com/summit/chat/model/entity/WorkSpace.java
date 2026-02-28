@@ -14,10 +14,10 @@ public class WorkSpace implements Serializable {
   private long id;
   private long todayNewUser;
   private long totalUser;
-  private long todayNewOrder;
-  private long totalOrder;
-  private double todayNewIncome;
-  private double totalIncome;
+  private Long totalMsg;
+  private Long todayNewMsg;
+  private Integer onlineUser;
+  private String date;
   private java.sql.Timestamp createTime;
 
 

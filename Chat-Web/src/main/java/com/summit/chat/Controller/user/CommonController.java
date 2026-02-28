@@ -18,7 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @RestController
-@RequestMapping("/")
+@RequestMapping
 @Tag(name = "通用控制")
 
 public class CommonController {
@@ -35,8 +35,8 @@ public class CommonController {
     @Operation(summary = "上传文件")
     @PostMapping("/upload")
     @ShakeProtect("T(com.summit.chat.Utils.UserHolder).getUserID()")
-    public Result upload(MultipartFile file) {
-        return fileLoadService.upload(file);
+    public Result upload(MultipartFile file, @RequestParam(defaultValue = "common") String directory) {
+        return fileLoadService.upload(file, directory);
     }
 
 

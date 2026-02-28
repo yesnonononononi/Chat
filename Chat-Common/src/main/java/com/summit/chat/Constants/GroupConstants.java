@@ -19,7 +19,7 @@ public class GroupConstants {
     public static final String ILLEGAL_CHAR = "搜索关键字不能为空";
     public static final String USER_NOT_MATCH = "非法获取";
 
-    // Group Creation Limits
+
     public static final int MAX_GROUPS_NORMAL = 5;
     public static final String GROUP_LIMIT_EXCEEDED = "创建群聊数量已达上限(%d个)";
     public static final String ALREADY_GROUP_MEMBER = "用户已经是群成员";

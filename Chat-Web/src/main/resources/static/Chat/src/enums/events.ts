@@ -5,6 +5,7 @@ export enum Event{
   // 消息回执
   CHAT_DELIVERED = "chat_delivered",
   CHAT_ERROR = "chat_error",
+  CHAT_WITHDRAWN = "chat_withdrawn", // 消息撤回
   // 群聊
   JOIN_GROUP = "join_group",
   CHAT_GROUP_SEND = "chat_group",

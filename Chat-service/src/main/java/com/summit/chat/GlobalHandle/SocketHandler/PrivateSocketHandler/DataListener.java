@@ -6,8 +6,8 @@ import com.corundumstudio.socketio.SocketIOClient;
 import com.summit.chat.Constants.BaseConstants;
 import com.summit.chat.Dto.MsgAckDTO;
 import com.summit.chat.Exception.BusinessException;
-import com.summit.chat.service.message.PrivateMessageResendCenter.MsgForPrivateChainProcessor;
 import com.summit.chat.model.vo.PrivateMessageVO;
+import com.summit.chat.service.message.PrivateMessageResendCenter.MsgForPrivateChainProcessor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -26,7 +26,7 @@ public class DataListener implements com.corundumstudio.socketio.listener.DataLi
 
         } catch (BusinessException e) {
 
-            log.error("【私聊消息转发】用户:{}转发消息遇到问题", o.getEmitterId(), e);
+            log.info("【私聊消息转发】用户:{}转发消息遇到问题", o.getEmitterId(), e);
 
             ackRequest.sendAckData(MsgAckDTO.error(e.getMessage()));
 

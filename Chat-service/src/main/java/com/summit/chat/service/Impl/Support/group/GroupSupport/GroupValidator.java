@@ -2,7 +2,6 @@ package com.summit.chat.service.Impl.Support.group.GroupSupport;
 
 import com.summit.chat.Constants.GroupConstants;
 import com.summit.chat.Dto.GroupChatDto;
-import com.summit.chat.Exception.BusinessException;
 import com.summit.chat.Mapper.GroupMapper;
 import com.summit.chat.Utils.UserHolder;
 import com.summit.chat.model.vo.GroupChatVO;

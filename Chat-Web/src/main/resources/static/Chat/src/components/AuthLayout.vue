@@ -1,6 +1,6 @@
 <template>
   <div class="cursor"></div>
-  <div class="login-page" v-loading="loading" element-loading-background="rgba(0, 0, 0, 0.7)">
+  <div class="login-page"   v-loading="loading" element-loading-background="rgba(0, 0, 0, 0.7)">
     <div class="bg-layer">
       <div @click="toggleBack" class="toggle-btn" id="toggle">
         <button type="button" class="btn" aria-label="切换主题">
@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, onUnmounted, nextTick } from "vue";
+import {nextTick, onMounted, onUnmounted, ref} from "vue";
 
 defineProps<{
   loading?: boolean;

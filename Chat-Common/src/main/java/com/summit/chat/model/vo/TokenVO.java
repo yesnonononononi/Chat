@@ -1,6 +1,7 @@
 package com.summit.chat.model.vo;
 
 import lombok.Data;
+
 import java.io.Serializable;
 
 @Data

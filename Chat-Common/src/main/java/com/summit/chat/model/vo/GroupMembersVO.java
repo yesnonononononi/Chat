@@ -1,6 +1,5 @@
 package com.summit.chat.model.vo;
 
-import com.summit.chat.Enum.GroupStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

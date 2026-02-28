@@ -52,8 +52,11 @@
                         <span class="text-green-400 cursor-pointer hover:text-green-700 mr-4"
                             @click="handleUnblack(scope.row)" v-if="scope.row.status === 0 &&( scope.row.role === UserRoleEnum.USER || (scope.row.role === UserRoleEnum.ADMIN && user.userInfo?.role === UserRoleEnum.SUPER_ADMIN) && scope.row.role !== UserRoleEnum.SUPER_ADMIN)">启用</span>
                         <span class="text-blue-400 cursor-pointer hover:text-blue-700"
-                            @click="handleSetAdmin(scope.row)" v-if=" (user.userInfo?.role === UserRoleEnum.SUPER_ADMIN && scope.row.id !== user.userInfo?.id)&&scope.row.role === UserRoleEnum.USER">设为管理员</span>
-                    </template><!--自己是超管&&设置对象不能为自己&&设置对象为user -->
+                            @click="handleSetAdmin(scope.row)" v-if=" (user.userInfo?.role === UserRoleEnum.SUPER_ADMIN && scope.row.id !== user.userInfo?.id)&&scope.row.role === UserRoleEnum.USER">设为管理员</span><!--自己是超管&&设置对象不能为自己&&设置对象为user -->
+                            <span class="text-red-400 cursor-pointer hover:text-red-700"
+                            @click="cancelAdmin(scope.row)" v-if="user.userInfo?.role === UserRoleEnum.SUPER_ADMIN && scope.row.role === UserRoleEnum.ADMIN">取消管理员</span>
+                    </template>
+                    
                 </el-table-column>
             </el-table>
             <el-pagination
@@ -71,13 +74,14 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { userStore } from '@/store/UserStore';
-import { AdminApi } from '../api/admin';
-import { BusinessError } from '../exception/BusinessError';
-import type { userInfo } from '../types/user';
-import { Log } from '../utils/TipUtil';
-import { computed, onMounted, reactive, ref } from 'vue';
-import { UserRoleEnum } from '@/enums/UserRoleEnum';
+import {userStore} from '../store/UserStore';
+import {AdminApi} from '../api/admin';
+import {BusinessError} from '../exception/BusinessError';
+import type {userInfo} from '../types/user';
+import {Log} from '../utils/TipUtil';
+import {onMounted, reactive, ref} from 'vue';
+import {UserRoleEnum} from '../enums/UserRoleEnum';
+
 const loading = ref(false);
 const userInfo = ref<userInfo[]>([]);
 const user = userStore();
@@ -206,5 +210,22 @@ const handleSetAdmin = async (user: userInfo) => {
     }
 };
 
+const cancelAdmin = async (user: userInfo) => { 
+    try {
+        if (loading.value) return;
+        loading.value = true;
+        await AdminApi.delAdmin(user.id);
+        user.role = UserRoleEnum.USER;
+        Log.ok("操作成功");
+    } catch (err) {
+        if (err instanceof BusinessError) {
+            Log.error(err.message)
+        } else {
+            console.error(err); Log.error("操作失败")
+        }
+    }finally {
+        loading.value = false;
+    }
+};
 
 </script>

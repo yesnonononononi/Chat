@@ -1,6 +1,5 @@
 package com.summit.chat.service.message.GroupMessageResendCenter;
 
-import cn.hutool.core.codec.Base16Codec;
 import com.summit.chat.Constants.BaseConstants;
 import com.summit.chat.Constants.GroupMsgConstants;
 import com.summit.chat.Constants.MsgConstants;

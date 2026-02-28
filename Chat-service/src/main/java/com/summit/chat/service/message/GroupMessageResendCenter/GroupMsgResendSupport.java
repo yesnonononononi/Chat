@@ -2,10 +2,8 @@ package com.summit.chat.service.message.GroupMessageResendCenter;
 
 import com.corundumstudio.socketio.SocketIOClient;
 import com.summit.chat.GlobalHandle.SocketHandler.ClientManager;
-import com.summit.chat.Mapper.GroupMemberMapper;
 import com.summit.chat.model.vo.GroupMessageVO;
 import com.summit.chat.service.Impl.Support.group.GroupMemberSupport.GroupMemberServiceCacheSupport;
-import com.summit.chat.service.group.GroupMemberService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

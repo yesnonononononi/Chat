@@ -23,7 +23,7 @@
                 <el-table-column label="ID" align="center" prop="id"></el-table-column>
                 <el-table-column label="名称" align="center" prop="groupName"></el-table-column>
                 <el-table-column label="描述" align="center" prop="groupDescription"></el-table-column>
-                <el-table-column label="创建人" align="center" prop="creatorId"></el-table-column>
+                <el-table-column label="创建人" align="center" prop="creatorName"></el-table-column>
                 <el-table-column label="创建时间" align="center" prop="createTime"></el-table-column>
                 <el-table-column label="人数" align="center" prop="number"></el-table-column>
                 <el-table-column label="操作" align="center" width="200">
@@ -51,13 +51,14 @@
 </template>
 
 <script lang="ts" setup>
-import { AdminApi } from '../api/admin';
-import { GroupStatus } from '../enums/GroupStatus';
-import { BusinessError } from '../exception/BusinessError';
-import type { Group } from '../types/group';
-import { TimeUtil } from '../utils/time';
-import { Log } from '../utils/TipUtil';
-import { onMounted, ref } from 'vue';
+import {AdminApi} from '../api/admin';
+import {GroupStatus} from '../enums/GroupStatus';
+import {BusinessError} from '../exception/BusinessError';
+import type {Group} from '../types/group';
+import {TimeUtil} from '../utils/time';
+import {Log} from '../utils/TipUtil';
+import {onMounted, ref} from 'vue';
+
 const state = ref({
     page: 1,
     pageSize: 10,
@@ -80,7 +81,7 @@ async function handleBan(group: Group) {
         loading.value = true;
         await AdminApi.banGroup(group.id);
         Log.ok("操作成功");
-        group.status = GroupStatus.BAN;
+        group.status = GroupStatus.FORBIDDEN;
     } catch (err) {
         if (err instanceof BusinessError) {
             Log.error(err.message)

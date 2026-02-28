@@ -12,13 +12,13 @@
 </template>
 
 <script lang="ts" setup>
-import { Log } from "../utils/TipUtil";
-import { GroupApi } from "../api/group";
-import type{ GroupChatDto } from "../types/group";
-import { ref } from "vue";
-import { useRoute } from "vue-router";
+import {Log} from "../utils/TipUtil";
+import {GroupApi} from "../api/group";
+import {ref} from "vue";
+import {useRoute} from "vue-router";
 import router from "../router";
-import { BusinessError } from "../exception/BusinessError";
+import {BusinessError} from "../exception/BusinessError";
+
 const content = ref("");
 const route = useRoute();
 function putGroup() {

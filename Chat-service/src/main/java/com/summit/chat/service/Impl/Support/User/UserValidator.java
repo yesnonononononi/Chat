@@ -1,4 +1,4 @@
-package com.summit.chat.service.Impl.Support.UserSupport;
+package com.summit.chat.service.Impl.Support.User;
 
 import cn.hutool.core.util.PhoneUtil;
 import com.summit.chat.Constants.UserConstants;

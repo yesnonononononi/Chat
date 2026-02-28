@@ -20,14 +20,14 @@ public class FileLoadServiceImpl implements FileLoadService {
     }
 
     @Override
-    public Result upload(MultipartFile file) {
+    public Result upload(MultipartFile file, String directory) {
         String path;
         //原始文件名
         String originalFilename = file.getOriginalFilename();
         //获取后缀
         if (originalFilename != null) {
             String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
-            String newFileName = UUID.randomUUID() + extension;
+            String newFileName = directory + "/" + UUID.randomUUID() + extension;
             try {
                 path = aliOssUtil.upload(file.getBytes(), newFileName);
             } catch (IOException e) {

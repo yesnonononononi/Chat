@@ -1,14 +1,11 @@
 package com.summit.chat.service.Impl.Support.Admin;
 
-import com.summit.chat.Constants.UserConstants;
 import com.summit.chat.Enum.UserRoleEnum;
 import com.summit.chat.Mapper.UserMapper;
 import com.summit.chat.model.entity.User;
 import com.summit.chat.service.Impl.GlobalValidatorImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Objects;
 
 @Component
 public class AdminValidator extends GlobalValidatorImpl<String> {

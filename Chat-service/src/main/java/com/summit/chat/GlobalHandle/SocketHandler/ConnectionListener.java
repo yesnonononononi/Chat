@@ -9,6 +9,7 @@ import com.summit.chat.Mapper.Cache.RedisProcessor;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -22,6 +23,9 @@ public class ConnectionListener implements ConnectListener {
 
     @Autowired
     RedisProcessor redisProcessor;
+
+    @Autowired
+    private RedisTemplate<String,Object>redisTemplate;
 
     @Override
     public void onConnect(SocketIOClient socketIOClient) {
@@ -81,6 +85,8 @@ public class ConnectionListener implements ConnectListener {
             return false;
         }
         try {
+
+
             client.set("USERID", userid);
         } catch (ClassCastException cce) {
             log.error("【Socket连接】拦截器类型转化错误: {}", cce.getMessage());

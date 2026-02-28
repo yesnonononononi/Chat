@@ -1,5 +1,5 @@
 // 方式1：直接解构导入 WebSocketServer（推荐）
-import { WebSocketServer } from 'ws';
+import {WebSocketServer} from 'ws';
 
 // 启动服务端（注意：用 WebSocketServer 而非 WebSocket.Server）
 const wss = new WebSocketServer({ port: 8080 });

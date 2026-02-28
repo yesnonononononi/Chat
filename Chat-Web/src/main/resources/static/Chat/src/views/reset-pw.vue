@@ -15,13 +15,14 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { UserApi } from '../api/user';
-import { userStore } from '../store/UserStore';
-import { ref } from 'vue'
-import type { userPwPutDto } from '../types/user';
-import { Log, log } from '../utils/TipUtil';
-import { BusinessError } from '../exception/BusinessError';
+import {UserApi} from '../api/user';
+import {userStore} from '../store/UserStore';
+import {ref} from 'vue'
+import type {userPwPutDto} from '../types/user';
+import {Log} from '../utils/TipUtil';
+import {BusinessError} from '../exception/BusinessError';
 import router from '@/router';
+
 const loading = ref(false);
 const oldPw = ref('');
 const newPw = ref('');

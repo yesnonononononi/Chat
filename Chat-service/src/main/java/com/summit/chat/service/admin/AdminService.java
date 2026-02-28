@@ -4,6 +4,8 @@ import com.summit.chat.Dto.admin.UserPageQueryDTO;
 import com.summit.chat.Result.Result;
 import com.summit.chat.model.entity.WorkSpace;
 
+import java.util.List;
+
 public interface AdminService {
     Result getAllUsers(UserPageQueryDTO userPageQueryDTO, Integer page, Integer pageSize);
 
@@ -21,4 +23,12 @@ public interface AdminService {
     Result queryGroupList(Integer page, Integer pageSize);
 
     Result unBanGroup(String groupId);
+
+    Result delAdmin(String userID);
+
+    List<WorkSpace> getWorkSpaceDataByDate(List<String> dateList);
+
+    Result getUserActive();
+
+    Result getUserActiveByRange(List<String> dateList);
 }

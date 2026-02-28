@@ -35,9 +35,9 @@
 </template>
 
 <script  lang="ts" setup>
-import { userStore } from '../store/UserStore';
-import { computed } from 'vue';
-import type { chat, ChatGroup } from '../types/chat';
+import {userStore} from '../store/UserStore';
+import {computed} from 'vue';
+import type {chat, ChatGroup} from '../types/chat';
 import router from '../router';
 
 const user = userStore();

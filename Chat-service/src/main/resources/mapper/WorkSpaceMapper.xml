@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.summit.chat.Mapper.WorkSpaceMapper">
+    <select id="queryAllData" resultType="com.summit.chat.model.entity.WorkSpace">
+        SELECT
+            -- 总消息数
+            ((SELECT COUNT(id) FROM user_msg) + (SELECT COUNT(id) FROM group_messages) + (SELECT COUNT(id) FROM sys_notice)) AS totalMsg,
+            -- 今日新消息数（如需今日，把 date_sub(...) 改为 curdate()）
+           ( (SELECT COUNT(id) FROM user_msg WHERE DATE(send_time) = CURDATE()) + (SELECT COUNT(id) FROM group_messages where DATE(create_time) = CURDATE()) + (SELECT COUNT(id) FROM sys_notice where DATE(create_time) = CURDATE())) AS todayNewMsg,
+            -- 今日新用户数（status=1 为有效用户，如需今日，把 date_sub(...) 改为 curdate()）
+            (SELECT COUNT(id) FROM user WHERE DATE(create_time) = CURDATE() AND status = 1) AS todayNewUser,
+            -- 总有效用户数
+            (SELECT COUNT(id) FROM user WHERE status = 1) AS totalUser
+
+        FROM DUAL;  -- dual 虚拟表，用于返回单行多列的结果,表示用于无物理表但需要 FROM 子句的场景，保证语法合规
+    </select>
+
+    <select id="queryAllDataByDate" resultType="com.summit.chat.model.entity.WorkSpace">
+        select today_new_user, total_user, today_new_msg, total_msg, DATE(create_time) as date
+        from work_space ws
+        <where>
+            <if test="dateList != null and dateList.size() > 0">
+                 DATE(create_time) in
+                <foreach collection="dateList" item="date" separator="," open="(" close=")">
+                    #{date,jdbcType=DATE}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+</mapper>

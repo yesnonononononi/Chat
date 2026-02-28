@@ -7,7 +7,7 @@
     <div class="account-login">
       <div class="form-group">
         <label class="form-label">手机号</label>
-        <input type="text" class="form-input" placeholder="请输入手机号" v-model="loginData.mobile" />
+        <input type="text" class="form-input" placeholder="请输入手机号" maxlength="11" v-model="loginData.mobile" />
       </div>
       <div class="form-group">
         <label class="form-label">密码</label>
@@ -38,13 +38,13 @@
 </template>
 
 <script lang="ts" setup>
-import type { body } from "../types/auth";
-import { reactive, ref, computed, onMounted } from "vue";
-import { Log } from "../utils/TipUtil";
-import { userStore } from "../store/UserStore";
+import type {body} from "../types/auth";
+import {computed, onMounted, reactive, ref} from "vue";
+import {Log} from "../utils/TipUtil";
+import {userStore} from "../store/UserStore";
 import router from "../router";
-import { BusinessError } from "@/exception/BusinessError";
-import { RsaUtil } from "@/utils/RsaUtil";
+import {BusinessError} from "@/exception/BusinessError";
+import {RsaUtil} from "@/utils/RsaUtil";
 import AuthLayout from "../components/AuthLayout.vue";
 
 const loading = ref(false);

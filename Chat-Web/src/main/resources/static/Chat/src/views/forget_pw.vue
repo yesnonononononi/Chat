@@ -29,14 +29,15 @@
 </template>
 
 <script lang="ts" setup>
-import { UserApi } from '../api/user';
-import { BusinessError } from '../exception/BusinessError';
-import { userStore } from '../store/UserStore';
-import type { userPwPutDto } from '../types/user';
-import { Log } from '../utils/TipUtil';
-import { onMounted, reactive, ref, watch, onUnmounted } from 'vue';
+import {UserApi} from '../api/user';
+import {BusinessError} from '../exception/BusinessError';
+import {userStore} from '../store/UserStore';
+import type {userPwPutDto} from '../types/user';
+import {Log} from '../utils/TipUtil';
+import {onMounted, onUnmounted, ref} from 'vue';
 import AuthLayout from "../components/AuthLayout.vue";
 import router from '@/router';
+
 const loading = ref(false);
 const user = userStore();
 const body = ref<userPwPutDto>({

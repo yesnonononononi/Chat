@@ -1,19 +1,17 @@
-import { Socket } from "socket.io-client";
-import { configuration } from "./config";
-import type { chat, ChatGroup } from "@/types/chat";
-import { Event, Status } from "@/enums/events";
-import type { systemMsg } from "@/types/msg";
-import type { MsgACKOfServer } from "@/types/msg-ack";
-import { serverMsgCode } from "@/enums/server-callback";
-import { Log } from "../TipUtil";
-import { BusinessError } from "@/exception/BusinessError";
-import { PrivateHandler } from "./PrivateHandler";
-import { GroupHandler } from "./GroupHandler";
-import { SystemHandler } from "./SystemHandler";
+import {Socket} from "socket.io-client";
+import {configuration} from "./config";
+import type {chat, ChatGroup} from "@/types/chat";
+import {Event, Status} from "@/enums/events";
+import type {systemMsg} from "@/types/msg";
+import type {MsgACKOfServer, withdrawn} from "@/types/msg-ack";
+import {PrivateHandler} from "./PrivateHandler";
+import {GroupHandler} from "./GroupHandler";
+import {SystemHandler} from "./SystemHandler";
 
 export interface MsgAck {
   success: boolean;
   msgId?: string;
+  sendTime?: number;
   errorMsg?: string;
 }
 
@@ -32,7 +30,24 @@ export class Ws {
     if(this.obj && this.obj.connected){
       return this.obj;
     }
-    this.obj = this.conf.getInstance(this.conf.config(), this.conf.getUrl());
+    
+    // 获取配置
+    const config = this.conf.config();
+    const url = this.conf.getUrl();
+    
+    // 如果没有token（未登录），则不建立连接
+    // 如果 token 不存在，getInstance 将返回一个未连接的 socket 实例，或者我们可以在这里直接返回 null
+    if (!localStorage.getItem("userToken")) {
+    
+      return null;
+    }
+
+    this.obj = this.conf.getInstance(config, url);
+    
+    // 如果实例存在但未连接（autoConnect: false），且现在有token，手动连接
+    if (this.obj && !this.obj.connected && config.autoConnect !== false) {
+       this.obj.connect();
+    }
 
     this.init();
     
@@ -89,7 +104,10 @@ export class Ws {
 
   public getSocket(){
     if(!this.obj){
-      return this.initSocket();
+      // 尝试初始化
+      const socket = this.initSocket();
+      // 如果因为未登录返回null，则直接返回null
+      return socket;
     }
     return this.obj;
   }
@@ -110,6 +128,15 @@ export class Ws {
   public onOneByOneMsgACK(ack: (data: MsgACKOfServer) => void) {
     this.getSocket();
     this.privateHandler?.onMsgStatus(ack);
+  }
+
+  public onWithdrawn(callback: (data: withdrawn) => void) {
+    this.getSocket();
+    this.privateHandler?.onWithdrawn(callback);
+  }
+
+  public removeWithdrawnListener() {
+    this.privateHandler?.removeWithdrawnListener();
   }
 
   public removeMsgACKListener() {

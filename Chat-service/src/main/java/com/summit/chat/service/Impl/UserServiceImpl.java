@@ -12,7 +12,7 @@ import com.summit.chat.Utils.UserHolder;
 import com.summit.chat.model.entity.User;
 import com.summit.chat.model.vo.UserVO;
 import com.summit.chat.service.Impl.Support.User.UserSupport;
-import com.summit.chat.service.Impl.Support.UserSupport.UserValidator;
+import com.summit.chat.service.Impl.Support.User.UserValidator;
 import com.summit.chat.service.User.UserService;
 import jodd.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -118,7 +118,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Result putUserIcon(MultipartFile file) {
-        Object data = fileLoadService.upload(file).getData();
+        Object data = fileLoadService.upload(file, "avatar").getData();
         if (data != null) {
             userMapper.putUserIcon(data.toString(), UserHolder.getUserID());
 

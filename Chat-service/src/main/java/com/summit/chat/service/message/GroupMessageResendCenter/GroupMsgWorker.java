@@ -13,15 +13,18 @@ public class GroupMsgWorker {
     public void conduct(GroupMsgContext context){
         GroupMessageVO msg = context.getMsg();
         // 如果消息ID为空，则生成新的ID (兼容逻辑)
-        if (msg.getMsgId() == null || msg.getMsgId() == 0) {
+        if (msg.getMsgId() == null || msg.getMsgId().isEmpty()) {
              String s = generateMsgId();
-             msg.setMsgId(Long.valueOf(s));
+             msg.setMsgId(s);
         }
         
-        String messageType = msg.getMessageType();
+        String messageType = msg.getType();
         //没有传入消息类型，默认为文本
         if(messageType == null){
-            msg.setMessageType(MsgType.TEXT.getType());
+            msg.setType(MsgType.TEXT.getType());
+        }
+        if(msg.getCreateTime() == null){
+            msg.setCreateTime(new java.sql.Timestamp(System.currentTimeMillis()));
         }
     }
     private String generateMsgId(){

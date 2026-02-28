@@ -3,11 +3,7 @@ package com.summit.chat.service.User;
 import com.summit.chat.Dto.UserDTO;
 import com.summit.chat.Dto.UserPwPutDto;
 import com.summit.chat.Result.Result;
-import com.summit.chat.model.entity.User;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
-import java.util.Map;
 
 public interface UserService {
 

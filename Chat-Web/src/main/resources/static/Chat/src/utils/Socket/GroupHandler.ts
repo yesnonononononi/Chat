@@ -1,9 +1,9 @@
-import { Socket } from "socket.io-client";
-import { Event } from "@/enums/events";
-import { Log } from "@/utils/TipUtil";
-import type { ChatGroup } from "@/types/chat";
-import { BusinessError } from "@/exception/BusinessError";
-import type { MsgAck } from "./webSocket";
+import {Socket} from "socket.io-client";
+import {Event} from "@/enums/events";
+import {Log} from "@/utils/TipUtil";
+import type {ChatGroup} from "@/types/chat";
+import {BusinessError} from "@/exception/BusinessError";
+import type {MsgAck} from "./webSocket";
 
 export class GroupHandler {
     private socket: Socket;

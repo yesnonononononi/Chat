@@ -39,11 +39,33 @@
         <pagehelper.version>1.4.6</pagehelper.version>
         <SocketIO.version>2.0.13</SocketIO.version>
         <live-kit.version>0.12.0</live-kit.version>
+        <thumbnailator>0.4.19</thumbnailator>
+        <nickname-generator>0.1.1</nickname-generator>
+        <elastichsearch-java>9.3.1</elastichsearch-java>
+        <lanchain-flux>1.0.1-beta6</lanchain-flux>
     </properties>
 
     <dependencyManagement>
         <dependencies>
-
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j</artifactId>
+                <version>1.11.0</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j-open-ai</artifactId>
+                <version>1.11.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>springfox-boot-starter-webflux</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>lanchain4j-reactor</artifactId>
+                <version>${lanchain-flux}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.mybatis.spring.boot</groupId>
@@ -106,7 +128,11 @@
                 <version>0.11.5</version>
                 <scope>runtime</scope>
             </dependency>
-
+            <dependency>
+                <groupId>net.coobird</groupId>
+                <artifactId>thumbnailator</artifactId>
+                <version>${thumbnailator}</version>
+            </dependency>
 
             <dependency>
                 <groupId>cn.hutool</groupId>
@@ -164,6 +190,27 @@
                 <artifactId>aspectjrt</artifactId>
                 <version>${aspectj}</version>
             </dependency>
+
+            <dependency>
+                <groupId>io.github.dogakday</groupId>
+                <artifactId>nickname-generator</artifactId>
+                <version>${nickname-generator}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>net.datafaker</groupId>
+                <artifactId>datafaker</artifactId>
+                <version>2.3.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>co.elastic.clients</groupId>
+                <artifactId>elasticsearch-java</artifactId>
+                <version>${elastichsearch-java}</version>
+                <scope>compile</scope>
+            </dependency>
+
+
         </dependencies>
     </dependencyManagement>
 
