@@ -2,11 +2,14 @@ package com.summit.chat.service.message.PrivateMessageResendCenter;
 
 import cn.hutool.core.util.IdUtil;
 import com.corundumstudio.socketio.SocketIOClient;
+import com.summit.chat.Constants.QueueConstants;
 import com.summit.chat.Enum.MsgEnum;
 import com.summit.chat.GlobalHandle.SocketHandler.ClientManager;
+import com.summit.chat.Utils.MsgQueueUtil;
 import com.summit.chat.model.vo.PrivateMessageVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
@@ -16,6 +19,10 @@ import java.sql.Timestamp;
 public class MsgWorker {
     @Autowired
     ClientManager clientManager;
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+    @Autowired
+    private MsgQueueUtil msgQueueUtil;
 
     public void conduct(MsgContext<PrivateMessageVO> context) {
 
@@ -41,6 +48,13 @@ public class MsgWorker {
 
         context.setReceiveClient(client);
         msg.setSendTime(timestamp);
+
+        Long seq = getMsgSessionSeqFromCache(msg);
+        msg.setSessionSeq(seq);
+    }
+
+    public Long getMsgSessionSeqFromCache(PrivateMessageVO msg){
+        return msgQueueUtil.getSessionSeqFromCache(MsgQueueUtil.getSessionId(msg.getEmitterId(), msg.getReceiveId()));
     }
 }
 

@@ -2,7 +2,7 @@ package com.summit.chat.service.Impl;
 
 import com.summit.chat.Dto.PutGroupMemberDTO;
 import com.summit.chat.Exception.BusinessException;
-import com.summit.chat.Mapper.GroupAdminMapper;
+import com.summit.chat.Mapper.Mysql.GroupAdminMapper;
 import com.summit.chat.Result.Result;
 import com.summit.chat.Utils.UserHolder;
 import com.summit.chat.service.Impl.Support.group.GroupMemberSupport.GroupMemberValidator;

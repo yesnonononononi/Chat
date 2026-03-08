@@ -1,7 +1,7 @@
 package com.summit.chat.Controller.admin;
 
 import com.summit.chat.Result.Result;
-import com.summit.chat.model.entity.WorkSpace;
+import com.summit.chat.model.entity.mysql.WorkSpace;
 import com.summit.chat.service.admin.AdminService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

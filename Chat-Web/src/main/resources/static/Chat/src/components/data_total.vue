@@ -196,17 +196,15 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, watch } from 'vue';
+import {onMounted, ref, watch} from 'vue';
 import EchartsChart from './EchartsChart.vue';
-import { AdminApi } from '../api/admin';
-import { BusinessError } from '../exception/BusinessError';
-import { Log } from '../utils/TipUtil';
-import { type userActiveVO, type UserTotalActiveVO, type WorkSpace } from '../types/WorkSpace';
-import { TimeUtil } from '../utils/time';
-import { da } from 'element-plus/es/locale/index.mjs';
-import type { List } from 'echarts/core';
-import { get } from 'lodash';
-import { Position } from '@element-plus/icons-vue';
+import {AdminApi} from '../api/admin';
+import {BusinessError} from '../exception/BusinessError';
+import {Log} from '../utils/TipUtil';
+import {type userActiveVO, type UserTotalActiveVO, type WorkSpace} from '../types/WorkSpace';
+import {TimeUtil} from '../utils/time';
+import {Position} from '@element-plus/icons-vue';
+
 const dataOfDay = ref<number>(7);  //7 30 90
 
 const total = ref<WorkSpace>({

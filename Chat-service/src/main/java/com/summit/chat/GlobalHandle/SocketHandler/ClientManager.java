@@ -2,19 +2,28 @@ package com.summit.chat.GlobalHandle.SocketHandler;
 
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.summit.chat.Constants.ChatConstants;
 import com.summit.chat.Enum.ChatEvent;
-import com.summit.chat.model.entity.ClientSession;
+import com.summit.chat.model.entity.mysql.ClientSession;
 import io.lettuce.core.RedisConnectionException;
+import io.lettuce.core.RedisException;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.RedisSystemException;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.Collection;
 import java.util.UUID;
@@ -32,9 +41,40 @@ public class ClientManager {
     private static final String SESSION_PREFIX = "session:id:";
     @Resource
     SocketIOServer socketIOServer;
-    @Resource
-    private RedisTemplate<String, Object> redisTemplate;  // <client userid:uuid>
-    private final ConcurrentMap<String, ClientSession> map = new ConcurrentHashMap<>();
+    @Autowired
+    private StringRedisTemplate redisTemplate;  // <client userid:uuid>
+
+    @Getter
+    private final Cache<String,ClientSession> map = Caffeine.newBuilder()
+            .maximumSize(5000000)
+            .expireAfterWrite(3, TimeUnit.DAYS)
+            .build();
+
+    static class Serializer {
+        private static final ObjectMapper mapper = new ObjectMapper()
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
+                .configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true)
+                .registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+
+        public static String serialize(ClientSession session) {
+            try {
+                return mapper.writeValueAsString(session);
+            } catch (Exception e) {
+                log.error("【会话管理】序列化会话对象异常: {}", e.getMessage());
+                return null;
+            }
+        }
+
+        public static ClientSession deserialize(String json) {
+            try {
+                return mapper.readValue(json, ClientSession.class);
+            } catch (Exception e) {
+                log.error("【会话管理】反序列化会话对象异常: {}", e.getMessage());
+                return null;
+            }
+        }
+    }
 
     /**
      * 根据接收方ID获取对应的SocketIO客户端。
@@ -46,7 +86,7 @@ public class ClientManager {
         try {
             SocketIOClient clientFromMap = getClientFromMap(receiveID); // 从map中获取会话id
             if (clientFromMap != null) return clientFromMap;
-            
+
             ClientSession clientFromCache = getClientFromCache(receiveID);// 从缓存中获取会话id
             if (clientFromCache == null) {
                 log.info("【会话管理】未获取到用户:{}会话", receiveID);
@@ -61,10 +101,10 @@ public class ClientManager {
             if (client == null || !client.isChannelOpen()) {
                 log.info("【会话管理】用户不在线或连接不在本机,用户id:{}", receiveID);
                 // 仅清理本地缓存，不轻易清理Redis
-                map.remove(receiveID);
+                map.invalidate(receiveID);
                 return null;
             }  // 判断会话id对应的SocketIO客户端是否在线
-            
+
             // 将从Redis获取到的有效Session加入本地缓存
             map.put(receiveID, clientFromCache);
             return client;
@@ -78,9 +118,9 @@ public class ClientManager {
     }
 
 
-    public Collection<SocketIOClient> getAllClient(){
+    public Collection<SocketIOClient> getAllClient() {
 
-        return  this.socketIOServer.getAllClients();
+        return this.socketIOServer.getAllClients();
     }
 
     /**
@@ -92,11 +132,11 @@ public class ClientManager {
         try {
             if (userId == null) return;
             redisTemplate.delete(buildKey(userId));
-            map.remove(userId);
+            map.invalidate(userId);
         } catch (RedisConnectionException | RedisSystemException e) {
             log.error("【会话管理】Redis连接异常,用户id:{}", userId, e);
         } catch (Exception e) {
-            log.error("【会话管理】移除用户会话异常,用户id:{},{}", userId,e.getMessage(), e);
+            log.error("【会话管理】移除用户会话异常,用户id:{},{}", userId, e.getMessage(), e);
         }
     }
 
@@ -110,21 +150,21 @@ public class ClientManager {
         try {
             userID = client.get(ChatConstants.USER_INFO);
             if (userID == null) return;
-            
+
             // 校验当前Session是否与Redis中一致，防止误删新连接的Session
             ClientSession session = getClientFromCache(userID);
             if (session != null && session.getSessionId().equals(client.getSessionId())) {
                 redisTemplate.delete(buildKey(userID));
-                log.info("【会话管理】成功清理用户:{}的会话缓存", userID); 
+                log.info("【会话管理】成功清理用户:{}的会话缓存", userID);
             } else {
                 log.info("【会话管理】用户:{}的会话已变更或不存在，跳过Redis清理", userID);
             }
             // 无论如何都要清理本地缓存，确保本地状态最新
-            map.remove(userID);
+            map.invalidate(userID);
         } catch (RedisConnectionException | RedisSystemException e) {
             log.error("【会话管理】Redis连接异常,用户id:{}", userID, e);
         } catch (Exception e) {
-            log.error("【会话管理】移除用户会话异常,用户id:{},错误:{}", userID,e.getMessage(), e);
+            log.error("【会话管理】移除用户会话异常,用户id:{},错误:{}", userID, e.getMessage(), e);
         }
     }
 
@@ -145,10 +185,9 @@ public class ClientManager {
             saveClient(userID, client);
         } catch (RedisConnectionException | RedisSystemException e) {
             log.error("【会话管理】Redis连接异常,用户id:{}", userID, e);
-            client.disconnect();
+            //降级使用本地缓存
         } catch (Exception e) {
             log.error("【会话管理】保存用户信息失败", e);
-            client.disconnect();
         }
     }
 
@@ -161,20 +200,13 @@ public class ClientManager {
     private ClientSession getClientFromCache(String receiveId) {
         try {
             // 获取对象
-            Object obj = redisTemplate.opsForValue().get(buildKey(receiveId));
+            String obj = redisTemplate.opsForValue().get(buildKey(receiveId));
             if (obj == null) {
                 return null;
             }
-            
-            // 兼容性处理：如果反序列化结果是 LinkedHashMap（Jackson默认行为），则进行二次转换
-            if (obj instanceof java.util.LinkedHashMap) {
-                return new ObjectMapper()
-                        .configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                        .convertValue(obj, ClientSession.class);
-            }
-            
+
             // 正常情况
-            return (ClientSession) obj;
+            return Serializer.deserialize(obj);
         } catch (RedisConnectionException | RedisSystemException e) {
             log.error("【会话管理】从缓存获取用户会话失败,用户id: {}", receiveId, e);
             return null;
@@ -199,14 +231,22 @@ public class ClientManager {
                     .clientIP(getClientIP(client))
                     .isDoNotDisturb(false)
                     .build();
-            redisTemplate.opsForValue().set(buildKey(receiveId), clientSession, ChatConstants.EXPIRE_TIME, TimeUnit.HOURS);
+            String json = Serializer.serialize(clientSession);
+            if (json == null) {
+                log.error("【会话管理】序列化用户会话信息失败,用户id:{}", receiveId);
+            } else {
+                // 新增：如果已存在会话，刷新过期时间
+                if (redisTemplate.hasKey(buildKey(receiveId))) {
+                    redisTemplate.expire(buildKey(receiveId), ChatConstants.EXPIRE_TIME, TimeUnit.HOURS);
+                }
+                else redisTemplate.opsForValue().set(buildKey(receiveId), json, ChatConstants.EXPIRE_TIME, TimeUnit.HOURS);
+            }
+            //降级+存储,序列化失败,保存本地缓存
             map.put(receiveId, clientSession);
         } catch (RedisConnectionException | RedisSystemException e) {
             log.error("【会话管理】Redis连接异常,用户id:{}", receiveId, e);
-            client.disconnect();
         } catch (Exception e) {
             log.error("【会话管理】保存用户会话信息到缓存失败", e);
-            client.disconnect();
         }
 
     }
@@ -229,6 +269,9 @@ public class ClientManager {
      */
     private String getClientIP(SocketIOClient client) {
         SocketAddress remoteAddress = client.getRemoteAddress();
+        if (remoteAddress instanceof InetSocketAddress) {
+            return ((InetSocketAddress) remoteAddress).getAddress().getHostAddress();
+        }
         if (remoteAddress != null) {
             String s = remoteAddress.toString();
             if (s.startsWith("/") && s.contains(":")) {
@@ -239,7 +282,7 @@ public class ClientManager {
         }
         return "未知";
     }
-    
+
     /**
      * 从本地映射中获取客户端。
      *
@@ -247,16 +290,41 @@ public class ClientManager {
      * @return SocketIO客户端，如果不存在或不在线则返回null
      */
     private SocketIOClient getClientFromMap(String receiveID) {
-        ClientSession clientSession = map.get(receiveID);
+        ClientSession clientSession = map.getIfPresent(receiveID);
         UUID uuid = clientSession == null ? null : clientSession.getSessionId();
         if (clientSession != null && uuid != null) {
             SocketIOClient client = this.socketIOServer.getClient(clientSession.getSessionId());
             if (client != null && client.isChannelOpen()) return client;
-            map.remove(receiveID);
+            map.invalidate(receiveID);
             log.info("【会话管理】用户:{}本地会话已断开,已从会话管理中移除", receiveID);
         }
-        // log.info("【会话管理】本地未获取到用户:{}会话,将从缓存获取", receiveID); // 降低日志级别或移除，避免刷屏
         return null;
+    }
+
+    public void clearInvalidMap() {
+
+        // 获取所有会话缓存的键
+        this.map.asMap().entrySet().removeIf(entry -> {
+            String key = null;
+            try {
+                key = entry.getKey();
+                ClientSession clientSession = entry.getValue();
+                if (clientSession != null && clientSession.getSessionId() != null) {
+                    SocketIOClient client = this.getClient(key);
+                    return client == null || !client.isChannelOpen();
+                }
+                return true;
+            } catch (RedisConnectionException e) {
+                log.error("【本地会话清理】Redis连接异常: {},用户:{}", e.getMessage(), key, e);
+                return true;
+            } catch (RedisException e) {
+                log.error("【本地会话清理】Redis异常: {},用户:{}", e.getMessage(), key, e);
+                return true;
+            } catch (Exception e) {
+                log.error("【本地会话清理】未知异常: {},用户:{}", e.getMessage(), key, e);
+                return true;
+            }
+        });
     }
 
 }

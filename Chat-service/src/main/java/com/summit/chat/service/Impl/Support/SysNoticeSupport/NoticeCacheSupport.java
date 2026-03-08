@@ -2,7 +2,6 @@ package com.summit.chat.service.Impl.Support.SysNoticeSupport;
 
 import com.summit.chat.Constants.SysNoticeConstants;
 import com.summit.chat.model.vo.NoticeLikeVO;
-import com.summit.chat.model.vo.SysNoticeVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;

@@ -17,8 +17,9 @@ public class MsgToQueue {
 
     public void conduct(MsgContext<PrivateMessageVO> context){
         try {
+
             PrivateMessageVO msg = context.getMsg();
-            msgQueueUtil.sendMsgToExChange(msg, msg.getMsgId());
+            msgQueueUtil.sendMsgToExChange(msg);
         }catch (Exception e){
             log.error("将用户{}的消息放入消息队列时出现问题",context.getEmitterClient().get(ChatConstants.USER_INFO),e);
             throw new BusinessException(BaseConstants.SERVER_EXCEPTION);

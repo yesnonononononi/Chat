@@ -2,7 +2,7 @@ package com.summit.chat.service.Impl.Support.SysNoticeSupport;
 
 import com.summit.chat.Constants.SysNoticeConstants;
 import com.summit.chat.Dto.SysNoticeDTO;
-import com.summit.chat.Mapper.SysNoticeMapper;
+import com.summit.chat.Mapper.Mysql.SysNoticeMapper;
 import com.summit.chat.model.vo.SysNoticeVO;
 import com.summit.chat.service.Impl.GlobalValidatorImpl;
 import jodd.util.StringUtil;

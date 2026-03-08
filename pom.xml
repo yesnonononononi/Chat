@@ -25,6 +25,7 @@
 
     <properties>
         <maven.test.skip>true</maven.test.skip>
+        <mysql-version>8.4.6</mysql-version>
         <hutool.version>5.8.42</hutool.version>
         <lombok.version>1.18.38</lombok.version>
         <java.version>21</java.version>
@@ -43,6 +44,12 @@
         <nickname-generator>0.1.1</nickname-generator>
         <elastichsearch-java>9.3.1</elastichsearch-java>
         <lanchain-flux>1.0.1-beta6</lanchain-flux>
+        <langchain.version>1.11.0</langchain.version>
+        <langchain-tongyi.version>1.11.0</langchain-tongyi.version>
+        <clickhouse-version>0.9.6</clickhouse-version>
+        <HikariCP.version>5.0.1</HikariCP.version>
+        <caffeine.version>3.1.8</caffeine.version>
+        <langchain_rag.version>1.11.0-beta19</langchain_rag.version>
     </properties>
 
     <dependencyManagement>
@@ -50,22 +57,29 @@
             <dependency>
                 <groupId>dev.langchain4j</groupId>
                 <artifactId>langchain4j</artifactId>
-                <version>1.11.0</version>
+                <version>${langchain.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j-spring-boot-starter</artifactId>
+                <version>1.11.0-beta19</version>
             </dependency>
             <dependency>
                 <groupId>dev.langchain4j</groupId>
                 <artifactId>langchain4j-open-ai</artifactId>
-                <version>1.11.0</version>
+                <version>${langchain.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j-milvus</artifactId>
+                <version>${langchain_rag.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>springfox-boot-starter-webflux</artifactId>
             </dependency>
-            <dependency>
-                <groupId>dev.langchain4j</groupId>
-                <artifactId>lanchain4j-reactor</artifactId>
-                <version>${lanchain-flux}</version>
-            </dependency>
+
 
             <dependency>
                 <groupId>org.mybatis.spring.boot</groupId>
@@ -190,7 +204,11 @@
                 <artifactId>aspectjrt</artifactId>
                 <version>${aspectj}</version>
             </dependency>
-
+            <dependency>
+                <groupId>com.github.ben-manes.caffeine</groupId>
+                <artifactId>caffeine</artifactId>
+                <version>${caffeine.version}</version>
+            </dependency>
             <dependency>
                 <groupId>io.github.dogakday</groupId>
                 <artifactId>nickname-generator</artifactId>
@@ -202,15 +220,29 @@
                 <artifactId>datafaker</artifactId>
                 <version>2.3.1</version>
             </dependency>
-
+            <!-- Source: https://mvnrepository.com/artifact/com.clickhouse/clickhouse-jdbc -->
+            <dependency>
+                <groupId>com.clickhouse</groupId>
+                <artifactId>clickhouse-jdbc</artifactId>
+                <version>${clickhouse-version}</version>
+                <scope>compile</scope>
+            </dependency>
             <dependency>
                 <groupId>co.elastic.clients</groupId>
                 <artifactId>elasticsearch-java</artifactId>
                 <version>${elastichsearch-java}</version>
                 <scope>compile</scope>
             </dependency>
-
-
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql-version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.zaxxer</groupId>
+                <artifactId>HikariCP</artifactId>
+                <version>${HikariCP.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

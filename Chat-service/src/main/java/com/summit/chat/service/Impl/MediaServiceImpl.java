@@ -8,12 +8,12 @@ import com.summit.chat.Dto.MediaApplyDTO;
 import com.summit.chat.Enum.MediaState;
 import com.summit.chat.Enum.UserCallStateEnum;
 import com.summit.chat.Exception.BusinessException;
-import com.summit.chat.Mapper.MediaMapper;
-import com.summit.chat.Mapper.UserMapper;
+import com.summit.chat.Mapper.Mysql.MediaMapper;
+import com.summit.chat.Mapper.Mysql.UserMapper;
 import com.summit.chat.Result.Result;
 import com.summit.chat.Utils.UserHolder;
-import com.summit.chat.model.entity.Media;
-import com.summit.chat.model.entity.User;
+import com.summit.chat.model.entity.mysql.Media;
+import com.summit.chat.model.entity.mysql.User;
 import com.summit.chat.service.Impl.Support.MediaSupport.MediaSocketSupport;
 import com.summit.chat.service.Impl.Support.MediaSupport.MediaValidator;
 import com.summit.chat.service.Lock.LockService;
@@ -26,6 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.util.concurrent.TimeUnit;
+
+import static com.summit.chat.Constants.UserConstants.LOCK_USER_ACTIVE_CLEAR_VAL;
 
 @Service
 @Slf4j
@@ -97,7 +99,7 @@ public class MediaServiceImpl implements MediaService {
             if (client != null) {
                 mediaSocketSupport.call(client, userID);
             }
-            rlock = lockService.tryLock(MediaConstants.MEDIA_VIDEO_PREFIX, UUID.randomUUID().toString(), MediaConstants.LEASE_TIME, MediaConstants.WAIT_TIME, TimeUnit.MILLISECONDS);
+            rlock = lockService.tryLock(MediaConstants.MEDIA_VIDEO_PREFIX, emitterId, MediaConstants.LEASE_TIME, MediaConstants.WAIT_TIME, TimeUnit.MILLISECONDS);
             if (rlock != null) {
                 mediaMapper.accept(emitterId, userID);
                 userMapper.putUserState(UserCallStateEnum.CALLING.getState(), userID);

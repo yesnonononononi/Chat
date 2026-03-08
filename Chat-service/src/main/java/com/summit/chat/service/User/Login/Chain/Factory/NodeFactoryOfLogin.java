@@ -42,6 +42,7 @@ public class NodeFactoryOfLogin implements NodeFactoryTemplate {
             case NodeTypeOfLogin.PWVALIDATE -> beanFactory.getBean(PwValidateNodeForLogin.class);
             case NodeTypeOfLogin.TOKENGENERATE -> beanFactory.getBean(TokenGenerateNodeForLogin.class);
             case NodeTypeOfLogin.RESULTGENERATE -> beanFactory.getBean(ResultGenerateNodeForLogin.class);
+            case NodeTypeOfLogin.IPADDRESS -> beanFactory.getBean(IpAddressNodeForLogin.class);
             default -> throw new NoSuchNodeException(BaseConstants.CHAIN_CONFIG_EXCEPTION);
         };
         return result;

@@ -3,8 +3,8 @@ package com.summit.chat.config;
 
 import com.summit.chat.Intercept.Interceptor;
 import com.summit.chat.Json.JacksonObjectMapper;
-import com.summit.chat.Mapper.Cache.RedisProcessor;
-import com.summit.chat.Mapper.UserMapper;
+import com.summit.chat.Mapper.Mysql.Cache.RedisProcessor;
+import com.summit.chat.Mapper.Mysql.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;

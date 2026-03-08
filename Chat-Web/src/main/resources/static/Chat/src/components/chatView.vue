@@ -99,35 +99,36 @@
 </template>
 
 <script lang="ts" setup name="chatView">
-import { Log } from '../utils/TipUtil';
-import type { chat } from '../types/chat';
-import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch, type WatchHandle } from 'vue'
-import type { page, userInfo } from '../types/user';
-import { userStore } from '../store/UserStore';
-import { msgStore } from '../store/MessageStore';
-import { Ws, type MsgAck } from '../utils/Socket/webSocket';
-import { useRoute } from 'vue-router';
-import { serverMsgCode } from '../enums/server-callback';
+import {Log} from '../utils/TipUtil';
+import type {chat} from '../types/chat';
+import {computed, nextTick, onMounted, onUnmounted, ref, watch} from 'vue'
+import type {page, userInfo} from '../types/user';
+import {userStore} from '../store/UserStore';
+import {msgStore} from '../store/MessageStore';
+import {type MsgAck, Ws} from '../utils/Socket/webSocket';
+import {useRoute} from 'vue-router';
+import {serverMsgCode} from '../enums/server-callback';
 import router from '../router';
-import { UserApi } from '../api/user';
-import { MsgApi } from '../api/msg';
-import type { historyPage } from '../types/msg';
-import type { ElScrollbar } from 'element-plus';
-import { ChatService } from '../services/ChatService';
-import type { MsgACKOfServer } from '../types/msg-ack';
-import { BusinessError } from '../exception/BusinessError';
-import { socketStore } from '../store/SocketStore';
+import {UserApi} from '../api/user';
+import {MsgApi} from '../api/msg';
+import type {historyPage} from '../types/msg';
+import type {ElScrollbar} from 'element-plus';
+import {ChatService} from '../services/ChatService';
+import type {MsgACKOfServer} from '../types/msg-ack';
+import {BusinessError} from '../exception/BusinessError';
+import {socketStore} from '../store/SocketStore';
 import ChatInput from './ChatInput.vue';
-import { MsgType } from '../enums/GroupMsgType';
+import {MsgType} from '../enums/GroupMsgType';
 
-import type { EmojiVO } from '../types/emoji';
-import { emojiStore } from '../store/EmojiStore';
-import { aiInfo } from '@/types/Ai';
-import { AiApi } from '@/api/Ai';
-import { model } from '@/enums/AiEnum';
-import { AiWs } from '@/utils/Socket/AiWs';
-import { resStatus } from '@/enums/AiResStatus';
-import { MdUtil } from '@/utils/md';
+import type {EmojiVO} from '../types/emoji';
+import {emojiStore} from '../store/EmojiStore';
+import {aiInfo} from '@/types/Ai';
+import {AiApi} from '@/api/Ai';
+import {model} from '@/enums/AiEnum';
+import {AiWs} from '@/utils/Socket/AiWs';
+import {resStatus} from '@/enums/AiResStatus';
+import {MdUtil} from '@/utils/md';
+
 const MAX_WHIHWRAWN_TIME = 1000 * 60 * 5;
 const user_msg_input = ref<string>("");
 const msg = msgStore();
@@ -160,8 +161,18 @@ const parseMd = async (msg: string) => {
 // 获取当前会话对象（响应式）
 const currentSession = computed(() => msg.getSession(currentSessionId.value));
 
-// 使用 computed 直接映射 Store 中的消息列表
-const msgList = computed(() => currentSession.value?.msgList.privateMsgList || []);
+// 使用 computed 直接映射 Store 中的消息列表，并按照 sessionSeq 升序排序
+const msgList = computed(() => {
+    const list = currentSession.value?.msgList.privateMsgList || [];
+    // 按照 sessionSeq 升序排序 (如果 sessionSeq 存在则按它排序，否则按 sendTime 排序)
+    return [...list].sort((a, b) => {
+        if (a.sessionSeq !== undefined && b.sessionSeq !== undefined) {
+            return a.sessionSeq - b.sessionSeq;
+        }
+        // 降级方案：如果 sessionSeq 不存在，按发送时间排序
+        return a.sendTime - b.sendTime;
+    });
+});
 
 // 用户好友信息
 const friend = ref<userInfo>({
@@ -287,7 +298,7 @@ async function loadHistoryMsgs() {
     dto.value.pageSize = currentSession.value.pageSize;
 
     try {
-        //发送聊天记录获取请求__返回desc,降序
+        //发送聊天记录获取请求__返回 desc，降序
         const historyMsgList: page<chat[]> = await MsgApi.getHistoryByDto(dto.value);
 
         if (historyMsgList.records.length == 0 || historyMsgList.records.length !== currentSession.value.pageSize) {
@@ -298,7 +309,7 @@ async function loadHistoryMsgs() {
         ChatService.sortMsgs(list);
         await ChatService.handleEmoji(list);
         await ChatService.handleMd(list);
-        //插入到消息序列之前  old->new --- [%s  old->new] 以此保证消息是从old向new排列
+        //插入到消息序列之前  old->new --- [%s  old->new] 以此保证消息是从 old 向 new 排列
         msg.addMsgs(currentSessionId.value, list);
     } catch (error) {
         if (error instanceof BusinessError) {
@@ -341,8 +352,8 @@ function validateInput(content: string): boolean {
         Log.error("未输入任何信息");
         return false;
     }
-    if (content.length > 200) {
-        Log.error("信息长度不能大于200个字");
+    if (content.length > 400) {
+        Log.error("信息长度不能大于400个字");
         return false;
     }
     return true;
@@ -456,14 +467,17 @@ async function send(msgType: MsgType = MsgType.TEXT, Emoji?: EmojiVO) {
 }
 
 async function sendForAi() {
+   
     if (!user.userInfo) return;
     if (!user_msg_input.value || user_msg_input.value.length === 0) {
         Log.info("请输入内容");
         return;
     }
+     let userInput = user_msg_input.value;
+     user_msg_input.value = '';
     // 先把用户问题发出去
     const userMessage: chat = createChatMessage(
-        user_msg_input.value,
+        userInput,
         MsgType.TEXT,
         user.userInfo.id,
         friend.value.id,
@@ -487,11 +501,10 @@ async function sendForAi() {
         }
         //2,开启流式,发送问题
         await AiApi.chat({
-            message: user_msg_input.value,
+            message: userInput,
             modelName: model.QWEN
         });
-        //3, 清空输入框
-        user_msg_input.value = "";
+       
 
     } catch (error) {
         isAiStreaming.value = false;

@@ -7,13 +7,9 @@ import com.summit.chat.Result.Result;
 import com.summit.chat.service.emoji.EmojiService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.cache.annotation.CacheRemoveAll;
 import java.util.List;
 
 @RestController

@@ -152,12 +152,10 @@ export class Ws {
    * 群聊相关
    */
   public sendOfGroup(data: ChatGroup, ackCallBack: (ackData: MsgAck) => void): boolean {
-    this.getSocket();
     return this.groupHandler?.send(data, ackCallBack) || false;
   }
 
   public onGroupMsg(callback: (data: ChatGroup, ack?: (ackData: any) => void) => void) {
-    this.getSocket();
     this.groupHandler?.onReceive(callback);
   }
 
@@ -165,18 +163,19 @@ export class Ws {
    * 系统消息相关
    */
   public systemListen(method: (data: systemMsg) => void) {
-    this.getSocket();
     this.systemHandler?.onNotice(method);
   }
 
   public onKick(method: (data: string) => void) {
-    this.getSocket();
     this.systemHandler?.onKick(method);
   }
 
   public removeSysReceive() {
     this.systemHandler?.removeNoticeListener();
   }
+
+
+ 
 
   public disconnect() {
     const socket = this.getSocket();

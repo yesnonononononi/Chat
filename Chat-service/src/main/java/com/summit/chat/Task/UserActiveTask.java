@@ -1,11 +1,14 @@
 package com.summit.chat.Task;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.summit.chat.Constants.UserConstants;
-import com.summit.chat.Mapper.Cache.RedisProcessor;
-import com.summit.chat.Mapper.admin.UserActiveMapper;
-import com.summit.chat.model.entity.User;
+import com.summit.chat.Mapper.Mysql.Cache.RedisProcessor;
+import com.summit.chat.Mapper.Mysql.admin.UserActiveMapper;
+import com.summit.chat.Result.Result;
 import com.summit.chat.model.vo.UserActiveVO;
+import com.summit.chat.model.vo.UserVO;
 import com.summit.chat.service.Lock.LockService;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.redisson.api.RLock;
@@ -26,8 +29,8 @@ import java.util.concurrent.TimeUnit;
 @Component
 @Slf4j
 public class UserActiveTask {
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+    @Resource
+    private RedisTemplate<String, String> zSetRedisTemplate;
     @Autowired
     private RedisProcessor redisProcessor;
     @Autowired
@@ -35,29 +38,32 @@ public class UserActiveTask {
     @Autowired
     private LockService lockService;
 
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
+            .configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
 
     //每天0点执行
-    @Scheduled(cron = "0 0 0 * * ?")
+    @Scheduled(cron = "0 55 23 * * ?")
     public void clearUserActive() {
         //0.5,获取分布式锁
-        RLock lock = lockService.tryLock(UserConstants.LOCK_USER_ACTIVE_CLEAR, UserConstants.LOCK_USER_ACTIVE_CLEAR_VAL, UserConstants.LOCK_USER_ACTIVE_LEASETIME,UserConstants.LOCK_USER_ACTIVE_WAITTIME,TimeUnit.MILLISECONDS);
-        if(lock == null)return;
+        RLock lock = lockService.tryLock(UserConstants.LOCK_USER_ACTIVE_CLEAR, UserConstants.LOCK_USER_ACTIVE_CLEAR_VAL, UserConstants.LOCK_USER_ACTIVE_LEASETIME, UserConstants.LOCK_USER_ACTIVE_WAITTIME, TimeUnit.SECONDS);
+        if (lock == null) return;
         List<String> userIdList = new ArrayList<>();
-        log.info("【工作空间】开始清除用户活跃数据");
+        log.info("【定时任务-用户活跃度持久化】开始清除用户活跃数据");
         try {
 
 
             //1,获取所有用户id的集合
-            Set<Object> range = redisTemplate.opsForZSet().range(UserConstants.CACHE_USER_ACTIVE, 0, -1);
+            Set<String> range = zSetRedisTemplate.opsForZSet().range(UserConstants.CACHE_USER_ACTIVE, 0, -1);
+            log.info("range:{}", range);
             if (range == null || range.isEmpty()) {
-                log.info("【工作空间】没有用户活跃数据");
+
+                log.info("【定时任务-用户活跃度持久化】没有用户活跃数据");
                 return;
             }
 
             //2,添加用户id到列表
-            for (Object o : range) {
-                userIdList.add(o.toString());
-            }
+            userIdList.addAll(range);
 
 
             //2,1执行redis命令
@@ -65,8 +71,8 @@ public class UserActiveTask {
 
             //3,获取用户信息
             int size = userIdList.size();
-            if(2*size != res.size()) {
-                log.error("【工作空间】用户活跃数据异常");
+            if (2 * size != res.size()) {
+                log.error("【定时任务-用户活跃度持久化】用户活跃数据异常");
                 return;
             }
             List<Object> userList = res.subList(0, size);
@@ -76,16 +82,16 @@ public class UserActiveTask {
             List<UserActiveVO> list = buildVO(userList, scoreList, size);
 
             if (list.isEmpty()) {
-                log.info("【工作空间】没有用户活跃数据");
+                log.info("【定时任务-用户活跃度持久化】没有用户活跃数据");
                 return;
             }
             Integer i = userActiveMapper.batchInsert(list);
-            log.info("【工作空间】清除用户活跃数据成功,持久化数量: {}", i);
+            log.info("【定时任务-用户活跃度持久化】清除用户活跃数据成功,持久化数量: {}", i);
             //最后删,防丢失
-            if (i != null && i > 0) redisTemplate.opsForZSet().removeRange(UserConstants.CACHE_USER_ACTIVE, 0, -1);
+            if (i != null && i > 0) zSetRedisTemplate.opsForZSet().removeRange(UserConstants.CACHE_USER_ACTIVE, 0, -1);
         } catch (Exception e) {
-            log.error("【工作空间】清除用户活跃数据失败", e);
-        }finally {
+            log.error("【定时任务-用户活跃度持久化】清除用户活跃数据失败", e);
+        } finally {
             lockService.unLock(lock);
         }
     }
@@ -95,10 +101,13 @@ public class UserActiveTask {
         for (int i = 0; i < size; i++) {
             try {
                 Object o = userList.get(i);
-                if(o == null){
+                if (o == null) {
                     continue;
                 }
-                if(o instanceof User user) {
+                Result<UserVO> result = OBJECT_MAPPER.readValue(o.toString(), OBJECT_MAPPER.getTypeFactory().constructParametricType(Result.class, UserVO.class));
+
+                try {
+                    UserVO user = result.getData();
                     Double score = (Double) scoreList.get(i);
                     if (score == null) {
                         score = 0.0;
@@ -110,9 +119,11 @@ public class UserActiveTask {
                             .nickName(user.getNickName())
                             .build();
                     list.add(vo);
+                } catch (Exception e) {
+                    log.error("【定时任务-用户活跃度持久化】用户实体类型转换失败,userID:{}", userList.get(i), e);
                 }
-            }catch (Exception e){
-                log.error("【工作空间】构建用户活跃数据失败,用户id:{}", userList.get(i),e);
+            } catch (Exception e) {
+                log.error("【定时任务-用户活跃度持久化】构建用户活跃数据失败,用户id:{}", userList.get(i), e);
             }
         }
         return list;

@@ -42,14 +42,12 @@ public class UserConstants {
     public static final String PHONE_INVALID = "手机号格式错误";
     public static final String SET_NOT_SUPER_ADMIN = "用户不存在或者已经是管理员了";
     public static final String NOT_ADMIN = "非管理员或者用户不存在";
-    public static final int DEFAULT_ADJECTIVE_LENGTH = 3;
-    public static final int DEFAULT_NOUN_LENGTH = 2;
 
     public static final String CACHE_USER_ACTIVE = "user:active";
 
     public static final int USER_ACTIVE_TOP_LENGTH = 10;
     public static final String LOCK_USER_ACTIVE_CLEAR = "active";
     public static final String LOCK_USER_ACTIVE_CLEAR_VAL = "";
-    public static final long LOCK_USER_ACTIVE_LEASETIME = 1000L;
-    public static final long LOCK_USER_ACTIVE_WAITTIME = 1000L;
+    public static final long LOCK_USER_ACTIVE_LEASETIME = 3L;
+    public static final long LOCK_USER_ACTIVE_WAITTIME = 1L;
 }

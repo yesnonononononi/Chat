@@ -1,5 +1,5 @@
 <template>
-    <div class="absolute top-0 z-[100000] w-full h-auto flex items-center justify-between bg-white shadow-md border-b"
+    <div class="absolute top-0 z-[100000] w-full h-auto flex items-center justify-between glass-base shadow-md border-b"
         v-if="curMsg">
         <div class="flex items-center gap-2 p-2">
             <img :src="curMsg.icon" alt="" class="w-10 h-10 rounded-full object-cover">

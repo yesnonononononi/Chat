@@ -80,4 +80,20 @@ public class RedisConfig {
         template.setConnectionFactory(factory);
         return template;
     }
+
+    @Bean
+    public RedisTemplate<String, String> zSetRedisTemplate(RedisConnectionFactory factory) {
+        RedisTemplate<String, String> template = new RedisTemplate<>();
+        template.setConnectionFactory(factory);
+
+        //  key和value都用StringRedisSerializer（纯字符串，无JSON引号）
+        StringRedisSerializer stringSerializer = new StringRedisSerializer();
+        template.setKeySerializer(stringSerializer);
+        template.setValueSerializer(stringSerializer);
+        template.setHashKeySerializer(stringSerializer);
+        template.setHashValueSerializer(stringSerializer);
+
+        template.afterPropertiesSet();
+        return template;
+    }
 }

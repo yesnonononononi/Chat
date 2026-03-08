@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.summit.chat.Mapper.Mysql.UserMapper">
+
+    <resultMap id="BaseResultMap" type="com.summit.chat.model.entity.mysql.User">
+        <id column="id" property="id" />
+        <result column="nick_name" property="nickName" />
+        <result column="pw" property="pw" />
+        <result column="mobile" property="mobile" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="third_auth" property="thirdAuth" />
+        <result column="status" property="status" />
+        <result column="icon" property="icon" />
+        <result column="age" property="age" />
+        <result column="role" property="role" />
+        <result column="hobby" property="hobby" />
+        <result column="ip" property="ip" />
+        <result column="gender" property="gender" />
+        <result column="is_delete" property="isDelete" />
+    </resultMap>
+
+    <insert id="register" useGeneratedKeys="true" keyProperty="id">
+        insert into user(id,nick_name,pw,icon,mobile,third_auth)
+        values (
+        #{id}, #{nickName}, #{pw},#{icon}, #{mobile}, #{thirdAuth}
+        )
+   </insert>
+
+    <select id="getUserByPhone" parameterType="String" resultMap="BaseResultMap">
+        select u.id, nick_name, pw, mobile, u.create_time, u.update_time, third_auth,
+               status, icon,role, age, hobby, ip, gender, is_delete
+            from user u where mobile = #{mobile} and is_delete = 1</select>
+
+    <select id="getUserById" parameterType="Long" resultMap="BaseResultMap">
+        select u.id, nick_name, pw, u.create_time, u.update_time, third_auth,
+               status, icon, role,age, hobby, ip, gender, is_delete
+        from user u where u.id = #{id} and is_delete =1
+    </select>
+
+    <select id="getUserByNickName" parameterType="String" resultType="com.summit.chat.model.vo.UserVO">
+        select u.id, nick_name,u.gender,u.hobby,u.ip, icon, role,gender, age
+        from user u where nick_name  like concat(#{nickName},'%') and is_delete = 1
+    </select>
+
+    <update id="putUser">
+        update user
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="gender!=null">
+                gender = #{gender},
+            </if>
+            <if test="icon!=null">
+                icon = #{icon},
+            </if>
+            <if test="nickName!=null">
+                nick_name = #{nickName},
+            </if>
+            <if test="birth!=null">
+                birth = #{birth},
+            </if>
+            <if test="hobby!=null">
+                hobby = #{hobby},
+            </if>
+            <if test="age!=null">
+                age = #{age},
+            </if>
+            <if test="ip!=null">
+                ip = #{ip},
+            </if>
+            update_time = now(),
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="deleteUserById">
+        update user set is_delete = 2 ,mobile = '' where id = #{userID}
+    </update>
+
+</mapper>

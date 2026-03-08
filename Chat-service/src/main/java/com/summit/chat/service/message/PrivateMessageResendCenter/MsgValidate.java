@@ -4,7 +4,7 @@ import com.corundumstudio.socketio.SocketIOClient;
 import com.summit.chat.Constants.BaseConstants;
 import com.summit.chat.Constants.ChatConstants;
 import com.summit.chat.Constants.MsgConstants;
-import com.summit.chat.Mapper.UserLinkMapper;
+import com.summit.chat.Mapper.Mysql.UserLinkMapper;
 import com.summit.chat.Utils.UserHolder;
 import com.summit.chat.model.vo.PrivateMessageVO;
 import com.summit.chat.service.Impl.GlobalValidatorImpl;

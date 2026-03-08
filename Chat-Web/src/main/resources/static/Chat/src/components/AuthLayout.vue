@@ -1,14 +1,10 @@
 <template>
   <div class="cursor"></div>
-  <div class="login-page"   v-loading="loading" element-loading-background="rgba(0, 0, 0, 0.7)">
-    <div class="bg-layer">
-      <div @click="toggleBack" class="toggle-btn" id="toggle">
-        <button type="button" class="btn" aria-label="切换主题">
-          <el-icon style="border: none; cursor: pointer">
-            <Switch />
-          </el-icon>
-        </button>
-      </div>
+  <div class="fixed inset-0 z-[-400]">
+    <video :src="bg.url" class="object-cover w-full h-full" loop playsinline preload="auto" controls="false" muted autoplay></video>
+  </div>
+  <div class="login-page "   v-loading="loading" element-loading-background="rgba(0, 0, 0, 0.7)">
+    <div class="bg-layer ">
     </div>
 
     <!-- 2. 偏白色表单容器（整体居中） -->
@@ -29,7 +25,13 @@ let isWhite = true;
 let isChange = false;
 const toggle = ref<HTMLElement | null>(null);
 const loginFormRef = ref<HTMLElement | null>(null);
-
+const bg = ref<{
+  url: string;
+  white: string;
+}>({
+  url: "https://summit-chat.oss-cn-beijing.aliyuncs.com/sys/%E5%BE%AE%E4%BF%A1%E8%A7%86%E9%A2%912026-03-05_224347_232.mp4",
+  white: "https://img-s.msn.cn/tenant/amp/entityid/AAOEa6N?q=60&m=6&f=jpg&u=t",
+});
 onMounted(async () => {
   toggle.value = document.querySelector("#toggle");
   
@@ -49,20 +51,7 @@ onUnmounted(() => {
   document.removeEventListener("mousemove", handleMouseMove);
 });
 
-function toggleBack() {
-  isWhite = !isWhite;
-  if (!isWhite) {
-    document.documentElement.style.setProperty(
-      "--page-image",
-      "url(https://img-s.msn.cn/tenant/amp/entityid/BB1msDMO?q=60&m=6&f=jpg&u=t)"
-    );
-  }
-  if (isWhite)
-    document.documentElement.style.setProperty(
-      "--page-image",
-      "url(https://img-s.msn.cn/tenant/amp/entityid/AAOEa6N?q=60&m=6&f=jpg&u=t)"
-    );
-}
+
 
 const handleMouseMove = (e: MouseEvent) => {
   if (isChange) return;
@@ -82,7 +71,7 @@ const handleMouseMove = (e: MouseEvent) => {
   --cursor-x: 50%;
   --cursor-y: 50%;
   /* 定义默认背景图（你的预期默认图片） */
-  --page-image: url(https://img-s.msn.cn/tenant/amp/entityid/BB1msDMO?q=60&m=6&f=jpg&u=t);
+  --page-image: url(https://summit-chat.oss-cn-beijing.aliyuncs.com/sys/%E5%BE%AE%E4%BF%A1%E8%A7%86%E9%A2%912026-03-05_224347_232.mp4);
 }
 </style>
 
@@ -119,8 +108,6 @@ const handleMouseMove = (e: MouseEvent) => {
   justify-content: center;
   /* 水平居中 */
   align-items: center;
-  /* 垂直居中 */
-  /* filter: blur(0.3px);  移除导致文字模糊的滤镜 */
 }
 
 
@@ -135,8 +122,7 @@ const handleMouseMove = (e: MouseEvent) => {
   /* 默认显示 */
   background-size: cover;
   background-position: center;
-  /* 引用CSS变量 */
-  background-image: var(--page-image);
+ 
   /* 混合模式：让背景图与底色融合，避免过于突兀 */
   background-blend-mode: overlay;
   z-index: -10;
@@ -177,7 +163,7 @@ const handleMouseMove = (e: MouseEvent) => {
 .login-form {
   position: relative;
   z-index: 20;
-  width: 90%;
+  width: 75%;
   /* 移动端默认宽度 */
   max-width: 360px;
   /* PC端最大宽度 */
@@ -201,6 +187,7 @@ const handleMouseMove = (e: MouseEvent) => {
 
 .login-form::after {
   position: absolute;
+ 
   z-index: -1;
   inset: -1px;
   filter: blur(5px);

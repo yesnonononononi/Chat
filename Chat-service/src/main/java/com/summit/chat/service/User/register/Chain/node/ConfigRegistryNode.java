@@ -8,14 +8,13 @@ import com.summit.chat.Dto.NormalRegisterLoginRequest;
 import com.summit.chat.Dto.UserLinkDto;
 import com.summit.chat.Result.Result;
 import com.summit.chat.Utils.GlobalIDWorker;
-import com.summit.chat.model.entity.User;
+import com.summit.chat.model.entity.mysql.User;
 import com.summit.chat.service.User.register.Chain.Entity.RegisterChainContext;
 import com.summit.chat.service.User.register.Chain.Entity.RegisterHandleChain;
 import com.summit.chat.service.UserLink.UserLinkService;
 import jodd.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.datafaker.Faker;
-import net.datafaker.providers.base.LanguageCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

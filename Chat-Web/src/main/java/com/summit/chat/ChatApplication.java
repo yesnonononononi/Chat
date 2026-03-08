@@ -18,7 +18,6 @@ import org.springframework.web.socket.config.annotation.EnableWebSocket;
 @EnableConfigurationProperties
 @EnableScheduling
 @EnableTransactionManagement
-@MapperScan("com.summit.chat.Mapper")
 @EnableWebSocket
 @SpringBootApplication(exclude = {
         SecurityAutoConfiguration.class,
@@ -28,10 +27,6 @@ public class ChatApplication {
         SpringApplication.run(ChatApplication.class, args);
     }
 
-    @Bean
-    public org.springframework.messaging.converter.JacksonJsonMessageConverter jsonbMessageConverter(){
-        return new JacksonJsonMessageConverter();
-    }
 
 
 }

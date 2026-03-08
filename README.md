@@ -3,7 +3,7 @@ __Description__:__单体架构应用程序,全栈项目,以聊天为主要功能
 
 __前端__: Vue3,TypeScript,pinia,tailwind,Socket.io,WebRTC(liveKit),element-plus
 
-__后端__:springboot3(jdk21) RabbitMQ Redis Mybatis Redission MySQL SpringCache
+__后端__:springboot3(jdk21) RabbitMQ Redis Mybatis Redisson MySQL SpringCache,Caffeine,ClickHouse
 
 ## 消息安全
 采用rabbitMQ
@@ -25,13 +25,3 @@ Socket.IO保证
 前端:
 
 目前使用了pinia存储用户信息,群聊消息,私聊消息,以及系统消息,router路由守卫配合后端接口鉴权注解保证管理页面安全,文件目录结构较为清晰
-
-- IP限流策略待开发
-   
-- 系统日志接口待开发
-
-- 表情包功能待开发
-
-- 后台管理控制台待完善
-
-- 增加本地消息列表保证离线消息待发送

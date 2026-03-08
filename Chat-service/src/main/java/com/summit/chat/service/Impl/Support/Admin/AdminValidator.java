@@ -1,8 +1,8 @@
 package com.summit.chat.service.Impl.Support.Admin;
 
 import com.summit.chat.Enum.UserRoleEnum;
-import com.summit.chat.Mapper.UserMapper;
-import com.summit.chat.model.entity.User;
+import com.summit.chat.Mapper.Mysql.UserMapper;
+import com.summit.chat.model.entity.mysql.User;
 import com.summit.chat.service.Impl.GlobalValidatorImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

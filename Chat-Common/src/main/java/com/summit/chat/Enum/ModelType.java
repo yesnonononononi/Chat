@@ -3,7 +3,7 @@ package com.summit.chat.Enum;
 import lombok.Getter;
 @Getter
 public enum ModelType {
-    QWEN_PLUS("qwen-plus","千问模型");
+    QWEN_PLUS("qwen3.5-flash","千问模型");
     private final String modelName;
     private final String modelDesc;
     ModelType(String modelName, String modelDesc) {

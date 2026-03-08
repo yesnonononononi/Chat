@@ -1,11 +1,13 @@
 package com.summit.chat.model.vo;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
 
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UserVO implements Serializable {
     private String id;
     private String nickName;
@@ -19,4 +21,5 @@ public class UserVO implements Serializable {
     private String ip;
     private String icon;
     private Integer isDelete;
+    private String createTime;
 }

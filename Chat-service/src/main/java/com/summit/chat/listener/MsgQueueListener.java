@@ -1,71 +1,52 @@
 package com.summit.chat.listener;
 
 import com.summit.chat.Constants.QueueConstants;
-import com.summit.chat.Mapper.MsgMapper;
+import com.summit.chat.Mapper.Mysql.MsgMapper;
 import com.summit.chat.model.vo.PrivateMessageVO;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.ExchangeTypes;
 import org.springframework.amqp.rabbit.annotation.*;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.AmqpHeaders;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
 public class MsgQueueListener {
 
-    private final RabbitTemplate template;
     private final MsgMapper msgMapper;
 
-    // 构造器注入（推荐，无需@Autowired）
-    public MsgQueueListener(RabbitTemplate template, MsgMapper msgMapper) {
-        this.template = template;
+
+    public MsgQueueListener(MsgMapper msgMapper) {
         this.msgMapper = msgMapper;
     }
 
-    /**
-     * 私信消息持久化消费
-     * 优化：1. 引用常量 2. 业务交换机补全durable=true 3. 保留多路由键（msg/msg_notice）
-     */
-    @RabbitListener(bindings = @QueueBinding(
-            exchange = @Exchange(
-                    name = QueueConstants.MSG_PRIVATE_EXCHANGE_NAME,
-                    type = ExchangeTypes.DIRECT,
-                    durable = "true" // 补全持久化，生产环境必备
-            ),
-            value = @Queue(
-                    name = QueueConstants.MSG_PRIVATE_QUEUE_NAME,
-                    durable = "true",
-                    arguments = {
-                            @Argument(name = "x-dead-letter-exchange", value = QueueConstants.MSG_PRIVATE_EXCHANGE_DEAD_LETTER_NAME),
-                            @Argument(name = "x-dead-letter-routing-key", value = QueueConstants.MSG_PRIVATE_QUEUE_DEAD_LETTER_ROUTING_KEY)
-                    }
-            ),
-            key = {QueueConstants.MSG_PRIVATE_QUEUE_ROUTING_KEY, "msg_notice"} // 保留业务多路由键
-    ))
-    public void consumer(PrivateMessageVO msg) {
-        log.info("【用户消息持久化】收到消息:{}，发送者：{}，接收者：{}", msg, msg.getEmitterId(), msg.getReceiveId());
+    // ====================== 私信持久化 32队列消费 ======================
+    @RabbitListener(queues = {
+            "msg_private_queue_0", "msg_private_queue_1", "msg_private_queue_2", "msg_private_queue_3",
+            "msg_private_queue_4", "msg_private_queue_5", "msg_private_queue_6", "msg_private_queue_7",
+            "msg_private_queue_8", "msg_private_queue_9", "msg_private_queue_10", "msg_private_queue_11",
+            "msg_private_queue_12", "msg_private_queue_13", "msg_private_queue_14", "msg_private_queue_15",
+            "msg_private_queue_16", "msg_private_queue_17", "msg_private_queue_18", "msg_private_queue_19",
+            "msg_private_queue_20", "msg_private_queue_21", "msg_private_queue_22", "msg_private_queue_23",
+            "msg_private_queue_24", "msg_private_queue_25", "msg_private_queue_26", "msg_private_queue_27",
+            "msg_private_queue_28", "msg_private_queue_29", "msg_private_queue_30", "msg_private_queue_31"
+    })
+    public void consumer(PrivateMessageVO msg,@Header(AmqpHeaders.CONSUMER_QUEUE) String currentQueueName) {
+        log.info("【用户消息持久化】队列:{} 收到消息，发送者：{}，接收者：{}", currentQueueName, msg.getEmitterId(), msg.getReceiveId());
         try {
             msgMapper.save(msg);
+            log.info("【用户消息持久化】队列:{},消息持久化完成", currentQueueName);
         } catch (Exception e) {
-            log.error("【用户消息持久化】消息:{} 持久化失败,发送者:{},接收者:{}", msg, msg.getEmitterId(), msg.getReceiveId(), e);
-            throw e; // 抛出异常触发重试，重试失败后入死信
+            log.error("【用户消息持久化】消息持久化失败", e);
+            throw e;
         }
-        log.info("【用户消息持久化】消息{}持久化完成", msg);
     }
 
-    /**
-     * 私信消息更新消费
-     * @param msg
-     */
+    // ====================== 消息更新消费 ======================
     @RabbitListener(bindings = @QueueBinding(
-            exchange = @Exchange(
-                    name = QueueConstants.MSG_PRIVATE_EXCHANGE_NAME,
-                    type = ExchangeTypes.DIRECT,
-                    durable = "true"
-            ),
+            exchange = @Exchange(name = QueueConstants.MSG_PRIVATE_EXCHANGE_NAME, durable = "true"),
             value = @Queue(
-                    name = QueueConstants.MSG_PRIVATE_UPDATE_QUEUE_NAME,
-                    durable = "true",
+                    name = QueueConstants.MSG_PRIVATE_UPDATE_QUEUE_NAME, durable = "true",
                     arguments = {
                             @Argument(name = "x-dead-letter-exchange", value = QueueConstants.MSG_PRIVATE_EXCHANGE_DEAD_LETTER_NAME),
                             @Argument(name = "x-dead-letter-routing-key", value = QueueConstants.MSG_PRIVATE_QUEUE_DEAD_LETTER_ROUTING_KEY)
@@ -73,35 +54,24 @@ public class MsgQueueListener {
             ),
             key = QueueConstants.MSG_PRIVATE_QUEUE_UPDATE_ROUTING_KEY
     ))
-    public void consumerOfUpdate(PrivateMessageVO msg){
+    public void consumerOfUpdate(PrivateMessageVO msg) {
+        log.info("【用户消息更新】收到消息，发送者：{}，接收者：{}", msg.getEmitterId(), msg.getReceiveId());
         try {
-            log.info("【用户消息更新】收到消息:{}，发送者：{}，接收者：{}", msg, msg.getEmitterId(), msg.getReceiveId());
             msgMapper.readMsgFromUser(msg.getEmitterId(), msg.getReceiveId());
-            log.info("【用户消息更新】消息{}更新完成", msg);
-        }catch (Exception e) {
-            log.error("【用户消息更新】消息:{} 更新失败,发送者:{},接收者:{}", msg, msg.getEmitterId(), msg.getReceiveId(), e);
-            throw e; // 抛出异常触发重试，重试失败后入死信
+            log.info("【用户消息更新】消息更新完成");
+        } catch (Exception e) {
+            log.error("【用户消息更新】消息更新失败", e);
+            throw e;
         }
     }
 
-    /**
-     * 私信消息死信消费
-     * 优化：1. 引用常量 2. 日志级别改为ERROR（更醒目）
-     */
+    // ====================== 死信消费 ======================
     @RabbitListener(bindings = @QueueBinding(
-            exchange = @Exchange(
-                    name = QueueConstants.MSG_PRIVATE_EXCHANGE_DEAD_LETTER_NAME,
-                    type = ExchangeTypes.DIRECT,
-                    durable = "true"
-            ),
-            value = @Queue(
-                    name = QueueConstants.MSG_PRIVATE_QUEUE_DEAD_LETTER_NAME,
-                    durable = "true"
-            ),
+            exchange = @Exchange(name = QueueConstants.MSG_PRIVATE_EXCHANGE_DEAD_LETTER_NAME, durable = "true"),
+            value = @Queue(name = QueueConstants.MSG_PRIVATE_QUEUE_DEAD_LETTER_NAME, durable = "true"),
             key = QueueConstants.MSG_PRIVATE_QUEUE_DEAD_LETTER_ROUTING_KEY
     ))
     public void msgDlqConsume(PrivateMessageVO msg) {
-        log.error("【用户消息持久化】消息持久化失败，发送者：{}，接收者：{}，已进入死信队列，请及时处理！消息内容：{}",
-                msg.getEmitterId(), msg.getReceiveId(), msg);
+        log.error("【死信】消息持久化失败，发送者：{}，接收者：{}", msg.getEmitterId(), msg.getReceiveId());
     }
 }

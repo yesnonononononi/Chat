@@ -5,7 +5,7 @@ import com.summit.chat.Constants.GroupConstants;
 import com.summit.chat.Dto.GroupChatDto;
 import com.summit.chat.Enum.GroupStatusEnum;
 import com.summit.chat.Utils.GlobalIDWorker;
-import com.summit.chat.model.entity.GroupChat;
+import com.summit.chat.model.entity.mysql.GroupChat;
 import org.springframework.stereotype.Component;
 
 @Component

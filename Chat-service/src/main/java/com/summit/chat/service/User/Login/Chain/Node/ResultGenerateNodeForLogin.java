@@ -2,9 +2,11 @@ package com.summit.chat.service.User.Login.Chain.Node;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.summit.chat.Constants.BaseConstants;
+import com.summit.chat.Dto.UserDTO;
 import com.summit.chat.Exception.ChainConfigException;
+import com.summit.chat.Mapper.Mysql.UserMapper;
 import com.summit.chat.Result.Result;
-import com.summit.chat.model.entity.User;
+import com.summit.chat.model.entity.mysql.User;
 import com.summit.chat.model.vo.TokenVO;
 import com.summit.chat.model.vo.UserVO;
 import com.summit.chat.service.User.Login.Chain.Entity.LoginContext;
@@ -18,7 +20,12 @@ import org.springframework.stereotype.Component;
 @Component("ResultGenerateNodeForLogin")
 @Scope("prototype")
 public class ResultGenerateNodeForLogin implements LoginHandleChain {
+    private final UserMapper userMapper;
     public LoginHandleChain next;
+
+    public ResultGenerateNodeForLogin(UserMapper userMapper) {
+        this.userMapper = userMapper;
+    }
 
 
     /**

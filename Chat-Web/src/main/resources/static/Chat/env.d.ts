@@ -7,7 +7,7 @@ declare module '*.vue' {
   export default component
 }
 
-import type { Message } from 'element-plus';
+import type {Message} from 'element-plus';
 
 declare module 'vue' {
   interface ComponentCustomProperties {

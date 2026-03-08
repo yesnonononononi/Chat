@@ -6,7 +6,6 @@ import com.summit.chat.Enum.ModelType;
 import com.summit.chat.service.Impl.GlobalValidatorImpl;
 import jodd.util.StringUtil;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 @Component
 public class AiValidator extends GlobalValidatorImpl<AiChatDto> {

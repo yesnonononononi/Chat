@@ -35,7 +35,7 @@ import {useRoute} from 'vue-router';
 import {BusinessError} from '../exception/BusinessError';
 import {Log} from '../utils/TipUtil';
 import {MediaApi} from '../api/media';
-import {Room, RoomEvent} from "livekit-client";
+import {Room, RoomEvent, VideoPresets} from "livekit-client";
 import type {MediaApplyDTO} from '../types/media';
 import {MediaWs} from '../utils/Socket/MediaWs';
 import {Ws} from '../utils/Socket/webSocket';
@@ -60,6 +60,9 @@ let media = null;
 const socket = Ws.getInstance();
 const role = route.params.role as string;
 const roomName = route.params.roomName as string;
+
+ 
+
 onMounted(async () => {
     if (!user.userInfo || !user.isLogin || !user.token) router.push('/login');
     await initRoom(roomName);
@@ -134,7 +137,13 @@ async function cancelCall() {
 
 async function initRoom(roomName: string) {
     if (room) return;
-    room = new Room();
+    room = new Room({
+        videoCaptureDefaults:{
+            resolution:VideoPresets.h1080.resolution
+        },
+     
+   
+    });
     try {
         token.value = await getToken(roomName);
         if (!token.value) {
@@ -160,7 +169,7 @@ async function turnCamera() {
         if (!room) return;
         await room.localParticipant.setCameraEnabled(!state.value.openCamera);
         state.value.openCamera = !state.value.openCamera;
-        Log.ok("已关闭摄像头");
+        Log.ok(state.value.openCamera ? "已关闭摄像头" : "已打开摄像头");
     } catch (error) {
         Log.error("关闭摄像头失败");
         console.error(error);
@@ -191,7 +200,7 @@ async function enableCamara() {
 async function muted() {
     if (!room) return;
     state.value.muted = !state.value.muted;
-    room.localParticipant.setMicrophoneEnabled(!state.value.muted);
+    room.localParticipant.setMicrophoneEnabled(state.value.muted);
 }
 
 async function getToken(roomName: string) {
@@ -283,10 +292,6 @@ onUnmounted(() => {
         room.disconnect();
         room = null;
     }
-    MediaWs.removeListenAccept();
-    MediaWs.removeListenReject();
-    MediaWs.removeListenCancel();
-
 
 })
 

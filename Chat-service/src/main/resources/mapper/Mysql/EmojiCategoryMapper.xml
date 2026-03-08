@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.summit.chat.Mapper.Mysql.EmojiCategoryMapper">
+    <insert id="insertCategory">
+        insert into emoji_category(name, sort, create_time, status) VALUES
+                                (#{name}, #{sort}, #{createTime}, #{status})
+    </insert>
+    <update id="updateCategory">
+        update emoji_category
+        <set>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="sort != null">
+                sort = #{sort},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+            <if test="status != null">
+                status = #{status}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+    <select id="queryAllCategory" resultType="com.summit.chat.model.vo.EmojiCategoryVO">
+        select id, name, sort, create_time, status from emoji_category
+        <where>
+            <if test="status != null">
+                 status = #{status}
+            </if>
+        </where>
+        order by sort
+    </select>
+    <select id="queryEmojiByCategoryId" resultType="com.summit.chat.model.vo.EmojiVO">
+        select e.id, e.url, e.content, ec.name, u.nick_name as creatorName, e.create_time, e.status
+        from emoji e
+        left join emoji_category ec
+        on e.category_id = ec.id
+        inner join user u
+        on e.creator_id = u.id
+        <where>
+            <if test="status != null">
+                and e.status = #{status}
+            </if>
+            and e.category_id = #{categoryId} and ec.status = 1
+        </where>
+    </select>
+    <update id="deleteCategory">
+        update  emoji_category set status = 0 where id = #{id}
+    </update>
+</mapper>

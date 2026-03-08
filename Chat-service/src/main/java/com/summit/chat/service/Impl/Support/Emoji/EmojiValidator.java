@@ -2,7 +2,7 @@ package com.summit.chat.service.Impl.Support.Emoji;
 
 import com.summit.chat.Constants.EmojiConstants;
 import com.summit.chat.Dto.EmojiDto;
-import com.summit.chat.Mapper.EmojiCategoryMapper;
+import com.summit.chat.Mapper.Mysql.EmojiCategoryMapper;
 import com.summit.chat.Utils.ImageUtil;
 import com.summit.chat.model.vo.EmojiCategoryVO;
 import com.summit.chat.service.Impl.GlobalValidatorImpl;

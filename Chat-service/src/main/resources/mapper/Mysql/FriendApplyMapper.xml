@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.summit.chat.Mapper.Mysql.FriendApplyMapper">
+
+    <insert id="sendApplication" parameterType="com.summit.chat.Dto.FriendDto">
+        insert into friend_apply (id, applicant_id, recipient_id, apply_reason, status, apply_time)
+        values (#{id}, #{applicantId}, #{recipientId}, #{applyReason}, 0, now())
+    </insert>
+
+    <update id="ackApplication">
+        update friend_apply
+        set status = 1, handle_time = now()
+        where id = #{id}
+    </update>
+
+    <update id="rejectApplication">
+        update friend_apply
+        set status = 2, handle_time = now()
+        where id = #{id}
+    </update>
+
+    <select id="countApplication" parameterType="com.summit.chat.Dto.FriendDto" resultType="java.lang.Integer">
+        select count(*) from friend_apply
+        where applicant_id = #{applicantId}
+        and recipient_id = #{recipientId}
+        and status = 0
+    </select>
+
+    <select id="queryAppById" resultType="com.summit.chat.model.vo.FriendApplyVO">
+        select fa.id, fa.applicant_id as applicantId, fa.recipient_id as recipientId,
+               fa.apply_reason as applyReason, fa.status, fa.apply_time as applyTime,
+               fa.handle_time as handleTime,
+               u.nick_name as applicantNick, u.icon as icon
+        from friend_apply fa
+        left join user u on fa.applicant_id = u.id
+        where fa.id = #{id}
+    </select>
+
+    <select id="queryAppByUserId" resultType="com.summit.chat.model.vo.FriendApplyVO">
+        select fa.id, fa.applicant_id as applicantId, fa.recipient_id as recipientId,
+               fa.apply_reason as applyReason, fa.status, fa.apply_time as applyTime,
+               fa.handle_time as handleTime,
+               u.nick_name as applicantNick, u.icon as icon
+        from friend_apply fa
+        left join user u on fa.applicant_id = u.id
+        where fa.recipient_id = #{userId}
+        order by fa.apply_time desc
+    </select>
+
+</mapper>

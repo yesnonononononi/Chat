@@ -50,6 +50,7 @@
           <!-- 标签组 -->
           <div class="user-tags">
             <el-tag type="info" effect="plain" round size="small">注册于 {{ formatTime(tempUserInfo.createTime) }}</el-tag>
+            <el-tag type="info" effect="plain" round size="small">ip: {{ tempUserInfo.ip || '未知' }}</el-tag>
           </div>
         </div>
       </div>

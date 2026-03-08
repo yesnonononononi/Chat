@@ -1,14 +1,10 @@
 package com.summit.chat.Task;
 
-import cn.hutool.core.date.DateUnit;
-import cn.hutool.core.date.DateUtil;
 import com.summit.chat.Constants.SysNoticeConstants;
-import com.summit.chat.Mapper.SysNoticeMapper;
+import com.summit.chat.Mapper.Mysql.SysNoticeMapper;
 import com.summit.chat.model.vo.SysNoticeVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -25,7 +21,7 @@ public class SysNoticeLikePrepare {
 
 
 
-    @Scheduled(cron = "* */10 0 * * *")
+    @Scheduled(cron = "0 */10 * * * *")
     public void prepare() {
         try {
             log.info("【系统公告】点赞数预处理开始");

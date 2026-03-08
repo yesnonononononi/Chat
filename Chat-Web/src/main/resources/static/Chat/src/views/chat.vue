@@ -171,29 +171,29 @@
   </div>
 </template>
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from "vue";
+import {computed, onMounted, onUnmounted, ref} from "vue";
 import router from "../router";
-import { FriendApi } from "../api/friend";
-import { userStore } from "../store/UserStore";
-import type { friend_info } from "../types/friend";
-import { Ws } from "../utils/Socket/webSocket";
-import { msgStore } from "../store/MessageStore";
-import type { GroupChatDto } from "../types/group";
-import { GroupApi } from "../api/group";
-import { ElMain } from "element-plus";
-import { Log } from "../utils/TipUtil";
-import { BusinessError } from "../exception/BusinessError";
+import {FriendApi} from "../api/friend";
+import {userStore} from "../store/UserStore";
+import type {friend_info} from "../types/friend";
+import {Ws} from "../utils/Socket/webSocket";
+import {msgStore} from "../store/MessageStore";
+import type {GroupChatDto} from "../types/group";
+import {GroupApi} from "../api/group";
+import {ElMain} from "element-plus";
+import {Log} from "../utils/TipUtil";
+import {BusinessError} from "../exception/BusinessError";
 import EmptyState from "../components/EmptyState.vue";
-import { SysNoticeApi } from "../api/sysNotice";
-import type { SysNotice } from "../types/sysNotice";
-import { TimeUtil } from "../utils/time";
-import { UserRoleEnum } from "../enums/UserRoleEnum";
- 
- 
+import {SysNoticeApi} from "../api/sysNotice";
+import type {SysNotice} from "../types/sysNotice";
+import {TimeUtil} from "../utils/time";
+import {UserRoleEnum} from "../enums/UserRoleEnum";
+
+
 const search_User = ref<friend_info[]>([]);
 const user = userStore();
 const msg = msgStore();
-const fold = ref(false);
+const fold = ref(true);
 const selectfriend = ref(true);
 const ws = Ws.getInstance();
 const search_Group = ref<GroupChatDto[]>();

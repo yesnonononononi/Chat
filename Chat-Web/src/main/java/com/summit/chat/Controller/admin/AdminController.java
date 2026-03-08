@@ -5,6 +5,7 @@ import com.summit.chat.Dto.admin.UserPageQueryDTO;
 import com.summit.chat.Enum.UserRoleEnum;
 import com.summit.chat.Result.Result;
 import com.summit.chat.service.admin.AdminService;
+import dev.langchain4j.agent.tool.Tool;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ public class AdminController {
 
     @Operation(summary = "分页获取所有用户")
     @GetMapping("/users")
+    @Tool(name = "分页获取所有用户")
     public Result getAllUsers(
             UserPageQueryDTO userDTO,
             @RequestParam(defaultValue = "1") Integer page,
@@ -33,6 +35,7 @@ public class AdminController {
 
     @Operation(summary = "禁用用户")
     @PostMapping("/black")
+
     public Result blackUser(@RequestBody Map<String, String> requestBody) {
         String userID = requestBody.get("userID");
         adminService.blackUser(userID);
@@ -42,6 +45,7 @@ public class AdminController {
 
     @Operation(summary = "解禁用户")
     @PostMapping("/unblack")
+
     public Result unblackUser(@RequestBody Map<String, String> requestBody) {
         String userID = requestBody.get("userID");
         adminService.unblackUser(userID);

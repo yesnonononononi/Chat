@@ -1,6 +1,6 @@
 import request from "@/utils/axios";
-import { ApiHelper } from "@/utils/ApiHelper";
-import { BusinessError } from "@/exception/BusinessError";
+import {ApiHelper} from "@/utils/ApiHelper";
+import {BusinessError} from "@/exception/BusinessError";
 
 export class AdminApi {
   static async getUsers(params: any): Promise<any> {

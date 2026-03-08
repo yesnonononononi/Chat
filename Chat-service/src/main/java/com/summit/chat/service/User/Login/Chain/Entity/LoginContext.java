@@ -4,7 +4,7 @@ import com.summit.chat.Constants.BaseConstants;
 import com.summit.chat.Dto.NormalLoginRequest;
 import com.summit.chat.Dto.VerifyCodeLoginRequest;
 import com.summit.chat.Exception.ChainConfigException;
-import com.summit.chat.model.entity.User;
+import com.summit.chat.model.entity.mysql.User;
 import com.summit.chat.model.vo.TokenVO;
 import com.summit.chat.model.vo.UserVO;
 import com.summit.chat.service.User.Login.Chain.LoginHandleChain;

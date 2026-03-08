@@ -1,7 +1,6 @@
 import request from "@/utils/axios";
 import {ApiHelper} from "@/utils/ApiHelper";
 import type {SysNoticeDto} from "@/types/sysNotice";
-import { BusinessError } from "@/exception/BusinessError";
 
 /**
  * 系统公告 API

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.summit.chat.Mapper.Mysql.admin.UserActiveMapper">
+    <insert id="batchInsert">
+        insert into user_active( user_id, active, icon, nick_name, update_time) values
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+            #{item.userID},#{item.active},#{item.icon},#{item.nickName},now()
+        </foreach>
+
+    </insert>
+
+    <select id="queryUserActiveByRange" resultType="com.summit.chat.model.vo.UserAllActiveRangeVO">
+        select date(ua.update_time) as date,sum(ua.active) as active
+        from user_active ua
+        inner join user u
+        on ua.user_id = u.id
+        where Date(ua.update_time) in
+        <foreach collection="dateList" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        group by date(ua.update_time)
+        ;
+    </select>
+</mapper>

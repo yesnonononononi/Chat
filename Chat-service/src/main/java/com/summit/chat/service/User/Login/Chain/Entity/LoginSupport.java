@@ -5,7 +5,7 @@ import com.summit.chat.Constants.UserConstants;
 import com.summit.chat.Dto.NormalLoginRequest;
 import com.summit.chat.Dto.VerifyCodeLoginRequest;
 import com.summit.chat.Exception.BusinessException;
-import com.summit.chat.Mapper.Cache.RedisProcessor;
+import com.summit.chat.Mapper.Mysql.Cache.RedisProcessor;
 import com.summit.chat.Result.Result;
 import com.summit.chat.Utils.AliyunUtil;
 import com.summit.chat.service.Impl.Support.User.UserSupport;
@@ -52,6 +52,7 @@ public class LoginSupport implements LoginService {
                         NodeTypeOfLogin.DBVALIDATE,
                         NodeTypeOfLogin.TOKENGENERATE,
                         NodeTypeOfLogin.RESULTGENERATE,
+                        NodeTypeOfLogin.IPADDRESS,
                         NodeTypeOfLogin.CACHESET
                 )).handle(loginContext);
     }
@@ -68,6 +69,7 @@ public class LoginSupport implements LoginService {
                         NodeTypeOfLogin.PWVALIDATE,
                         NodeTypeOfLogin.TOKENGENERATE,
                         NodeTypeOfLogin.RESULTGENERATE,
+                        NodeTypeOfLogin.IPADDRESS,
                         NodeTypeOfLogin.CACHESET
                 )).handle(loginContext);
 

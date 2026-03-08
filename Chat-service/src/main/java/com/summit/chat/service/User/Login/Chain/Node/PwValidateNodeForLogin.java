@@ -7,7 +7,7 @@ import com.summit.chat.Exception.ChainConfigException;
 import com.summit.chat.Result.Result;
 import com.summit.chat.Utils.EncryptUtil;
 import com.summit.chat.Utils.RSAUtil;
-import com.summit.chat.model.entity.User;
+import com.summit.chat.model.entity.mysql.User;
 import com.summit.chat.service.User.Login.Chain.Entity.LoginContext;
 import com.summit.chat.service.User.Login.Chain.LoginHandleChain;
 import org.springframework.beans.factory.annotation.Value;

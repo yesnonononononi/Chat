@@ -7,7 +7,7 @@ import com.summit.chat.Constants.MsgConstants;
 import com.summit.chat.Dto.ChatForPrivatePage;
 import com.summit.chat.Enum.MsgEnum;
 import com.summit.chat.Exception.BusinessException;
-import com.summit.chat.Mapper.MsgMapper;
+import com.summit.chat.Mapper.Mysql.MsgMapper;
 import com.summit.chat.Result.PageResult;
 import com.summit.chat.Result.Result;
 import com.summit.chat.Utils.GlobalIDWorker;

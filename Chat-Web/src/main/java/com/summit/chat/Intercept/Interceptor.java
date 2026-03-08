@@ -2,10 +2,10 @@ package com.summit.chat.Intercept;
 
 import com.summit.chat.Constants.UserConstants;
 import com.summit.chat.Enum.UserRoleEnum;
-import com.summit.chat.Mapper.Cache.RedisProcessor;
-import com.summit.chat.Mapper.UserMapper;
+import com.summit.chat.Mapper.Mysql.Cache.RedisProcessor;
+import com.summit.chat.Mapper.Mysql.UserMapper;
 import com.summit.chat.Utils.UserHolder;
-import com.summit.chat.model.entity.User;
+import com.summit.chat.model.entity.mysql.User;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jodd.util.StringUtil;

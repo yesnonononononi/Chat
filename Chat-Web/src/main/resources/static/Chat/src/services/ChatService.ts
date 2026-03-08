@@ -1,12 +1,12 @@
-import { nextTick, type Ref } from "vue";
-import type { chat, ChatGroup } from "../types/chat";
-import type { ElScrollbar } from "element-plus";
-import { throttle } from "lodash";
-import { Log } from "../utils/TipUtil";
-import { BusinessError } from "../exception/BusinessError";
-import { emojiStore } from "@/store/EmojiStore";
-import { MsgType } from "@/enums/GroupMsgType";
-import { MdUtil } from "@/utils/md";
+import {nextTick, type Ref} from "vue";
+import type {chat, ChatGroup} from "../types/chat";
+import type {ElScrollbar} from "element-plus";
+import {throttle} from "lodash";
+import {Log} from "../utils/TipUtil";
+import {BusinessError} from "../exception/BusinessError";
+import {emojiStore} from "@/store/EmojiStore";
+import {MsgType} from "@/enums/GroupMsgType";
+import {MdUtil} from "@/utils/md";
 
 /**
  * 聊天通用业务逻辑服务类

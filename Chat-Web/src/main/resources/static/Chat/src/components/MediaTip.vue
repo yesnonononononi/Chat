@@ -1,5 +1,5 @@
 <template>
-    <div class="absolute top-0 z-[100000] w-full h-auto min-h-[100px] flex items-center justify-between bg-white shadow-md border-b"
+    <div class="absolute top-0 z-[100000] w-full h-auto min-h-[100px] flex items-center justify-between glass-base shadow-md border-b"
         v-if="isSend">
         <div class=" flex items-center gap-2 p-2">
             <img :src="user?.icon" alt="" class="w-10 h-10 rounded-full object-cover">
@@ -17,76 +17,22 @@
     </div>
 </template>
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, watch } from 'vue';
-import type { MediaApplyDTO } from '../types/media';
-import { MediaWs } from '../utils/Socket/MediaWs';
-import { Ws } from '../utils/Socket/webSocket';
-import { MediaApi } from '../api/media';
+import {computed} from 'vue';
+
+import {MediaApi} from '../api/media';
 import router from '../router';
-import { BusinessError } from '../exception/BusinessError';
-import { Log } from '../utils/TipUtil';
-import { userStore } from '../store/UserStore';
+import {BusinessError} from '../exception/BusinessError';
+import {Log} from '../utils/TipUtil';
+import {userStore} from '../store/UserStore';
+import {mediaStore} from '@/store/MediaStore';
 
-const isSend = ref<boolean>(false);  //是否收到视频聊天
-const isCancel = ref<boolean>(false);
-const user = ref<MediaApplyDTO>()
+const media = mediaStore();
+const isSend =computed(()=>media.isSend); //是否收到视频聊天
+const isCancel = media.isCancel;
+const user = computed(()=>media.user);
 const user_me = userStore();
-let media: MediaWs | null = null;
 
-
-function receiveListen(data: MediaApplyDTO) {
-    isSend.value = true;
-    user.value = data;
-}
-
-function acceptListen(data: any) {
-        isSend.value = false;     
-}
-
-function rejectListen(data: any) {
  
-        isCancel.value = true;
-        setTimeout(() => { isSend.value = false }, 2000)
- 
-
-}
-
-function cancelListen(data: any) {
-   
-        //对方取消视频聊天
-        console.log("对方取消了视频聊天");
-        isCancel.value = true;
-        isSend.value = false;
-        setTimeout(() => { isCancel.value = false }, 2000);
-       
-
-}
-
-function initMediaListeners() {
-    if (media) {
-        MediaWs.stopListen();
-    }
-    const ws = Ws.getInstance();
-    media = new MediaWs(ws);
-    media.init(receiveListen, acceptListen, rejectListen, cancelListen);
-}
-
-onMounted(async () => {
-   if(user_me.isLogin) initMediaListeners();
-});
-
-watch(() => user_me.isLogin, (newVal) => {
-    if (newVal) {
-        setTimeout(() => {
-            initMediaListeners();
-        }, 500);
-    }
-});
-
-onUnmounted(() => {
-    MediaWs.stopListen();
-})
-
 async function accept() {
     if (!user.value?.userId || !user_me.userInfo) return;
     try {
@@ -101,8 +47,8 @@ async function accept() {
                     role: 'receiver'
                 }
             })
-            isSend.value = false;
         }
+        media.closeNotify();
     } catch (error) {
         if (error instanceof BusinessError) {
             Log.error(error.message);
@@ -115,7 +61,7 @@ async function reject() {
     if (!user.value?.userId) return;
     try {
         await MediaApi.reject(user.value.userId);
-        isSend.value = false;
+        media.closeNotify();
     } catch (error) {
         console.error(error);
     }

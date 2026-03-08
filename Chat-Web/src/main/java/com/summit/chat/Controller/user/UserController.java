@@ -8,6 +8,7 @@ import com.summit.chat.Result.Result;
 import com.summit.chat.service.User.Login.LoginService;
 import com.summit.chat.service.User.UserService;
 import com.summit.chat.service.User.register.RegisterService;
+import dev.langchain4j.agent.tool.Tool;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
@@ -76,6 +77,7 @@ public class UserController {
     }
 
     @Operation(summary = "根据昵称获取用户")
+
     @GetMapping("/nickName")
     public Result getUserByNick(String nickName) {
         return userService.getUserByNick(nickName);
@@ -83,6 +85,7 @@ public class UserController {
 
     @Operation(summary = "根据手机号获取用户信息")
     @GetMapping
+    @Tool("根据手机号获取单个用户的详情")
     public Result getUserByPhone(String phoneNumber) {
         return userService.getUserByPhone(phoneNumber);
     }
@@ -130,7 +133,7 @@ public class UserController {
     @Operation(summary = "忘记密码,找回")
     @PostMapping("/forget")
     @ShakeProtect("#dto.id")
-    public Result forget( @RequestBody UserPwPutDto dto) {
+    public Result forget(@RequestBody UserPwPutDto dto) {
         return userService.forgetPw(dto);
     }
 

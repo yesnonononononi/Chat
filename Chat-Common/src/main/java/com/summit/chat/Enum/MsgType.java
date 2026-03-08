@@ -1,7 +1,5 @@
 package com.summit.chat.Enum;
 
-import javax.swing.*;
-
 public enum MsgType {
     //enum('text', 'image', 'file', 'system')
     TEXT("text"),

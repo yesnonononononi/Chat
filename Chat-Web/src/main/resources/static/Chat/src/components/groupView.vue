@@ -83,23 +83,24 @@
     </div>
 </template>
 <script setup lang="ts">
-import { GroupApi } from '../api/group';
-import { type MsgAck } from '../utils/Socket/webSocket';
-import { msgStore } from '../store/MessageStore';
-import { userStore } from '../store/UserStore';
-import { socketStore } from '../store/SocketStore';
-import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
-import { useRoute } from 'vue-router';
-import type { Group, GroupMessageVO } from '../types/group';
-import { Log } from '../utils/TipUtil';
+import {GroupApi} from '../api/group';
+import {type MsgAck} from '../utils/Socket/webSocket';
+import {msgStore} from '../store/MessageStore';
+import {userStore} from '../store/UserStore';
+import {socketStore} from '../store/SocketStore';
+import {computed, nextTick, onMounted, onUnmounted, ref, watch} from 'vue';
+import {useRoute} from 'vue-router';
+import type {Group, GroupMessageVO} from '../types/group';
+import {Log} from '../utils/TipUtil';
 import router from '../router';
-import { ChatService } from '../services/ChatService';
-import type { ChatGroup } from '../types/chat';
-import type { ElScrollbar } from 'element-plus';
-import { MsgType } from '../enums/GroupMsgType';
-import { BusinessError } from '../exception/BusinessError';
-import type { EmojiVO } from '../types/emoji';
+import {ChatService} from '../services/ChatService';
+import type {ChatGroup} from '../types/chat';
+import type {ElScrollbar} from 'element-plus';
+import {MsgType} from '../enums/GroupMsgType';
+import {BusinessError} from '../exception/BusinessError';
+import type {EmojiVO} from '../types/emoji';
 import ChatInput from './ChatInput.vue';
+
 const wrapEl = ref<InstanceType<typeof ElScrollbar>>();
 const user_msg_input = ref("");
 const msg = msgStore();

@@ -7,7 +7,7 @@ import com.summit.chat.Constants.UserConstants;
 import com.summit.chat.Dto.FriendDto;
 import com.summit.chat.Dto.UserLinkDto;
 import com.summit.chat.Exception.BusinessException;
-import com.summit.chat.Mapper.FriendApplyMapper;
+import com.summit.chat.Mapper.Mysql.FriendApplyMapper;
 import com.summit.chat.Result.PageResult;
 import com.summit.chat.Result.Result;
 import com.summit.chat.Utils.GlobalIDWorker;

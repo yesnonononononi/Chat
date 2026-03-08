@@ -3,14 +3,12 @@ import type {Ws} from "./webSocket";
 import {Event} from "@/enums/events";
 
 export class MediaWs {
-  private static instance: Ws;
   private static socket: Socket;
 
   constructor(ws: Ws) {
-    if (!MediaWs.instance || !MediaWs.socket) {
-      MediaWs.instance = ws;
-      const  res =  MediaWs.instance.getSocket();
-
+    if ( !MediaWs.socket) {
+  
+      const  res =  ws.getSocket();
       if(res)MediaWs.socket = res;
     }
   }
@@ -21,6 +19,9 @@ export class MediaWs {
     reject: (data: any) => void,
     cancel: (data: any) => void,
   ) {
+       // 先移除旧监听，避免重复绑定
+    MediaWs.stopListen();
+
     this.initListenSend(send); //监听收到的视频聊天通知
     this.initListenAccept(accept); //监听对方是否接受
     this.initListenReject(reject); //监听对方是否拒绝
@@ -62,9 +63,12 @@ export class MediaWs {
 
 
   public static stopListen() {
-    MediaWs.socket.off(Event.MEDIA_APPLY_ACCEPT);
     MediaWs.socket.off(Event.MEDIA_APPLY_SEND);
+    MediaWs.socket.off(Event.MEDIA_APPLY_ACCEPT);
     MediaWs.socket.off(Event.MEDIA_APPLY_REJECT);
     MediaWs.socket.off(Event.MEDIA_APPLY_CANCEL);
   }
+
+
+
 }

@@ -2,7 +2,7 @@ package com.summit.chat.service.message.PrivateMessageResendCenter;
 
 import com.corundumstudio.socketio.AckRequest;
 import com.corundumstudio.socketio.SocketIOClient;
-import com.summit.chat.model.entity.Msg;
+import com.summit.chat.model.entity.mysql.Msg;
 import lombok.Data;
 
 @Data

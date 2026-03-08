@@ -2,7 +2,7 @@ package com.summit.chat.service.Impl.Support.group.GroupNoticeSupport;
 
 import com.summit.chat.Constants.GroupNoticeConstants;
 import com.summit.chat.Dto.GroupNoticeDTO;
-import com.summit.chat.Mapper.GroupNoticeMapper;
+import com.summit.chat.Mapper.Mysql.GroupNoticeMapper;
 import com.summit.chat.model.vo.GroupNoticeVO;
 import com.summit.chat.service.Impl.Support.group.AbstractGroupValidator;
 import org.springframework.beans.factory.annotation.Autowired;

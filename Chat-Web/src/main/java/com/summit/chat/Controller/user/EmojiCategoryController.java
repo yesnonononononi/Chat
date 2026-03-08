@@ -1,6 +1,5 @@
 package com.summit.chat.Controller.user;
 
-import com.summit.chat.Dto.EmojiCategoryDto;
 import com.summit.chat.Enum.EmojiStatusEnum;
 import com.summit.chat.Result.Result;
 import com.summit.chat.service.emoji.EmojiCategoryService;
@@ -8,8 +7,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "表情包分类管理", description = "表情包分类")
 @RequestMapping("/emoji/category")

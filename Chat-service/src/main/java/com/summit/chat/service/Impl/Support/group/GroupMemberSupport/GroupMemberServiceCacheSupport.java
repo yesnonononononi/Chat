@@ -1,6 +1,6 @@
 package com.summit.chat.service.Impl.Support.group.GroupMemberSupport;
 
-import com.summit.chat.Mapper.GroupMemberMapper;
+import com.summit.chat.Mapper.Mysql.GroupMemberMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;

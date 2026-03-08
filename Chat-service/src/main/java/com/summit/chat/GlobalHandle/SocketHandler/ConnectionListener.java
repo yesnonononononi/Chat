@@ -5,8 +5,7 @@ import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.listener.ConnectListener;
 import com.summit.chat.Constants.ChatConstants;
 import com.summit.chat.Constants.UserConstants;
-import com.summit.chat.Mapper.Cache.RedisProcessor;
-import jakarta.annotation.Resource;
+import com.summit.chat.Mapper.Mysql.Cache.RedisProcessor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -18,8 +17,8 @@ import java.util.Map;
 @Component
 @Slf4j
 public class ConnectionListener implements ConnectListener {
-    @Resource
-    ClientManager clientManager;
+    @Autowired
+    private ClientManager clientManager;
 
     @Autowired
     RedisProcessor redisProcessor;
@@ -81,12 +80,9 @@ public class ConnectionListener implements ConnectListener {
         String userid = redisProcessor.get(t, ChatConstants.USER_INFO);
         if (userid == null) {
             log.warn("【Socket连接】token存在,但是信息为空");
-
             return false;
         }
         try {
-
-
             client.set("USERID", userid);
         } catch (ClassCastException cce) {
             log.error("【Socket连接】拦截器类型转化错误: {}", cce.getMessage());

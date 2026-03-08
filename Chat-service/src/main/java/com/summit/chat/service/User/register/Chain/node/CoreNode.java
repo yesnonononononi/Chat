@@ -1,21 +1,13 @@
 package com.summit.chat.service.User.register.Chain.node;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.RandomUtil;
 import com.summit.chat.Constants.BaseConstants;
-import com.summit.chat.Constants.FileConstants;
 import com.summit.chat.Constants.UserConstants;
-import com.summit.chat.Dto.NormalRegisterLoginRequest;
-import com.summit.chat.Mapper.UserMapper;
+import com.summit.chat.Mapper.Mysql.UserMapper;
 import com.summit.chat.Result.Result;
-import com.summit.chat.Utils.GlobalIDWorker;
-import com.summit.chat.model.entity.User;
+import com.summit.chat.model.entity.mysql.User;
 import com.summit.chat.service.User.register.Chain.Entity.RegisterChainContext;
 import com.summit.chat.service.User.register.Chain.Entity.RegisterHandleChain;
-import io.dogakday.NicknameGenerator;
-import jodd.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
-import net.datafaker.Faker;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Component;
 

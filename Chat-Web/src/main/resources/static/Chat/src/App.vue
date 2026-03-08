@@ -1,6 +1,34 @@
 <script setup lang="ts">
+import {onMounted, onUnmounted, watch} from 'vue';
 import MediaTip from './components/MediaTip.vue';
 import MessageTip from './components/MessageTip.vue';
+import {mediaStore} from './store/MediaStore';
+import {userStore} from './store/UserStore';
+
+const media = mediaStore();
+const user =userStore();
+const initGlobalListen = () => { 
+  if(user){
+    media.initMediaListener();
+  }
+};
+
+watch(()=>user.isLogin,(newVal:any)=>{
+  if(newVal){
+    setTimeout(()=>{
+     media.initMediaListener();
+    },500)
+  }else{
+    media.removeMediaListener();
+  }
+})
+
+onMounted(() => {
+  initGlobalListen();
+});
+onUnmounted(() => {
+  media.removeMediaListener();
+});
 </script>
 
 <template>
@@ -12,6 +40,7 @@ import MessageTip from './components/MessageTip.vue';
   <MediaTip />
   <MessageTip />
 </template>
+
 
 
 <style>

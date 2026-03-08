@@ -4,7 +4,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.summit.chat.Constants.BaseConstants;
 import com.summit.chat.Constants.UserConstants;
 import com.summit.chat.Exception.ChainConfigException;
-import com.summit.chat.Mapper.Cache.CacheSupport;
+import com.summit.chat.Mapper.Mysql.Cache.CacheSupport;
 import com.summit.chat.Result.Result;
 import com.summit.chat.model.vo.TokenVO;
 import com.summit.chat.model.vo.UserVO;

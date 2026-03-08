@@ -12,13 +12,13 @@
 </template>
 
 <script lang="ts" setup>
-import { AiApi } from '@/api/Ai';
-import { BusinessError } from '@/exception/BusinessError';
-import request from '@/utils/axios';
-import { AiWs } from '@/utils/Socket/AiWs';
-import { Ws } from '@/utils/Socket/webSocket';
-import { Log } from '@/utils/TipUtil';
-import { ref } from 'vue';
+import {AiApi} from '@/api/Ai';
+import {BusinessError} from '@/exception/BusinessError';
+import {AiWs} from '@/utils/Socket/AiWs';
+import {Ws} from '@/utils/Socket/webSocket';
+import {Log} from '@/utils/TipUtil';
+import {ref} from 'vue';
+
 const text = ref<string>("");
 const input = ref("");
 async function get() {

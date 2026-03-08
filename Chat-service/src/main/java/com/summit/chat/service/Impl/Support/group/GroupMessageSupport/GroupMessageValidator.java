@@ -4,7 +4,7 @@ import com.summit.chat.Constants.GroupConstants;
 import com.summit.chat.Constants.GroupMessageConstants;
 import com.summit.chat.Dto.GroupMessageDTO;
 import com.summit.chat.Enum.GroupStatusEnum;
-import com.summit.chat.Mapper.GroupMessageMapper;
+import com.summit.chat.Mapper.Mysql.GroupMessageMapper;
 import com.summit.chat.Utils.UserHolder;
 import com.summit.chat.model.vo.GroupMembersVO;
 import com.summit.chat.model.vo.GroupMessageVO;

@@ -8,16 +8,15 @@ import com.summit.chat.Constants.PaginationConstants;
 import com.summit.chat.Dto.CursorPage;
 import com.summit.chat.Dto.EmojiDto;
 import com.summit.chat.Exception.BusinessException;
-import com.summit.chat.Mapper.EmojiMapper;
+import com.summit.chat.Mapper.Mysql.EmojiMapper;
 import com.summit.chat.Result.Result;
 import com.summit.chat.Utils.UserHolder;
-import com.summit.chat.model.entity.Emoji;
+import com.summit.chat.model.entity.mysql.Emoji;
 import com.summit.chat.model.vo.EmojiVO;
 import com.summit.chat.service.Impl.Support.Emoji.EmojiValidator;
 import com.summit.chat.service.emoji.EmojiService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 

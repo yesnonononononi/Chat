@@ -2,12 +2,7 @@ package com.summit.chat.config;
 
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch.connector.ElasticsearchConnectorClient;
-import co.elastic.clients.elasticsearch.transform.ElasticsearchTransformClient;
-import co.elastic.clients.json.JsonpMapper;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
-import co.elastic.clients.transport.ElasticsearchTransport;
-import co.elastic.clients.transport.ElasticsearchTransportConfig;
 import co.elastic.clients.transport.rest5_client.Rest5ClientTransport;
 import co.elastic.clients.transport.rest5_client.low_level.Rest5Client;
 import com.fasterxml.jackson.databind.ObjectMapper;

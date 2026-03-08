@@ -11,11 +11,11 @@ import * as echarts from 'echarts/core';
 import type {BarSeriesOption, LineSeriesOption, PieSeriesOption} from 'echarts/charts';
 import {BarChart, LineChart, PieChart} from 'echarts/charts';
 import type {
-    DatasetComponentOption,
-    GridComponentOption,
-    LegendComponentOption,
-    TitleComponentOption,
-    TooltipComponentOption
+  DatasetComponentOption,
+  GridComponentOption,
+  LegendComponentOption,
+  TitleComponentOption,
+  TooltipComponentOption
 } from 'echarts/components';
 import {
   DatasetComponent,

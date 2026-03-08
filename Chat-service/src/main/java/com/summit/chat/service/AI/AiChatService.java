@@ -2,10 +2,8 @@ package com.summit.chat.service.AI;
 
 import com.summit.chat.Dto.AiChatDto;
 import com.summit.chat.Result.Result;
-import dev.langchain4j.model.chat.response.StreamingChatResponseHandler;
-import io.lettuce.core.output.StreamingChannel;
+
 
 public interface AiChatService  {
-    public Result chat(AiChatDto dto);
-
+    public Result chat( AiChatDto dto);
 }

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.summit.chat.Mapper.Mysql.UserLinkMapper">
+  <select id="getLinkById" resultType="com.summit.chat.model.vo.UserLinkVO">
+      WITH user_contacts AS (
+          -- 获取当前用户的所有联系人（已过滤未删除）
+          SELECT u.icon,
+                 ul.link_user_id   AS linkId,
+                 u.nick_name       AS nickName,
+                 ul.is_frequent,
+                 ul.remark,
+                 ul.is_delete
+          FROM user_link ul
+                   INNER JOIN user u ON ul.link_user_id = u.id
+          WHERE ul.user_id =  #{userID}
+            AND ul.is_delete = 0   -- 0否 1是
+      ),
+           user_msgs AS (
+               -- 所有与当前用户相关的消息（无论发送/接收），并标记对方ID
+               SELECT *,
+                      CASE WHEN emitter_id = #{userID} THEN receive_id ELSE emitter_id END AS other_user_id
+               FROM user_msg
+               WHERE #{userID} IN (emitter_id, receive_id)
+           ),
+           ranked_msgs AS (
+               -- 按对方ID分组，按发送时间倒序编号，取最新的一条
+               SELECT *,
+                      ROW_NUMBER() OVER (PARTITION BY other_user_id ORDER BY send_time DESC) AS rn
+               FROM user_msgs
+           )
+      SELECT
+          rm.content      AS lastMsg,
+          rm.send_time    AS lastMsgTime,
+          uls.icon,
+          uls.linkId,
+          uls.remark,
+          uls.nickName,
+          uls.is_delete,
+          uls.is_frequent
+      FROM user_contacts uls
+               LEFT JOIN ranked_msgs rm ON uls.linkId = rm.other_user_id AND rm.rn = 1
+      ORDER BY rm.send_time DESC;   -- 可按最后消息时间排序，无消息的联系人排在最后
+  </select>
+
+    <insert id="saveLink">
+        insert user_link(link_user_id, user_id, remark,is_frequent) values (#{linkID},#{userID},#{remark},#{isFrequent})
+        ON DUPLICATE KEY UPDATE
+        is_delete = 0,
+        remark = VALUES(remark),
+        is_frequent = VALUES(is_frequent)
+    </insert>
+
+    <select id="linkExist" resultType="java.lang.Integer">
+        select exists(select 1 from user_link where user_id = #{userID} and link_user_id = #{linkID} and is_delete = 0 )
+    </select>
+</mapper>

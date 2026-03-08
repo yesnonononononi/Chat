@@ -1,0 +1,161 @@
+server:
+  port: 8080
+
+spring:
+  elasticsearch:
+    uris: http://localhost:9200
+  application:
+    name: Chat-server
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+      enabled: true
+  datasource:
+    mysql:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      jdbc-url: jdbc:mysql://localhost:3306/chat?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+      username: root
+      password: root
+    clickhouse:
+      driver-class-name: com.clickhouse.jdbc.ClickHouseDriver
+      jdbc-url: jdbc:clickhouse://localhost:8123/default
+      username: default
+      password: root
+      type: com.zaxxer.hikari.HikariDataSource
+  rabbitmq:
+    port: 5672
+    virtual-host:
+    password: guest
+    host: localhost
+    username: guest
+    template:
+      mandatory: true
+      retry:
+        enabled: true
+        initial-interval: 1000
+        max-interval: 10000
+        multiplier: 2
+        max-retries: 3
+    publisher-confirm-type: correlated
+    publisher-returns: true
+    connection-timeout: 1s
+    listener:
+      simple:
+        default-requeue-rejected: false
+  data:
+    aliyun:
+      endpoint: dypnsapi.aliyuncs.com
+      sign-name: 速通互联验证码
+      template-code: 100001
+      template-param: '{"code":"##code##","min":"5"}'
+      code-type: 1
+      valid-time: 120
+      code-length: 6
+      access-key-id: YOUR_API_KEY
+      access-key-secret: YOUR_SECRET
+      bucket-name: summit-chat
+      endpointForOss: oss-cn-beijing.aliyuncs.com
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+      timeout: 5000ms        # 增加超时时间
+      connect-timeout: 5000ms # 连接超时时间
+      lettuce:
+        pool:
+          max-active: 16       # 增加最大活跃连接数
+          max-idle: 16         # 增加最大空闲连接数
+          min-idle: 4          # 增加最小空闲连接数
+          max-wait: 5000ms     # 增加连接池等待时间
+        shutdown-timeout: 100ms # 优雅关闭超时时间
+
+langchain4j:
+  open-ai:
+    chat-model:
+      base-url: https://dashscope.aliyuncs.com/compatible-mode/v1
+      api-key: ${DASHSCOPE_API_KEY}
+      log-requests: true
+      log-responses: true
+    streaming-chat-model:
+      base-url: https://dashscope.aliyuncs.com/compatible-mode/v1
+      api-key: ${DASHSCOPE_API_KEY}
+      log-requests: true
+      log-responses: true
+
+# Agent 相关配置
+agent:
+  milvus:
+    host: localhost
+    port: 19530
+    collection-name: langchain4j_rag_v2
+    dimension: 1024
+  retriever:
+    max-results: 3
+    min-score: 0.7
+  document:
+    path: D:\Code\Chat\docs
+  chat-model:
+    model-name: text-embedding-v3
+    timeout-minutes: 1
+    temperature: 0.0
+  memory:
+    max-messages: 20
+
+socket:
+  io:
+    port: 9090
+
+
+livekit:
+  secret: YOUR_SECRET
+  apiKey: YOUR_API_KEY
+
+
+mybatis:
+  mysql:
+    mapper-locations: classpath*:mapper/*.xml
+    type-aliases-package: com.summit.chat
+    configuration:
+      map-underscore-to-camel-case: true
+  clickhouse:
+    mapper-locations: classpath:mapper/ClickHouse/*.xml
+    type-aliases-package: com.summit.chat.model.entity
+    configuration:
+      map-underscore-to-camel-case: true
+
+# Swagger配置
+springdoc:
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+    version: 2.0
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  group-configs:
+    - group: 'default'
+      paths-to-match: '/**'
+      packages-to-scan: com.summit.chat
+
+logging:
+  level:
+    org.springframework.security: DEBUG  # 打印授权、拦截的详细日志
+    org.springframework.web: INFO
+    org.springdoc: DEBUG  # 启用springdoc日志
+    org.slf4j: DEBUG
+    org.springframework.web.multipart: DEBUG  # 文件上传相关日志
+  appender:
+    clickhouse:
+      name: CLICKHOUSE_LOG
+      class: com.summit.chat.GlobalHandle.Log.ClickHouseLogAppend # 你的Appender全类名
+  root:
+    appender-ref:
+      - ref: CONSOLE # 控制台输出
+      - ref: CLICKHOUSE_LOG
+
+rsa:
+  private-key: "MIIEuwIBADANBgkqhkiG9w0BAQEFAASCBKUwggShAgEAAoIBAQCI3nyTuHdGTe9iQhon4uctH6FmtQJZF0ynq1HFEWfBCjDnrtx43LCSUBHrfYykD+ZQ1RFg0H7Ex4J4eZgkDBQo+R9uCXEZz4DT/5d6xq+xFqcKtIvMINd/2dY4XB2ALGcAuRE7kGddLCa3AnIfOq88FDifylBYuegKSN7qf9kNB4YtWk0nTGd8opAWbx1Wr3rCUhjDFsLC6NoLpyD0m0Dbe1daN2fOO3gFGKfGGvEt8oun5S+CiyBKabLep88RHbox2lMr98bP9lsCWISZrGkK/PQQz2mQQxbiSzHX9hEd9VhodcnwNzC9MZ2qPnByPJ230A18CvfDLFo87ZtyoKZ1AgMBAAECgf8MB4HrecsB4tenSygBWW/4B0+oN0B9lA6oreYB7AWycbLaqgO2m67pLSBmEiLKSJt1f0SHvctmgCJ3dDhq8qTS9RJOGYZXPmWUPGKT5+KJLfSAfF3NExXdpsetLGtrWHu1FI7vLUHobnj4nL5rAD1mimBvqthk8/Hw9XaiJZpuCppY+ExRxB1DIhN99m4Re+1lxptrVLU4kRsC0hdrvNNPUjlAOZPsabeqr6iLVEjdkKFM7RXu49d7QwOB/kzPjWYFMrQ/sWjFI9u+e8WByONv9S8anop/af33fOhAZs+K5kl0Binexs1OXPvsrE0FZQiQ/iionxCrH37ilMZl4TECgYEAu9+xXUeExSyKiJtXezZB5YUcT0qwD/ss3fUrkepKxQdwD7uHIpo8DPJJxKFZ7sJ61lADTf8kWWIOEnii06a4ty9sBHME6/5OpUSG7in5OnMIOsytWhjvyS9Wpc6YfqT7GQbf557DND9trxrr71grBXfk4HsNLmIfAuldCd+BLK0CgYEAuoAH/aYpGXUZ3jwS1PmVdHPJpR4Vm29Gfgvx2+/QhqqNvkRAcQaXaiqpDghzT9lEjw1Jk3hM5NBsv3cBeszJB98y3YybuRsMpf4yHxQJtJm0w/EJp7wah/HCx+O34sCKaODkMypP5MuHvcZsYnLdxjQ98mQ0IRqlEverMRnlkekCgYABdBKQMSxyxgxwUBtWJa5O0z/L0T0Zcoz/TpU+tLxNV+hjBsVd3CmYxAsUDVd/xFtk6wuLf+zNEDghpnNEBecp66D/S9B+7uG235fXodV+wUMQCWNR7h10xfv6nmWJnUcgA3CZ/x1tewwjLacjm+ABU9MedXU9pZ6tzBZfLC54pQKBgQCE+k84S6bYcQedzwW6d69aFkk8A4RyjNgdfdTY9lif/LIObUnpjUKfP4XE7L+Tup5Ixbelf8yMBhTUPD2A2s2oYDw7fkt2o9PT87i3MiltbX9XiuFQiS39qqMwtazi8FiASYJM/Sl0QK8r4HRdifuZnJxi3ZHR3NbA/HlDDG0FKQKBgHL/GIxLUAWYo88tU315vd0kjnhsHZeRuH1v6R9IbYGqBg+h2lYFL9oKH895nvERp6Jf8+PRJ8eQhHvs7WRefNxHftXJfEzUHZG7luDsHGA/1XTjHlc5jJM24EzdnARXMPjk08F41+lAh+mnwKlU3Ia3uDyVy12bF5JQIrIbpY77"
+  public-key: "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAiN58k7h3Rk3vYkIaJ+LnLR+hZrUCWRdMp6tRxRFnwQow567ceNywklAR632MpA/mUNURYNB+xMeCeHmYJAwUKPkfbglxGc+A0/+XesavsRanCrSLzCDXf9nWOFwdgCxnALkRO5BnXSwmtwJyHzqvPBQ4n8pQWLnoCkje6n/ZDQeGLVpNJ0xnfKKQFm8dVq96wlIYwxbCwujaC6cg9JtA23tXWjdnzjt4BRinxhrxLfKLp+UvgosgSmmy3qfPER26MdpTK/fGz/ZbAliEmaxpCvz0EM9pkEMW4ksx1/YRHfVYaHXJ8DcwvTGdqj5wcjydt9ANfAr3wyxaPO2bcqCmdQIDAQAB"

@@ -35,6 +35,11 @@
       还没有账号？<router-link to="/register" class="link">立即注册</router-link>
     </div>
   </AuthLayout>
+  <div class="w-full absolute bottom-[20px] text-center">
+    <a href="https://beian.miit.gov.cn/" target="_blank" class="font-bold text-indigo-300 hover:underline">
+        湘ICP备2026006047号
+    </a>
+</div>
 </template>
 
 <script lang="ts" setup>

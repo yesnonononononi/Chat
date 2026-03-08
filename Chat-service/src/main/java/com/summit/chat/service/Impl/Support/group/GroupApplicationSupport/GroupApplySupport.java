@@ -2,9 +2,9 @@ package com.summit.chat.service.Impl.Support.group.GroupApplicationSupport;
 
 import com.summit.chat.Enum.GroupRole;
 import com.summit.chat.Enum.GroupStatusEnum;
-import com.summit.chat.Mapper.GroupMemberMapper;
-import com.summit.chat.model.entity.GroupApplications;
-import com.summit.chat.model.entity.GroupMembers;
+import com.summit.chat.Mapper.Mysql.GroupMemberMapper;
+import com.summit.chat.model.entity.mysql.GroupApplications;
+import com.summit.chat.model.entity.mysql.GroupMembers;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

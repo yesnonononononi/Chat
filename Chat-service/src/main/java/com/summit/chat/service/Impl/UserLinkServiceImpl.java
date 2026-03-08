@@ -1,10 +1,9 @@
 package com.summit.chat.service.Impl;
 
 import com.summit.chat.Constants.BaseConstants;
-import com.summit.chat.Constants.UserLinkConstants;
 import com.summit.chat.Dto.UserLinkDto;
 import com.summit.chat.Exception.BusinessException;
-import com.summit.chat.Mapper.UserLinkMapper;
+import com.summit.chat.Mapper.Mysql.UserLinkMapper;
 import com.summit.chat.Result.Result;
 import com.summit.chat.Utils.UserHolder;
 import com.summit.chat.model.vo.UserLinkVO;

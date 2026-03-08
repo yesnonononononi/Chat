@@ -1,7 +1,7 @@
 package com.summit.chat.model.vo;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.summit.chat.model.entity.Msg;
+import com.summit.chat.model.entity.mysql.Msg;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,4 +26,5 @@ public class PrivateMessageVO extends Msg {
     private Timestamp sendTime;
     private Integer status; //0 已发送 1已撤回 2未发送
     private String type;
+    private Long sessionSeq;
 }

@@ -96,6 +96,11 @@ const routes: RouteRecordRaw[] = [
         component: () => import("../components/System_admin.vue"),
       },
       {
+        path:"system-log-admin",
+        name: "system-log-admin",
+        component: () => import("../components/LogManagement.vue"),
+      },
+      {
         path:"emoji-admin",
         name: "emoji-admin",
         component: () => import("../components/Emoji_admin.vue"),

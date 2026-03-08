@@ -1,7 +1,7 @@
 package com.summit.chat.Utils;
 
 import net.coobird.thumbnailator.Thumbnails;
-import net.coobird.thumbnailator.geometry.Positions;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 

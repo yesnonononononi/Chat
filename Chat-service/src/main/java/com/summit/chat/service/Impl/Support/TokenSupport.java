@@ -2,7 +2,7 @@ package com.summit.chat.service.Impl.Support;
 
 import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.StrUtil;
-import com.summit.chat.Mapper.Cache.CacheSupport;
+import com.summit.chat.Mapper.Mysql.Cache.CacheSupport;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.TimeUnit;

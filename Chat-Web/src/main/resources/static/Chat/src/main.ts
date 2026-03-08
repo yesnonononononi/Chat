@@ -8,7 +8,7 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import {createPinia} from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import {userStore} from './store/UserStore'
- 
+
 import '@fortawesome/fontawesome-free/css/all.min.css'
 //Element-plus全局组件svg
 const app = createApp(App);

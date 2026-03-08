@@ -2,7 +2,7 @@ package com.summit.chat.service.Impl.Support.User;
 
 import com.summit.chat.Constants.UserConstants;
 import com.summit.chat.Dto.UserPwPutDto;
-import com.summit.chat.Mapper.UserMapper;
+import com.summit.chat.Mapper.Mysql.UserMapper;
 import com.summit.chat.Result.Result;
 import com.summit.chat.Utils.EncryptUtil;
 import org.springframework.stereotype.Component;

@@ -140,9 +140,9 @@ export const msgStore = defineStore("msg", {
         !msgData.privateMsgList.some(existingMsg => existingMsg.msgId === newMsg.msgId)
       );
       msgData.privateMsgList.unshift(...newMsgs);
-      // 批量添加通常是加载历史记录，lastMsg应该是列表末尾的最新消息，或者是已有lastMsg
-      // 这里不做修改，因为如果是历史消息，lastMsg应该保持为最新的那个（即原来的lastMsg）
-      // 如果是首次加载，lastMsg应该是列表最后一个
+      // 批量添加通常是加载历史记录，lastMsg 应该是列表末尾的最新消息，或者是已有 lastMsg
+      // 这里不做修改，因为如果是历史消息，lastMsg 应该保持为最新的那个（即原来的 lastMsg）
+      // 如果是首次加载，lastMsg 应该是列表最后一个
       if (!msgData.lastMsg && msgData.privateMsgList.length > 0) {
           msgData.lastMsg = msgData.privateMsgList[msgData.privateMsgList.length - 1];
       }
